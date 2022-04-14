@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/shapeableImageView"
+                android:id="@+id/avatar_post"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginHorizontal="@dimen/horizontal_small_margin"
@@ -41,8 +41,8 @@
                 android:layout_height="0dp"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/imageButton"
-                app:layout_constraintStart_toEndOf="@+id/shapeableImageView"
+                app:layout_constraintEnd_toStartOf="@+id/menu"
+                app:layout_constraintStart_toEndOf="@+id/avatar_post"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -59,7 +59,7 @@
             </LinearLayout>
 
             <ImageView
-                android:id="@+id/imageButton"
+                android:id="@+id/menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
