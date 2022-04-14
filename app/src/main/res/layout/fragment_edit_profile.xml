@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/vertical_margin"
         app:backgroundTint="@color/white"
-        app:elevation="3dp"
+        app:elevation="2dp"
         android:scaleType="centerCrop"
         android:background="@drawable/ripple_effect"
         app:layout_anchor="@id/appBarLayout"

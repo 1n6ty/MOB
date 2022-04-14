@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.nav_content_frame, mainFragment);
         transaction.commit();
+
+
     }
 
 //    @Override

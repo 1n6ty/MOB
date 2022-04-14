@@ -41,7 +41,6 @@ public class EditProfileFragment extends Fragment
     {
         toolbar = binding.toolbar;
         toolbar.setTitle("Fullname");
-        toolbar.setSubtitle("Fullname");
         toolbar.setNavigationOnClickListener(v ->
         {
             requireActivity().onBackPressed();

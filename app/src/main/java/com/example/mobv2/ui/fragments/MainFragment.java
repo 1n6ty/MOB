@@ -82,7 +82,7 @@ public class MainFragment extends Fragment
     private void initToolbar()
     {
         toolbar = binding.toolbar;
-        toolbar.setTitle(R.string.menu_notification_and_sound);
+        toolbar.setTitle(R.string.app_name);
         toolbar.setNavigationOnClickListener(v -> {
             navDrawer.open();
         });
