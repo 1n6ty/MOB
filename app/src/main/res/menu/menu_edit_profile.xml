@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@drawable/ic_show_more"
+        android:title=""
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:icon="@drawable/ic_add_photo"
+                android:title="@string/menu_set_new_photo" />
+            <item
+                android:icon="@drawable/ic_save_photo"
+                android:title="@string/menu_save_to_gallery"
+                app:showAsAction="never" />
+            <item
+                android:icon="@drawable/ic_delete_photo"
+                android:title="@string/menu_delete_photo" />
+            <item
+                android:icon="@drawable/ic_logout"
+                android:title="@string/menu_log_out" />
+        </menu>
+    </item>
+</menu>
