@@ -1,5 +1,8 @@
 package com.example.mobv2.ui.fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,17 +12,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.adapters.PostAdapter;
 import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class MainFragment extends Fragment
 {
@@ -28,25 +34,25 @@ public class MainFragment extends Fragment
 
     private Toolbar toolbar;
     private NavDrawer navDrawer;
+    private BottomSheetBehavior sheetBehavior;
+
 
     private OnMapReadyCallback callback = new OnMapReadyCallback()
     {
-
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
         @Override
         public void onMapReady(GoogleMap googleMap)
         {
             LatLng sydney = new LatLng(-34, 151);
             googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            googleMap.setOnMarkerClickListener(
+                    marker ->
+                    {
+                        sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+                        binding.toolbarPosts.setTitle(marker.getTitle());
+
+                        return true;
+                    });
+//            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         }
     };
 
@@ -65,8 +71,26 @@ public class MainFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         navDrawer = new NavDrawer((MainActivity) requireActivity());
-        initMap();
+
         initToolbar();
+        initMap();
+        initBottomSheet();
+        initRecycler();
+    }
+
+    private void initToolbar()
+    {
+        // a half-measure
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sample_avatar);
+        Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 72, 72, false);
+
+        toolbar = binding.toolbar;
+        toolbar.setTitle(R.string.app_name);
+        toolbar.setNavigationIcon(new BitmapDrawable(getResources(), bitmapScaled));
+        toolbar.setNavigationOnClickListener(v ->
+        {
+            navDrawer.open();
+        });
     }
 
     private void initMap()
@@ -79,12 +103,17 @@ public class MainFragment extends Fragment
         }
     }
 
-    private void initToolbar()
+    private void initBottomSheet()
     {
-        toolbar = binding.toolbar;
-        toolbar.setTitle(R.string.app_name);
-        toolbar.setNavigationOnClickListener(v -> {
-            navDrawer.open();
-        });
+        sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+    }
+
+    private void initRecycler()
+    {
+        RecyclerView postsRecyclerView = binding.recyclerPosts;
+
+        postsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        postsRecyclerView.setAdapter(new PostAdapter(10));
     }
 }

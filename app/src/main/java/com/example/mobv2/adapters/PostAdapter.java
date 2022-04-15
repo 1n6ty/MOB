@@ -16,6 +16,12 @@ import com.google.android.material.imageview.ShapeableImageView;
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder>
 {
 
+    private int count;
+
+    public PostAdapter(int count)
+    {
+        this.count = count;
+    }
 
     @NonNull
     @Override
@@ -35,7 +41,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     @Override
     public int getItemCount()
     {
-        return 0;
+        return count;
     }
 
     protected class PostViewHolder extends RecyclerView.ViewHolder

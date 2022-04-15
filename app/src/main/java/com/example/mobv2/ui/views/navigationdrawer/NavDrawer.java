@@ -182,13 +182,14 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         drawerLayout.openDrawer(navigationView);
     }
 
+    public boolean isClosed()
+    {
+        return !drawerLayout.isDrawerOpen(navigationHeader);
+    }
+
     public void close()
     {
         drawerLayout.closeDrawer(navigationView);
     }
 
-    private void lock(int mode)
-    {
-        drawerLayout.setDrawerLockMode(mode);
-    }
 }
