@@ -1,9 +1,13 @@
 package com.example.mobv2.ui.fragments;
 
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +23,15 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.PostAdapter;
 import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import java.util.Date;
 
 public class MainFragment extends Fragment
 {
@@ -35,26 +41,10 @@ public class MainFragment extends Fragment
     private Toolbar toolbar;
     private NavDrawer navDrawer;
     private BottomSheetBehavior sheetBehavior;
-
-
-    private OnMapReadyCallback callback = new OnMapReadyCallback()
-    {
-        @Override
-        public void onMapReady(GoogleMap googleMap)
-        {
-            LatLng sydney = new LatLng(-34, 151);
-            googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            googleMap.setOnMarkerClickListener(
-                    marker ->
-                    {
-                        sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-                        binding.toolbarPosts.setTitle(marker.getTitle());
-
-                        return true;
-                    });
-//            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        }
-    };
+    private Toolbar postsToolbar;
+    private RecyclerView postsRecycler;
+    private AppBarLayout postsAppBar;
+    private View dragger;
 
     @Nullable
     @Override
@@ -70,7 +60,6 @@ public class MainFragment extends Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        navDrawer = new NavDrawer((MainActivity) requireActivity());
 
         initToolbar();
         initMap();
@@ -80,12 +69,14 @@ public class MainFragment extends Fragment
 
     private void initToolbar()
     {
+        dragger = binding.dragger;
+        toolbar = binding.toolbar;
+        navDrawer = new NavDrawer((MainActivity) requireActivity());
+
         // a half-measure
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sample_avatar);
         Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 72, 72, false);
 
-        toolbar = binding.toolbar;
-        toolbar.setTitle(R.string.app_name);
         toolbar.setNavigationIcon(new BitmapDrawable(getResources(), bitmapScaled));
         toolbar.setNavigationOnClickListener(v ->
         {
@@ -99,21 +90,63 @@ public class MainFragment extends Fragment
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null)
         {
-            mapFragment.getMapAsync(callback);
+            mapFragment.getMapAsync(
+                    googleMap ->
+                    {
+                        LatLng sydney = new LatLng(-34, 151);
+                        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                        googleMap.setOnMarkerClickListener(
+                                marker ->
+                                {
+                                    sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+                                    postsToolbar.setTitle(marker.getTitle());
+
+                                    return true;
+                                });
+//            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                    });
         }
     }
 
     private void initBottomSheet()
     {
+        postsAppBar = binding.postsAppBar;
+        postsToolbar = binding.postsToolbar;
+
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+
+        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(postsAppBar, dragger));
+
+
+        int actionBarHeight;
+        int[] abSzAttr;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            abSzAttr = new int[] { android.R.attr.actionBarSize };
+        } else {
+            abSzAttr = new int[] { androidx.constraintlayout.widget.R.attr.actionBarSize };
+        }
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(abSzAttr);
+        actionBarHeight = a.getDimensionPixelSize(0, -1);
+
+        sheetBehavior.setPeekHeight(actionBarHeight);
+        sheetBehavior.setHalfExpandedRatio(0.6f);
+
+        postsToolbar.setNavigationOnClickListener(v ->
+        {
+            if (sheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN)
+            {
+                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
     }
 
     private void initRecycler()
     {
-        RecyclerView postsRecyclerView = binding.recyclerPosts;
+        postsRecycler = binding.postsRecycler;
 
-        postsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        postsRecyclerView.setAdapter(new PostAdapter(10));
+        postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        postsRecycler.setAdapter(new PostAdapter(10));
     }
 }
