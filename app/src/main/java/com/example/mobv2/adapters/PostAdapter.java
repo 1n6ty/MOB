@@ -7,20 +7,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ItemPostBinding;
+import com.example.mobv2.models.Post;
 import com.google.android.material.imageview.ShapeableImageView;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder>
 {
+    private List<Post> posts;
 
-    private int count;
-
-    public PostAdapter(int count)
+    public PostAdapter(List<Post> posts)
     {
-        this.count = count;
+        this.posts = posts;
     }
 
     @NonNull
@@ -28,20 +32,35 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
         View postItem =
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
+                LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(R.layout.item_post, parent, false);
         return new PostViewHolder(postItem);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position)
     {
+        Post post = posts.get(position);
+
+        if (post.getAvatar() != null) holder.avatar.setImageBitmap(post.getAvatar());
+        holder.fullname.setText(post.getUser().toString());
+        holder.date.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
+
+        holder.menu.setOnClickListener(
+                v ->
+                {
+// inflate menu
+                });
+//        holder.reactions.setLayoutManager(new LinearLayoutManager(c));
+        holder.reactions.setAdapter(new ReactionAdapter(post.getReactions()));
 
     }
 
     @Override
     public int getItemCount()
     {
-        return count;
+        return posts.size();
     }
 
     protected class PostViewHolder extends RecyclerView.ViewHolder
@@ -55,6 +74,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         public PostViewHolder(@NonNull View itemView)
         {
             super(itemView);
+
             ItemPostBinding binding = ItemPostBinding.bind(itemView);
             avatar = binding.avatarPost;
             fullname = binding.fullnameField;

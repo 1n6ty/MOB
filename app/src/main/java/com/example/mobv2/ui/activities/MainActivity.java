@@ -1,18 +1,18 @@
 package com.example.mobv2.ui.activities;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
+import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.MainFragment;
-import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
 
         mainFragment = new MainFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.nav_content_frame, mainFragment);
+        transaction.replace(R.id.nav_content_frame, new AuthFragment());
         transaction.commit();
 
 
@@ -60,7 +60,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-//        if (navDrawer.isOpen())
+        if (getFragmentAtFrame() instanceof MainFragment)
+        {
+            super.onBackPressed();
+            return;
+        }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.nav_content_frame, mainFragment).commit();

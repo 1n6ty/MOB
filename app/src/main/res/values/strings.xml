@@ -37,4 +37,9 @@
     <!--  item reactions  -->
     <string name="item_reaction_count">200</string>
     <string name="item_reaction_this">👍</string>
+
+    <!--  auth fragment  -->
+    <string name="auth_desc">You do not need to enter your phone number. It happens automatically.</string>
+    <string name="auth_hint">Enter your password</string>
+    <string name="auth_button">Next -&gt;</string>
 </resources>

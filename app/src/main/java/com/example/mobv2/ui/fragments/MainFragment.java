@@ -1,13 +1,9 @@
 package com.example.mobv2.ui.fragments;
 
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,17 +17,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.PostAdapter;
+import com.example.mobv2.databaseimprovisation.Database;
 import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
+import com.example.mobv2.utils.BitmapConverter;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import java.util.Date;
 
 public class MainFragment extends Fragment
 {
@@ -64,7 +61,7 @@ public class MainFragment extends Fragment
         initToolbar();
         initMap();
         initBottomSheet();
-        initRecycler();
+        initPostsRecycler();
     }
 
     private void initToolbar()
@@ -84,6 +81,7 @@ public class MainFragment extends Fragment
         });
     }
 
+
     private void initMap()
     {
         SupportMapFragment mapFragment =
@@ -93,8 +91,31 @@ public class MainFragment extends Fragment
             mapFragment.getMapAsync(
                     googleMap ->
                     {
-                        LatLng sydney = new LatLng(-34, 151);
-                        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                        BitmapDescriptor descriptor =
+                                BitmapConverter.drawableToBitmapDescriptor(getContext(), R.drawable.ic_marker);
+
+
+                        MarkerOptions[] markerOptions =
+                                new MarkerOptions[]{
+                                        new MarkerOptions()
+                                                .position(new LatLng(-34, 151))
+                                                .title("Sydney")
+                                                .icon(descriptor),
+                                        new MarkerOptions()
+                                                .position(new LatLng(55, 37))
+                                                .title("Moscow")
+                                                .icon(descriptor)};
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+//                        {
+//                            googleMap.addCircle(new CircleOptions().center(sydney).radius(100000)
+//                                    .strokeColor(requireActivity().getColor(R.color.blue_500)));
+//                        }
+
+                        for (MarkerOptions option : markerOptions)
+                        {
+                            googleMap.addMarker(option);
+                        }
+
                         googleMap.setOnMarkerClickListener(
                                 marker ->
                                 {
@@ -115,20 +136,21 @@ public class MainFragment extends Fragment
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
+
+        sheetBehavior.addBottomSheetCallback(
+                new PostsSheetCallback(
+                        sheetBehavior,
+                        postsAppBar,
+                        postsToolbar,
+                        dragger
+                ));
 
 
-        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(postsAppBar, dragger));
-
-
-        int actionBarHeight;
-        int[] abSzAttr;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            abSzAttr = new int[] { android.R.attr.actionBarSize };
-        } else {
-            abSzAttr = new int[] { androidx.constraintlayout.widget.R.attr.actionBarSize };
-        }
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(abSzAttr);
-        actionBarHeight = a.getDimensionPixelSize(0, -1);
+        int actionBarHeight = getContext()
+                .getTheme()
+                .obtainStyledAttributes(new int[]{android.R.attr.actionBarSize})
+                .getDimensionPixelSize(0, -1);
 
         sheetBehavior.setPeekHeight(actionBarHeight);
         sheetBehavior.setHalfExpandedRatio(0.6f);
@@ -142,11 +164,11 @@ public class MainFragment extends Fragment
         });
     }
 
-    private void initRecycler()
+    private void initPostsRecycler()
     {
         postsRecycler = binding.postsRecycler;
 
         postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        postsRecycler.setAdapter(new PostAdapter(10));
+        postsRecycler.setAdapter(new PostAdapter(Database.postsDb));
     }
 }
