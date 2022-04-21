@@ -4,14 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,22 +16,18 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.PostAdapter;
 import com.example.mobv2.databaseimprovisation.Database;
 import com.example.mobv2.databinding.FragmentMainBinding;
-import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
+import com.example.mobv2.utils.AddMarker;
 import com.example.mobv2.utils.BitmapConverter;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-public class MainFragment extends Fragment
+public class MainFragment extends BaseFragment<FragmentMainBinding>
 {
-
-    private FragmentMainBinding binding;
-
     private Toolbar toolbar;
     private NavDrawer navDrawer;
     private BottomSheetBehavior sheetBehavior;
@@ -43,18 +36,14 @@ public class MainFragment extends Fragment
     private AppBarLayout postsAppBar;
     private View dragger;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState)
+    public MainFragment()
     {
-        binding = FragmentMainBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        super(R.layout.fragment_main);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
 
@@ -68,7 +57,7 @@ public class MainFragment extends Fragment
     {
         dragger = binding.dragger;
         toolbar = binding.toolbar;
-        navDrawer = new NavDrawer((MainActivity) requireActivity());
+        navDrawer = new NavDrawer(mainActivity);
 
         // a half-measure
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sample_avatar);
@@ -97,14 +86,10 @@ public class MainFragment extends Fragment
 
                         MarkerOptions[] markerOptions =
                                 new MarkerOptions[]{
-                                        new MarkerOptions()
-                                                .position(new LatLng(-34, 151))
-                                                .title("Sydney")
-                                                .icon(descriptor),
-                                        new MarkerOptions()
-                                                .position(new LatLng(55, 37))
-                                                .title("Moscow")
-                                                .icon(descriptor)};
+                                        new AddMarker(-34, 151, "Sydney", descriptor).create(),
+                                        new AddMarker(55, 37, "Moscow", descriptor).create(),
+                                        new AddMarker(51.5406, 46.0086, "Saratov", descriptor).create()
+                                };
 //                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
 //                        {
 //                            googleMap.addCircle(new CircleOptions().center(sydney).radius(100000)

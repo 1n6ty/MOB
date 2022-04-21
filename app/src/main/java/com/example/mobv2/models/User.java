@@ -8,7 +8,9 @@ public class User
     private String surname;
     private String number;
 
-    public User(String name, String surname, String number)
+    public User(String name,
+                String surname,
+                String number)
     {
         this.name = name;
         this.surname = surname;

@@ -10,4 +10,7 @@
     <color name="gray_500">#7E7E7E</color>
     <color name="gray_700">#494949</color>
     <color name="black">#FF000000</color>
+
+    <!--  alpha colors  -->
+    <color name="blue_100_alpha">#0DBDD7FB</color>
 </resources>

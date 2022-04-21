@@ -7,7 +7,8 @@ public class MenuItemMetadatum
     public int itemType;
     public OnClickListener listener;
 
-    public MenuItemMetadatum(int itemType, OnClickListener listener)
+    public MenuItemMetadatum(int itemType,
+                             OnClickListener listener)
     {
         this.itemType = itemType;
         this.listener = listener;

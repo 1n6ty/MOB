@@ -1,15 +1,15 @@
 package com.example.mobv2.ui.activities;
 
-import android.app.Application;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.MainFragment;
@@ -19,32 +19,38 @@ public class MainActivity extends AppCompatActivity
     private ActivityMainBinding binding;
 
     private MainFragment mainFragment;
+    private FrameLayout navContentFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
+
+//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
-        setContentView(R.layout.activity_main);
+        binding.constraintLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
-        mainFragment = new MainFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.nav_content_frame, new AuthFragment());
-        transaction.commit();
+        setContentView(binding.getRoot());
 
-
+        initNavContentFrame();
+        initMainFragment();
     }
 
-//    @Override
-//    protected void onResume()
-//    {
-//        super.onResume();
-//
-//        navDrawer.initNavigationDrawer();
-////        navDrawer.
-//    }
+    private void initMainFragment()
+    {
+        mainFragment = new MainFragment();
+        transactionToFragment(new AuthFragment());
+    }
+
+    private void initNavContentFrame()
+    {
+        navContentFrame = binding.navContentFrame;
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item)
@@ -57,6 +63,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void transactionToFragment(Fragment fragment)
+    {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(navContentFrame.getId(), fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
     @Override
     public void onBackPressed()
     {
@@ -66,20 +80,16 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.nav_content_frame, mainFragment).commit();
-
+        transactionToFragment(mainFragment);
     }
 
     public Fragment getFragmentAtFrame()
     {
-        return getSupportFragmentManager().findFragmentById(R.id.nav_content_frame);
+        return getSupportFragmentManager().findFragmentById(navContentFrame.getId());
     }
 
     public MainFragment getMainFragment()
     {
-        if (mainFragment != null)
-            return mainFragment;
-        return null;
+        return mainFragment;
     }
 }

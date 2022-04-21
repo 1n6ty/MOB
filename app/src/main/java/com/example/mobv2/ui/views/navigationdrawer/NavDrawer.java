@@ -33,7 +33,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     private MainFragment mainFragment;
 
     private DrawerLayout drawerLayout;
-    private NavDrawerView navigationView;
+    private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
     private View navigationHeader;
     private ImageView avatarView;
@@ -46,7 +46,8 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         this.mainActivity = mainActivity;
 
         drawerLayout = mainActivity.findViewById(R.id.drawer_layout);
-        navigationHeader = mainActivity.getLayoutInflater().inflate(R.layout.nav_header_main, null);
+        navigationHeader = mainActivity.getLayoutInflater()
+                                       .inflate(R.layout.nav_header_main, null);
         navigationView = mainActivity.findViewById(R.id.navigation_view);
         avatarView = navigationHeader.findViewById(R.id.avatar);
         fullNameView = navigationHeader.findViewById(R.id.fullname);
@@ -72,7 +73,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            transactionToFragment(new EditProfileFragment());
+                            mainActivity.transactionToFragment(new EditProfileFragment());
                         }),
                 R.drawable.ic_menu_profile
         );
@@ -88,7 +89,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            transactionToFragment(new NotificationAndSoundFragment());
+                            mainActivity.transactionToFragment(new NotificationAndSoundFragment());
                         }),
                 R.drawable.ic_menu_notification
         );
@@ -100,7 +101,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            transactionToFragment(new MapFeaturesFragment());
+                            mainActivity.transactionToFragment(new MapFeaturesFragment());
                         }),
                 R.drawable.ic_menu_map
         );
@@ -112,7 +113,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            transactionToFragment(new LanguageFragment());
+                            mainActivity.transactionToFragment(new LanguageFragment());
                         }),
                 R.drawable.ic_menu_international
         );
@@ -138,13 +139,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         return true;
     }
 
-    private void transactionToFragment(Fragment fragment)
-    {
-        FragmentTransaction transaction =
-                mainActivity.getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.nav_content_frame, fragment);
-        transaction.commit();
-    }
+
 
     private void addNavigationMenuItem(Menu menu,
                                        int groupId,
@@ -163,7 +158,8 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                                        MenuItemMetadatum menuItemMetadatum,
                                        @DrawableRes int icon)
     {
-        MenuItem menuItem = menu.add(groupId, order, order, title).setIcon(icon);
+        MenuItem menuItem = menu.add(groupId, order, order, title)
+                                .setIcon(icon);
 
         NavDrawerViewModel viewModel =
                 new ViewModelProvider(mainActivity).get(NavDrawerViewModel.class);
@@ -191,5 +187,4 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     {
         drawerLayout.closeDrawer(navigationView);
     }
-
 }

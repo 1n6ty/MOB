@@ -31,22 +31,25 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
 
     @NonNull
     @Override
-    public ReactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    public ReactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                 int viewType)
     {
-        View reactionItem =
-                LayoutInflater
-                        .from(parent.getContext())
-                        .inflate(R.layout.item_reaction, parent, false);
+        View reactionItem = LayoutInflater
+                .from(parent.getContext())
+                .inflate(R.layout.item_reaction, parent, false);
         return new ReactionViewHolder(reactionItem);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReactionViewHolder holder, int position)
+    public void onBindViewHolder(@NonNull ReactionViewHolder holder,
+                                 int position)
     {
         ReactionItem item = reactionItems.get(position);
 
-        holder.reaction.setText(item.getReaction().getEmoji());
-        holder.count.setText(String.valueOf(item.getReaction().getCount()));
+        holder.reaction.setText(item.getReaction()
+                                    .getEmoji());
+        holder.count.setText(String.valueOf(item.getReaction()
+                                                .getCount()));
 
         holder.itemView.setOnClickListener(v -> toggleChecked(position));
 
@@ -68,12 +71,16 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
         if (item.isChecked())
         {
             item.setChecked(false);
-            item.getReaction().setCount(item.getReaction().getCount() - 1);
+            item.getReaction()
+                .setCount(item.getReaction()
+                              .getCount() - 1);
         }
         else
         {
             item.setChecked(true);
-            item.getReaction().setCount(item.getReaction().getCount() + 1);
+            item.getReaction()
+                .setCount(item.getReaction()
+                              .getCount() + 1);
         }
 
         notifyItemChanged(position);

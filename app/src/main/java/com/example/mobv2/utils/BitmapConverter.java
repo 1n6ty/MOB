@@ -12,7 +12,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 public class BitmapConverter
 {
-    public static BitmapDescriptor drawableToBitmapDescriptor(Context context, int id)
+    public static BitmapDescriptor drawableToBitmapDescriptor(Context context,
+                                                              int id)
     {
         Drawable vectorDrawable;
         vectorDrawable = AppCompatResources.getDrawable(context, id);

@@ -1,6 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.MOBv2.DayNight" parent="Theme.MOBv2.Dark" />
+
     <!-- Base application theme. -->
-    <style name="Theme.MOBv2" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.MOBv2.Dark" parent="Theme.MOBv2">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue_500</item>
         <item name="colorPrimaryVariant">@color/blue_700</item>
@@ -8,7 +11,6 @@
         <!-- Secondary brand color. -->
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/blue_100_alpha</item>
     </style>
 </resources>

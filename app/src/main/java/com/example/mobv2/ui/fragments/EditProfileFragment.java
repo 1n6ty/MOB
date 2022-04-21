@@ -13,23 +13,18 @@ import androidx.fragment.app.Fragment;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
 
-public class EditProfileFragment extends Fragment
+public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
 {
-    private FragmentEditProfileBinding binding;
-
     private Toolbar toolbar;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    public EditProfileFragment()
     {
-        binding = FragmentEditProfileBinding.inflate(inflater, container, false);
-
-        return binding.getRoot();
+        super(R.layout.fragment_edit_profile);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
 

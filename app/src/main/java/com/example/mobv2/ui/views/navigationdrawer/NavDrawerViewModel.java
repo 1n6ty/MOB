@@ -18,7 +18,8 @@ public class NavDrawerViewModel extends ViewModel
         return menuItemHashMap.get(item.getTitle());
     }
 
-    public void putMenuItemHash(MenuItem item, MenuItemMetadatum itemMetadatum)
+    public void putMenuItemHash(MenuItem item,
+                                MenuItemMetadatum itemMetadatum)
     {
         menuItemHashMap.put(item.getTitle(), itemMetadatum);
     }

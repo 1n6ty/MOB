@@ -1,15 +1,20 @@
 <resources>
+    <dimen name="horizontal_medium_margin">32dp</dimen>
     <dimen name="horizontal_margin">16dp</dimen>
     <dimen name="horizontal_small_margin">8dp</dimen>
     <dimen name="horizontal_very_small_margin">4dp</dimen>
+
+    <dimen name="vertical_medium_margin">32dp</dimen>
     <dimen name="vertical_margin">16dp</dimen>
     <dimen name="vertical_small_margin">8dp</dimen>
     <dimen name="vertical_very_small_margin">4dp</dimen>
+
+    <dimen name="toolbar_main_margin_top">40dp</dimen>
+    <dimen name="toolbar_rest_margin_top">32dp</dimen>
+
     <dimen name="nav_header_height">200dp</dimen>
     <dimen name="nav_width">280dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="textSize_medium">16sp</dimen>
     <dimen name="textSize_small">12sp</dimen>
-    <dimen name="list_item_spacing">16dp</dimen>
-    <dimen name="list_item_spacing_half">8dp</dimen>
 </resources>

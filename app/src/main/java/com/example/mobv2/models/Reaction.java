@@ -9,7 +9,8 @@ public class Reaction
     private String emoji;
     private int count;
 
-    public Reaction(String emoji, int count)
+    public Reaction(String emoji,
+                    int count)
     {
         this.emoji = emoji;
         this.count = count;

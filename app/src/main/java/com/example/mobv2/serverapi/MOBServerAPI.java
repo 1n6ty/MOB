@@ -1,6 +1,7 @@
 package com.example.mobv2.serverapi;
 
 import com.example.mobv2.serverapi.callbacks.SuccessArrayListCallback;
+import com.example.mobv2.serverapi.callbacks.SuccessCreateCallback;
 import com.example.mobv2.serverapi.callbacks.SuccessHashMapCallback;
 import com.example.mobv2.serverapi.callbacks.SuccessStringCallback;
 import com.example.mobv2.serverapi.callbacks.SuccessVoidCallback;
@@ -57,14 +58,17 @@ public class MOBServerAPI
 
         @FormUrlEncoded
         @POST("createPost/")
-        Call<Void> createPost(@Field("text") String text, @Field("img") String img,
-                              @Field("markx") double markx,
-                              @Field("marky") double marky, @Field("token") String token);
+        Call<HashMap<String, Integer>> createPost(@Field("text") String text,
+                                                  @Field("img") String img,
+                                                  @Field("markx") double markx,
+                                                  @Field("marky") double marky,
+                                                  @Field("token") String token);
 
         @FormUrlEncoded
         @POST("comment/")
-        Call<Void> comment(@Field("post_id") int post_id, @Field("text") String text,
-                           @Field("token") String token);
+        Call<HashMap<String, Integer>> comment(@Field("post_id") int post_id,
+                                               @Field("text") String text,
+                                               @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("setLocation/")
@@ -138,13 +142,13 @@ public class MOBServerAPI
         Call<Void> deletePost(@Field("post_id") int post_id, @Field("token") String token);
     }
 
-    public static byte[] getSHA(String input) throws NoSuchAlgorithmException
+    private static byte[] getSHA(String input) throws NoSuchAlgorithmException
     {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String toHexString(byte[] hash)
+    private static String toHexString(byte[] hash)
     {
         BigInteger number = new BigInteger(1, hash);
         StringBuilder hexString = new StringBuilder(number.toString(16));
@@ -208,8 +212,8 @@ public class MOBServerAPI
                            double marky,
                            String token)
     {
-        Call<Void> crpost = MOBAPI.createPost(text, img, markx, marky, token);
-        crpost.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        Call<HashMap<String, Integer>> crpost = MOBAPI.createPost(text, img, markx, marky, token);
+        crpost.enqueue(new SuccessCreateCallback(funcOk, funcBad));
     }
 
     public void comment(Function<Integer, Void> funcOk,
@@ -218,8 +222,8 @@ public class MOBServerAPI
                         String text,
                         String token)
     {
-        Call<Void> crcomment = MOBAPI.comment(post_id, text, token);
-        crcomment.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        Call<HashMap<String, Integer>> crcomment = MOBAPI.comment(post_id, text, token);
+        crcomment.enqueue(new SuccessCreateCallback(funcOk, funcBad));
     }
 
     public void setLocation(Function<String, Void> funcOk,
