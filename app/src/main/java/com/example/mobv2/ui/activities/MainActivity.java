@@ -1,15 +1,14 @@
 package com.example.mobv2.ui.activities;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
+import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.MainFragment;
@@ -26,19 +25,25 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
+        initViewBinding();
 
-//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        initNavContentFrame();
+        initMainFragment();
+    }
 
-
+    private void initViewBinding()
+    {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         binding.constraintLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         setContentView(binding.getRoot());
+    }
 
-        initNavContentFrame();
-        initMainFragment();
+    private void initNavContentFrame()
+    {
+        navContentFrame = binding.navContentFrame;
     }
 
     private void initMainFragment()
@@ -47,28 +52,17 @@ public class MainActivity extends AppCompatActivity
         transactionToFragment(new AuthFragment());
     }
 
-    private void initNavContentFrame()
+    public void transactionToFragment(@NonNull Fragment fragment)
     {
-        navContentFrame = binding.navContentFrame;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item)
-    {
-        if (item.getItemId() == androidx.constraintlayout.widget.R.id.home)
-        {
-            onBackPressed();
-        }
-
-        return true;
-    }
-
-    public void transactionToFragment(Fragment fragment)
-    {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(navContentFrame.getId(), fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        String fragmentName = fragment.getClass()
+                                      .getSimpleName();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .setCustomAnimations(R.animator.slide_in_left, 0, 0, R.animator.slide_in_right)
+                .replace(navContentFrame.getId(), fragment, fragmentName)
+                .addToBackStack(fragmentName)
+                .commit();
     }
 
     @Override
@@ -76,11 +70,11 @@ public class MainActivity extends AppCompatActivity
     {
         if (getFragmentAtFrame() instanceof MainFragment)
         {
-            super.onBackPressed();
+            finish();
             return;
         }
 
-        transactionToFragment(mainFragment);
+        super.onBackPressed();
     }
 
     public Fragment getFragmentAtFrame()

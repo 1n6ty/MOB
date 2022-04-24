@@ -28,13 +28,10 @@ public class NotificationAndSoundFragment extends BaseFragment<FragmentNotificat
         initToolbar();
     }
 
-    private void initToolbar()
+    protected void initToolbar()
     {
         toolbar = binding.toolbar;
-        toolbar.setTitle(R.string.menu_notification_and_sound);
-        toolbar.setNavigationOnClickListener(v ->
-        {
-            requireActivity().onBackPressed();
-        });
+
+        super.initToolbar(toolbar, R.string.menu_notification_and_sound);
     }
 }

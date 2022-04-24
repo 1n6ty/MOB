@@ -1,14 +1,11 @@
 package com.example.mobv2.ui.fragments;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
@@ -32,13 +29,20 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     }
 
 
-    private void initToolbar()
+    @Override
+    protected void initToolbar()
     {
-        toolbar = binding.toolbar;
-        toolbar.setTitle("Fullname");
-        toolbar.setNavigationOnClickListener(v ->
-        {
-            requireActivity().onBackPressed();
-        });
+        this.toolbar = binding.toolbar;
+        super.initToolbar(toolbar, "Fullname");
     }
+
+//    private void initToolbar()
+//    {
+//        toolbar = binding.toolbar;
+//        toolbar.setTitle("Fullname");
+//        toolbar.setNavigationOnClickListener(v ->
+//        {
+//            requireActivity().onBackPressed();
+//        });
+//    }
 }

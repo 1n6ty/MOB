@@ -10,28 +10,26 @@ import java.util.function.Function;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class SuccessCreateCallback extends BaseSuccessCallback<HashMap<String, Integer>,
-        Function<Integer, Void>,
+public class StringSuccessCallback extends BaseSuccessCallback<HashMap<String, String>,
+        Function<String, Void>,
         Function<Integer, Void>>
 {
-
-
-    public SuccessCreateCallback(Function<Integer, Void> funcOk,
+    public StringSuccessCallback(Function<String, Void> funcOk,
                                  Function<Integer, Void> funcBad)
     {
         super(funcOk, funcBad);
     }
 
     @Override
-    public void onResponse(@NonNull Call<HashMap<String, Integer>> call,
-                           @NonNull Response<HashMap<String, Integer>> response)
+    public void onResponse(@NonNull Call<HashMap<String, String>> call,
+                           @NonNull Response<HashMap<String, String>> response)
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
         {
             if (response.isSuccessful())
             {
                 funcOk.apply(response.body()
-                                     .get("id"));
+                                     .get("token"));
             }
             else
             {

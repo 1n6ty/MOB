@@ -20,9 +20,12 @@ import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.utils.AddMarker;
 import com.example.mobv2.utils.BitmapConverter;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -35,6 +38,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private RecyclerView postsRecycler;
     private AppBarLayout postsAppBar;
     private View dragger;
+    private GoogleMap googleMap;
 
     public MainFragment()
     {
@@ -53,7 +57,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         initPostsRecycler();
     }
 
-    private void initToolbar()
+    protected void initToolbar()
     {
         dragger = binding.dragger;
         toolbar = binding.toolbar;
@@ -62,12 +66,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         // a half-measure
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sample_avatar);
         Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 72, 72, false);
+        BitmapDrawable icon = new BitmapDrawable(getResources(), bitmapScaled);
 
-        toolbar.setNavigationIcon(new BitmapDrawable(getResources(), bitmapScaled));
-        toolbar.setNavigationOnClickListener(v ->
-        {
-            navDrawer.open();
-        });
+        super.initToolbar(toolbar, icon, v -> navDrawer.open());
     }
 
 
@@ -77,40 +78,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null)
         {
-            mapFragment.getMapAsync(
-                    googleMap ->
-                    {
-                        BitmapDescriptor descriptor =
-                                BitmapConverter.drawableToBitmapDescriptor(getContext(), R.drawable.ic_marker);
-
-
-                        MarkerOptions[] markerOptions =
-                                new MarkerOptions[]{
-                                        new AddMarker(-34, 151, "Sydney", descriptor).create(),
-                                        new AddMarker(55, 37, "Moscow", descriptor).create(),
-                                        new AddMarker(51.5406, 46.0086, "Saratov", descriptor).create()
-                                };
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-//                        {
-//                            googleMap.addCircle(new CircleOptions().center(sydney).radius(100000)
-//                                    .strokeColor(requireActivity().getColor(R.color.blue_500)));
-//                        }
-
-                        for (MarkerOptions option : markerOptions)
-                        {
-                            googleMap.addMarker(option);
-                        }
-
-                        googleMap.setOnMarkerClickListener(
-                                marker ->
-                                {
-                                    sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-                                    postsToolbar.setTitle(marker.getTitle());
-
-                                    return true;
-                                });
-//            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                    });
+            mapFragment.getMapAsync(this::onMapReady);
         }
     }
 
@@ -121,7 +89,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
+//        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
 
         sheetBehavior.addBottomSheetCallback(
                 new PostsSheetCallback(
@@ -140,13 +108,8 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior.setPeekHeight(actionBarHeight);
         sheetBehavior.setHalfExpandedRatio(0.6f);
 
-        postsToolbar.setNavigationOnClickListener(v ->
-        {
-            if (sheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN)
-            {
-                sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            }
-        });
+        postsToolbar.setNavigationOnClickListener(
+                v -> sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN));
     }
 
     private void initPostsRecycler()
@@ -155,5 +118,40 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         postsRecycler.setAdapter(new PostAdapter(Database.postsDb));
+    }
+
+    private void onMapReady(GoogleMap googleMap)
+    {
+        this.googleMap = googleMap;
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(55.0415, 82.9346), 14));
+
+        BitmapDescriptor descriptor =
+                BitmapConverter.drawableToBitmapDescriptor(getContext(), R.drawable.ic_marker);
+
+
+        AddMarker[] addMarkers =
+                new AddMarker[]{
+                        new AddMarker(-34, 151, "Sydney", descriptor),
+                        new AddMarker(55, 37, "Moscow", descriptor),
+                        new AddMarker(51.5406, 46.0086, "Saratov", descriptor)
+                };
+
+        for (AddMarker addMarker : addMarkers)
+        {
+            googleMap.addMarker(addMarker.create());
+        }
+
+        googleMap.setOnMarkerClickListener(this::onMarkerClick);
+    }
+
+    private boolean onMarkerClick(Marker marker)
+    {
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 14));
+
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+        postsToolbar.setTitle(marker.getTitle());
+
+        return true;
     }
 }

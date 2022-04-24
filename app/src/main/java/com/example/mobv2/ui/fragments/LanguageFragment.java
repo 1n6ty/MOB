@@ -28,13 +28,9 @@ public class LanguageFragment extends BaseFragment<FragmentLanguageBinding>
         initToolbar();
     }
 
-    private void initToolbar()
+    protected void initToolbar()
     {
         toolbar = binding.toolbar;
-        toolbar.setTitle(R.string.menu_language);
-        toolbar.setNavigationOnClickListener(v ->
-        {
-            requireActivity().onBackPressed();
-        });
+        super.initToolbar(toolbar, R.string.menu_language);
     }
 }

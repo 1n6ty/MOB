@@ -1,10 +1,10 @@
 package com.example.mobv2.serverapi;
 
-import com.example.mobv2.serverapi.callbacks.SuccessArrayListCallback;
-import com.example.mobv2.serverapi.callbacks.SuccessCreateCallback;
-import com.example.mobv2.serverapi.callbacks.SuccessHashMapCallback;
-import com.example.mobv2.serverapi.callbacks.SuccessStringCallback;
-import com.example.mobv2.serverapi.callbacks.SuccessVoidCallback;
+import com.example.mobv2.serverapi.callbacks.ArrayListSuccessCallback;
+import com.example.mobv2.serverapi.callbacks.CreateSuccessCallback;
+import com.example.mobv2.serverapi.callbacks.HashMapSuccessCallback;
+import com.example.mobv2.serverapi.callbacks.StringSuccessCallback;
+import com.example.mobv2.serverapi.callbacks.VoidSuccessCallback;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -165,7 +165,7 @@ public class MOBServerAPI
                      String password) throws NoSuchAlgorithmException
     {
         Call<HashMap<String, String>> authCall = MOBAPI.auth(login, toHexString(getSHA(password)));
-        authCall.enqueue(new SuccessStringCallback(funcOk, funcBad));
+        authCall.enqueue(new StringSuccessCallback(funcOk, funcBad));
     }
 
     public void getLocations(Function<ArrayList<HashMap<String, String>>, Void> funcOk,
@@ -174,7 +174,7 @@ public class MOBServerAPI
     {
         Call<HashMap<String, ArrayList<HashMap<String, String>>>> getFunc =
                 MOBAPI.getLocations(token);
-        getFunc.enqueue(new SuccessArrayListCallback(funcOk, funcBad));
+        getFunc.enqueue(new ArrayListSuccessCallback(funcOk, funcBad));
     }
 
     public void getMarks(Function<ArrayList<HashMap<String, String>>, Void> funcOk,
@@ -182,7 +182,7 @@ public class MOBServerAPI
                          String token)
     {
         Call<HashMap<String, ArrayList<HashMap<String, String>>>> getFunc = MOBAPI.getMarks(token);
-        getFunc.enqueue(new SuccessArrayListCallback(funcOk, funcBad));
+        getFunc.enqueue(new ArrayListSuccessCallback(funcOk, funcBad));
     }
 
     public void getPost(Function<HashMap<String, Object>, Void> funcOk,
@@ -191,7 +191,7 @@ public class MOBServerAPI
                         String token)
     {
         Call<HashMap<String, Object>> getFunc = MOBAPI.getPost(post_id, token);
-        getFunc.enqueue(new SuccessHashMapCallback(funcOk, funcBad));
+        getFunc.enqueue(new HashMapSuccessCallback(funcOk, funcBad));
     }
 
     public void getComment(Function<HashMap<String, Object>, Void> funcOk,
@@ -201,7 +201,7 @@ public class MOBServerAPI
                            String token)
     {
         Call<HashMap<String, Object>> getFunc = MOBAPI.getComment(post_id, comment_id, token);
-        getFunc.enqueue(new SuccessHashMapCallback(funcOk, funcBad));
+        getFunc.enqueue(new HashMapSuccessCallback(funcOk, funcBad));
     }
 
     public void createPost(Function<Integer, Void> funcOk,
@@ -213,7 +213,7 @@ public class MOBServerAPI
                            String token)
     {
         Call<HashMap<String, Integer>> crpost = MOBAPI.createPost(text, img, markx, marky, token);
-        crpost.enqueue(new SuccessCreateCallback(funcOk, funcBad));
+        crpost.enqueue(new CreateSuccessCallback(funcOk, funcBad));
     }
 
     public void comment(Function<Integer, Void> funcOk,
@@ -223,7 +223,7 @@ public class MOBServerAPI
                         String token)
     {
         Call<HashMap<String, Integer>> crcomment = MOBAPI.comment(post_id, text, token);
-        crcomment.enqueue(new SuccessCreateCallback(funcOk, funcBad));
+        crcomment.enqueue(new CreateSuccessCallback(funcOk, funcBad));
     }
 
     public void setLocation(Function<String, Void> funcOk,
@@ -232,7 +232,7 @@ public class MOBServerAPI
                             String token)
     {
         Call<HashMap<String, String>> setL = MOBAPI.setLocation(location_id, token);
-        setL.enqueue(new SuccessStringCallback(funcOk, funcBad));
+        setL.enqueue(new StringSuccessCallback(funcOk, funcBad));
     }
 
     public void setUpdate(Function<String, Void> funcOk,
@@ -240,7 +240,7 @@ public class MOBServerAPI
                           String token)
     {
         Call<HashMap<String, String>> setU = MOBAPI.setUpdate(token);
-        setU.enqueue(new SuccessStringCallback(funcOk, funcBad));
+        setU.enqueue(new StringSuccessCallback(funcOk, funcBad));
     }
 
     public void editUser(Function<Integer, Void> funcOk,
@@ -254,7 +254,7 @@ public class MOBServerAPI
     {
         Call<Void> editU =
                 MOBAPI.editUser(nickName, name, surname, toHexString(getSHA(password)), email, token);
-        editU.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        editU.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void postInc(Function<Integer, Void> funcOk,
@@ -263,7 +263,7 @@ public class MOBServerAPI
                         String token)
     {
         Call<Void> postinc = MOBAPI.postInc(post_id, token);
-        postinc.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        postinc.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void postDec(Function<Integer, Void> funcOk,
@@ -272,7 +272,7 @@ public class MOBServerAPI
                         String token)
     {
         Call<Void> postdec = MOBAPI.postDec(post_id, token);
-        postdec.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        postdec.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void commentInc(Function<Integer, Void> funcOk,
@@ -282,7 +282,7 @@ public class MOBServerAPI
                            String token)
     {
         Call<Void> commentinc = MOBAPI.commentInc(post_id, comment_id, token);
-        commentinc.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        commentinc.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void commentDec(Function<Integer, Void> funcOk,
@@ -292,7 +292,7 @@ public class MOBServerAPI
                            String token)
     {
         Call<Void> commentdec = MOBAPI.commentDec(post_id, comment_id, token);
-        commentdec.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        commentdec.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void postReact(Function<Integer, Void> funcOk,
@@ -302,7 +302,7 @@ public class MOBServerAPI
                           String token)
     {
         Call<Void> postr = MOBAPI.postReact(post_id, reaction, token);
-        postr.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        postr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void postUnreact(Function<Integer, Void> funcOk,
@@ -312,7 +312,7 @@ public class MOBServerAPI
                             String token)
     {
         Call<Void> postunr = MOBAPI.postUnreact(post_id, reaction, token);
-        postunr.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        postunr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void commentReact(Function<Integer, Void> funcOk,
@@ -323,7 +323,7 @@ public class MOBServerAPI
                              String token)
     {
         Call<Void> commentr = MOBAPI.commentReact(post_id, comment_id, reaction, token);
-        commentr.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        commentr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void commentUnreact(Function<Integer, Void> funcOk,
@@ -334,7 +334,7 @@ public class MOBServerAPI
                                String token)
     {
         Call<Void> commentunr = MOBAPI.commentUnreact(post_id, comment_id, reaction, token);
-        commentunr.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        commentunr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void deleteComment(Function<Integer, Void> funcOk,
@@ -344,7 +344,7 @@ public class MOBServerAPI
                               String token)
     {
         Call<Void> deletec = MOBAPI.deleteComment(post_id, comment_id, token);
-        deletec.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        deletec.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 
     public void deletePost(Function<Integer, Void> funcOk,
@@ -353,6 +353,6 @@ public class MOBServerAPI
                            String token)
     {
         Call<Void> deletep = MOBAPI.deletePost(post_id, token);
-        deletep.enqueue(new SuccessVoidCallback(funcOk, funcBad));
+        deletep.enqueue(new VoidSuccessCallback(funcOk, funcBad));
     }
 }

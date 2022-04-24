@@ -9,10 +9,11 @@ import java.util.function.Function;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class SuccessVoidCallback
-        extends BaseSuccessCallback<Void, Function<Integer, Void>, Function<Integer, Void>>
+public class VoidSuccessCallback extends BaseSuccessCallback<Void,
+        Function<Integer, Void>,
+        Function<Integer, Void>>
 {
-    public SuccessVoidCallback(Function<Integer, Void> funcOk,
+    public VoidSuccessCallback(Function<Integer, Void> funcOk,
                                Function<Integer, Void> funcBad)
     {
         super(funcOk, funcBad);

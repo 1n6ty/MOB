@@ -1,12 +1,10 @@
 package com.example.mobv2.ui.callbacks;
 
-import android.annotation.SuppressLint;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
-import com.example.mobv2.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -39,7 +37,6 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
 //        appBar.set(appBar.getHeight() -  R.dimen.toolbar_rest_margin_top);
     }
 
-    @SuppressLint("SwitchIntDef")
     @Override
     public void onStateChanged(@NonNull View bottomSheet,
                                int newState)
@@ -54,6 +51,7 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
                 break;
             default:
                 appBar.setVisibility(View.VISIBLE);
+                sheetBehavior.setPeekHeight(appBar.getHeight());
                 break;
         }
     }
@@ -63,7 +61,7 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
                         float slideOffset)
     {
         appBar.animate()
-              .translationY(((float) -Math.pow(appBar.getHeight(), 1 - slideOffset)))
+              .translationY(((float) -Math.pow(appBar.getHeight(), 1 - slideOffset / 1.5)))
               .setDuration(0)
               .start();
 

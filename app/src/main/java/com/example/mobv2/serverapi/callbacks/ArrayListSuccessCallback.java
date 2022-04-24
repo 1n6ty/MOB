@@ -11,11 +11,11 @@ import java.util.function.Function;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class SuccessArrayListCallback extends BaseSuccessCallback<HashMap<String, ArrayList<HashMap<String, String>>>,
+public class ArrayListSuccessCallback extends BaseSuccessCallback<HashMap<String, ArrayList<HashMap<String, String>>>,
         Function<ArrayList<HashMap<String, String>>, Void>,
         Function<Integer, Void>>
 {
-    public SuccessArrayListCallback(Function<ArrayList<HashMap<String, String>>, Void> funcOk,
+    public ArrayListSuccessCallback(Function<ArrayList<HashMap<String, String>>, Void> funcOk,
                                     Function<Integer, Void> funcBad)
     {
         super(funcOk, funcBad);

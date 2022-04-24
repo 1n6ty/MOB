@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,8 +13,9 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.serverapi.MOBServerAPI;
-import com.example.mobv2.ui.activities.MainActivity;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding>
@@ -67,23 +69,31 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
         {
             try
             {
-                mobServerAPI.auth(obj ->
-                {
-                    Log.v("DEBUG", obj.toString());
-                    return null;
-                }, num ->
-                {
-                    Log.v("DEBUG", num.toString());
-                    return null;
-                }, phone.getText()
-                        .toString(), password.getText()
-                                             .toString());
+                mobServerAPI.auth(
+                        obj ->
+                        {
+                            Log.v("DEBUG", obj.toString());
+                            mainActivity.transactionToFragment(mainActivity.getMainFragment());
+                            return null;
+                        },
+                        num ->
+                        {
+                            Log.v("DEBUG", num.toString());
+                            Toast.makeText(getContext(), "This user is not exist", Toast.LENGTH_LONG)
+                                 .show();
+                            return null;
+                        },
+                        phone.getText()
+                             .toString(),
+                        password.getText()
+                                .toString());
             }
             catch (NoSuchAlgorithmException e)
             {
                 e.printStackTrace();
+
             }
-            ((MainActivity) requireActivity()).transactionToFragment(((MainActivity) requireActivity()).getMainFragment());
+
         });
     }
 }

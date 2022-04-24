@@ -1,5 +1,6 @@
 package com.example.mobv2.ui.fragments;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,13 +9,16 @@ import android.view.ViewGroup;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 
+import com.example.mobv2.R;
 import com.example.mobv2.ui.activities.MainActivity;
 
-public class BaseFragment<T extends ViewDataBinding> extends Fragment
+public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
 {
     protected MainActivity mainActivity;
     protected T binding;
@@ -35,6 +39,56 @@ public class BaseFragment<T extends ViewDataBinding> extends Fragment
         mainActivity = (MainActivity) getActivity();
 
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false);
+
+        binding.getRoot().setBackgroundResource(R.color.white);
         return binding.getRoot();
+    }
+
+    protected void initToolbar()
+    {
+
+    }
+
+    protected void initToolbar(Toolbar toolbar,
+                               String title)
+    {
+        toolbar.setTitle(title);
+        toolbar.setNavigationOnClickListener(this::defaultOnClick);
+    }
+
+    protected void initToolbar(Toolbar toolbar,
+                               @StringRes int title)
+    {
+        toolbar.setTitle(title);
+        toolbar.setNavigationOnClickListener(this::defaultOnClick);
+    }
+
+    protected void initToolbar(Toolbar toolbar,
+                               String title,
+                               View.OnClickListener onClickListener)
+    {
+        toolbar.setTitle(title);
+        toolbar.setNavigationOnClickListener(onClickListener);
+    }
+
+    protected void initToolbar(Toolbar toolbar,
+                               @StringRes int title,
+                               View.OnClickListener onClickListener)
+    {
+        toolbar.setTitle(title);
+        toolbar.setNavigationOnClickListener(onClickListener);
+    }
+
+    protected void initToolbar(Toolbar toolbar,
+                               Drawable icon,
+                               View.OnClickListener onClickListener)
+    {
+        toolbar.setNavigationIcon(icon);
+        toolbar.setNavigationOnClickListener(onClickListener);
+    }
+
+    private void defaultOnClick(View v)
+    {
+        mainActivity.onBackPressed();
     }
 }

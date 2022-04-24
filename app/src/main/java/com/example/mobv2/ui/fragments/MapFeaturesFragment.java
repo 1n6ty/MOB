@@ -28,13 +28,10 @@ public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding
         initToolbar();
     }
 
-    private void initToolbar()
+    protected void initToolbar()
     {
         toolbar = binding.toolbar;
-        toolbar.setTitle(R.string.menu_map_features);
-        toolbar.setNavigationOnClickListener(v ->
-        {
-            requireActivity().onBackPressed();
-        });
+
+        super.initToolbar(toolbar, R.string.menu_map_features);
     }
 }
