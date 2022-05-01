@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.R;
@@ -20,7 +18,7 @@ import com.example.mobv2.models.MenuItemMetadatum;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.EditProfileFragment;
 import com.example.mobv2.ui.fragments.LanguageFragment;
-import com.example.mobv2.ui.fragments.MainFragment;
+import com.example.mobv2.ui.fragments.main.MainFragment;
 import com.example.mobv2.ui.fragments.MapFeaturesFragment;
 import com.example.mobv2.ui.fragments.NotificationAndSoundFragment;
 import com.google.android.material.navigation.NavigationView;

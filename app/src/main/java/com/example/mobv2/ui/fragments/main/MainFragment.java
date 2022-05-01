@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.fragments;
+package com.example.mobv2.ui.fragments.main;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,13 +18,16 @@ import com.example.mobv2.adapters.PostAdapter;
 import com.example.mobv2.databaseimprovisation.Database;
 import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
+import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
-import com.example.mobv2.utils.AddMarker;
+import com.example.mobv2.utils.MarkerAddition;
 import com.example.mobv2.utils.BitmapConverter;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.appbar.AppBarLayout;
@@ -31,7 +35,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
 {
+    public static final int ZOOM = 14;
+
+
     private Toolbar toolbar;
+
     private NavDrawer navDrawer;
     private BottomSheetBehavior sheetBehavior;
     private Toolbar postsToolbar;
@@ -39,6 +47,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private AppBarLayout postsAppBar;
     private View dragger;
     private GoogleMap googleMap;
+    private MainFragmentViewModel viewModel;
 
     public MainFragment()
     {
@@ -49,12 +58,20 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
+
         super.onViewCreated(view, savedInstanceState);
+
+        initViewModel();
 
         initToolbar();
         initMap();
         initBottomSheet();
         initPostsRecycler();
+    }
+
+    private void initViewModel()
+    {
+        viewModel = new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
     }
 
     protected void initToolbar()
@@ -89,7 +106,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-//        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
+        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
 
         sheetBehavior.addBottomSheetCallback(
                 new PostsSheetCallback(
@@ -124,22 +141,27 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         this.googleMap = googleMap;
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(55.0415, 82.9346), 14));
+//        if (viewModel.getMarker() == null)
+//            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(55.0415, 82.9346), ZOOM));
+//        else
+//            onMarkerClick(viewModel.getMarker());
+//        googleMap.animateCamera(viewModel.getLastCoordinates());
+
 
         BitmapDescriptor descriptor =
                 BitmapConverter.drawableToBitmapDescriptor(getContext(), R.drawable.ic_marker);
 
 
-        AddMarker[] addMarkers =
-                new AddMarker[]{
-                        new AddMarker(-34, 151, "Sydney", descriptor),
-                        new AddMarker(55, 37, "Moscow", descriptor),
-                        new AddMarker(51.5406, 46.0086, "Saratov", descriptor)
+        MarkerAddition[] markerAdditions =
+                new MarkerAddition[]{
+                        new MarkerAddition(-34, 151, "Sydney", descriptor),
+                        new MarkerAddition(55, 37, "Moscow", descriptor),
+                        new MarkerAddition(51.5406, 46.0086, "Saratov", descriptor)
                 };
 
-        for (AddMarker addMarker : addMarkers)
+        for (MarkerAddition markerAddition : markerAdditions)
         {
-            googleMap.addMarker(addMarker.create());
+            googleMap.addMarker(markerAddition.create());
         }
 
         googleMap.setOnMarkerClickListener(this::onMarkerClick);
@@ -147,11 +169,23 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private boolean onMarkerClick(Marker marker)
     {
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 14));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM));
 
         sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         postsToolbar.setTitle(marker.getTitle());
 
+//        if (viewModel.getMarker() != marker) viewModel.setMarker(marker);
+
         return true;
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+
+        CameraPosition cameraPosition = googleMap.getCameraPosition();
+
+        viewModel.setLastCoordinates(CameraUpdateFactory.newLatLngZoom(cameraPosition.target, cameraPosition.zoom));
     }
 }

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,9 +14,7 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.serverapi.MOBServerAPI;
-import com.google.android.material.snackbar.Snackbar;
 
-import java.net.SocketTimeoutException;
 import java.security.NoSuchAlgorithmException;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding>
@@ -73,7 +72,6 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
                         obj ->
                         {
                             Log.v("DEBUG", obj.toString());
-                            mainActivity.transactionToFragment(mainActivity.getMainFragment());
                             return null;
                         },
                         num ->
@@ -91,8 +89,9 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
             catch (NoSuchAlgorithmException e)
             {
                 e.printStackTrace();
-
             }
+
+            mainActivity.transactionToFragment(mainActivity.getMainFragment());
 
         });
     }

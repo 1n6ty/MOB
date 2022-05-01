@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#F8F8FF">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardElevation="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_gravity="center">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -36,6 +32,7 @@
                     android:layout_marginHorizontal="@dimen/horizontal_margin"
                     android:layout_marginTop="@dimen/vertical_small_margin"
                     android:autofillHints="phone"
+                    android:backgroundTint="@color/white"
                     android:hint="Enter your phone number"
                     android:inputType="phone" />
 
@@ -47,19 +44,37 @@
                     android:layout_marginHorizontal="@dimen/horizontal_margin"
                     android:layout_marginTop="@dimen/vertical_small_margin"
                     android:autofillHints="password"
+                    android:backgroundTint="@color/white"
                     android:hint="@string/auth_hint"
                     android:inputType="textPassword" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/next_button"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    style="@style/Widget.MaterialComponents.FloatingActionButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/vertical_margin"
+                    android:layout_height="48dp"
+                    android:backgroundTint="@color/blue_100"
                     android:text="@string/auth_button"
-                    android:textAppearance="@style/navSubheaderStyle"
+                    android:textAppearance="@style/nextButtonTextStyle"
                     android:textStyle="bold" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -58,4 +58,14 @@
         <item name="android:textColor">@color/gray_500</item>
         <item name="android:textColorHint">@color/gray_200</item>
     </style>
+
+    <style name="nextButtonTextStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="nextButtonStyle">
+        <item name="android:background">@drawable/background_button_auth_selector</item>
+        <item name="android:stateListAnimator">@animator/hover_up_button</item>
+    </style>
 </resources>

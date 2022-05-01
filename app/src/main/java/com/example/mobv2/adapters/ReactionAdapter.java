@@ -53,7 +53,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
 
         holder.itemView.setOnClickListener(v -> toggleChecked(position));
 
-        holder.itemView.setBackgroundResource(R.drawable.background_selector_reaction);
+        holder.itemView.setBackgroundResource(R.drawable.background_item_reaction_selector);
 
         if (item.isChecked())
         {

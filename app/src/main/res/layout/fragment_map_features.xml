@@ -26,6 +26,5 @@
                 app:navigationIcon="@drawable/ic_arrow"
                 app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
         </com.google.android.material.appbar.AppBarLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

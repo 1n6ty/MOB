@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.ui.fragments.AuthFragment;
-import com.example.mobv2.ui.fragments.MainFragment;
+import com.example.mobv2.ui.fragments.main.MainFragment;
 
 public class MainActivity extends AppCompatActivity
 {
