@@ -3,10 +3,11 @@ from django.urls import path
 from Rule.views.address import getLocations, setLocation, getMarks
 from Rule.views.comments import commentInc, commentDec, comment, deleteComment, reactComment, unreactComment, getComment, deleteComment
 from Rule.views.posts import createPost, getPost, deletePost, postInc, postDec, reactPost, unreactPost
-from Rule.views.user import auth, editUser, refreshToken
+from Rule.views.user import auth, editUser, refreshToken, register
 
 urlpatterns = [
     path('auth/', auth),
+    path('reg/', register),
     path('getLocations/', getLocations),
     path('setLocation/', setLocation),
     path('createPost/', createPost),

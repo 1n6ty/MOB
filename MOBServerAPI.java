@@ -44,7 +44,7 @@ public class MOBServerAPI {
                         body.put("response", response.body().get("response"));
                         funcOk.apply(body);
                     } else {
-                        body.put("msg", response.body().get("msg"));
+                        funcBad.apply(body);
                     }
                 }
             }

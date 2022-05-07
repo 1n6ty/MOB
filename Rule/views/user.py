@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from Rule.views.views import sessionTime, isCorruptedToken, getDataFromToken, createSessionToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
@@ -37,12 +38,12 @@ def auth(req):
     return HttpResponse(status = 405)
 
 def register(req):
-    if req.method == 'PUT':
-        nickName = req.PUT['nick']
-        password = req.PUT['password']
-        phone = req.PUT['phone']
-        email = req.PUT['email']
-        name = req.PUT['name']
+    if req.method == 'POST':
+        nickName = req.POST['nick']
+        password = req.POST['password']
+        phone = req.POST['phone']
+        email = req.POST['email']
+        name = req.POST['name']
         query = Q(phone_number__startswith = phone) | Q(email__startswith = email)
         user = User.objects.filter(query)
         
@@ -52,7 +53,7 @@ def register(req):
             return HttpResponse(status = 201)
         else:
             return HttpResponse(status = 406)
-    return HttpResponse("Registration form", status = 401) #fix this
+    return render(req, 'registration.html', {})
 
 @csrf_exempt
 def editUser(req):
