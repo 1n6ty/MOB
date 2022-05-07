@@ -21,7 +21,7 @@ class User(models.Model):
     addresses = models.ManyToManyField('Address', blank = True)
     sessionExpTime = models.BigIntegerField(default=0)
     prv_key = models.BigIntegerField(default=0)
-    refresh = models.TextField(default='')
+    refresh = models.TextField(default='0')
 
 class PostWithMark(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
