@@ -1,4 +1,4 @@
-from views import sessionTime, isCorruptedToken, getDataFromToken, sessionTimeExpired
+from Rule.views.views import sessionTime, isCorruptedToken, getDataFromToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
