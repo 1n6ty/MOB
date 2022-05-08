@@ -87,13 +87,12 @@ public class MOBServerAPI {
         Call<LinkedTreeMap<String, Object>> refresh(@Query("token") String token, @Query("token") String refresh);
 
         @Multipart
-        @FormUrlEncoded
         @POST("createPost/")
-        Call<LinkedTreeMap<String, Object>> createPost(@Field("text") String text,
-                                                 @Field("markx") double markx,
-                                                 @Field("marky") double marky,
-                                                 @Part MultipartBody.Part[] imgs,
-                                                 @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> createPost(@Part("text") String text,
+                                                 @Part("markx") double markx,
+                                                 @Part("marky") double marky,
+                                                 @Part("token") String token,
+                                                       @Part MultipartBody.Part[] imgs);
         @FormUrlEncoded
         @POST("comment/")
         Call<LinkedTreeMap<String, Object>> comment(@Field("post_id") int post_id, @Field("text") String text,
@@ -191,7 +190,7 @@ public class MOBServerAPI {
             imgs[i] = MultipartBody.Part.createFormData("imgs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
         }
 
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.createPost(text, markX, markY, imgs, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.createPost(text, markX, markY, token, imgs);
         call.enqueue(createResponseCallback(funcOk, funcBad, fail));
     }
     public void comment(Function<LinkedTreeMap<String, Object>, Void> funcOk, Function<LinkedTreeMap<String, Object>, Void> funcBad, Function<Throwable, Void> fail,
