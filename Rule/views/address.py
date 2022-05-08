@@ -73,7 +73,7 @@ def setLocation(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -81,8 +81,9 @@ def setLocation(req):
     
         token = createSessionToken(token_data, user.prv_key)
         return JsonResponse({
-            'token': token,
-            'response': {}
+            'response': {
+                'token': token,
+            }
         }, status = 200)
     return HttpResponse(status = 405)
 

@@ -133,12 +133,16 @@ def deletePost(req):
 @csrf_exempt
 def createPost(req):
     if req.method == 'POST':
+        print(req.POST)
         try:
-            token = req.POST['token']
-            text = req.POST['text']
+            token = str(req.POST['token']).replace("\"", "")
+            text = str(req.POST['text']).replace("\"", "")
         except:
-            return HttpResponse(status = 400)
+            return JsonResponse({
+                'msg': "bad_request"
+            }, status = 400)
         try:
+            print()
             token_data = getDataFromToken(token)
         except:
             return JsonResponse({
@@ -148,6 +152,7 @@ def createPost(req):
         try:
             user = User.objects.get(id = token_data['id'])
             address = user.addresses.get(id = token_data['location_id'])
+            
         except ObjectDoesNotExist:
             return JsonResponse({
                 'msg': "not_found"
@@ -158,7 +163,7 @@ def createPost(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -169,6 +174,7 @@ def createPost(req):
             post = PostWithMark(user = user, text = text, markx = markx, marky = marky)
         except KeyError:
             post = PostWithMark(user = user, text = text)
+        post.save()
         
         for f in req.FILES.getlist('imgs'):
             post.imgs.create(img = f)
