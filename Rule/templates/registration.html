@@ -9,32 +9,37 @@
         <div class="leftBar"></div>
         <main>
             <div class="content">
-                <h4>Sign up to MOB</h4>
-                <form>
-                    <div class="wrap">
-                        <div class="group">
-                            <label for="name">Full Name</label>
-                            <input name="name" placeholder="Enter Full Name"/>
+                {% if not accept %}
+                    <h4>Sign up to MOB</h4>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <div class="wrap">
+                            <div class="group">
+                                <label for="name">Full Name</label>
+                                <input name="name" type="text" placeholder="Enter Full Name" required/>
+                            </div>
+                            <div class="group">
+                                <label for="nick_name">Nick Name</label>
+                                <input name="nick_name" placeholder="Enter Nick Name" required/>
+                            </div>
                         </div>
                         <div class="group">
-                            <label for="nick_name">Nick Name</label>
-                            <input name="nick_name" placeholder="Enter Nick Name"/>
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" name="phone" placeholder="Enter Phone Number" required/>
                         </div>
-                    </div>
-                    <div class="group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" name="phone" placeholder="Enter Phone Number"/>
-                    </div>
-                    <div class="group">
-                        <label for="email">Email</label>
-                        <input type="email" name="email" placeholder="Enter Email"/>
-                    </div>
-                    <div class="group">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" placeholder="Enter Password"/>
-                    </div>
-                    <button type="submit">Create Account</button>
-                </form>
+                        <div class="group">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" placeholder="Enter Email" required/>
+                        </div>
+                        <div class="group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" placeholder="Enter Password" required/>
+                        </div>
+                        <button type="submit">Create Account</button>
+                    </form>
+                {% else %}
+                    <h4>Now you have an account in MOB</h4>
+                {% endif %}
             </div>
         </main>
         <script>

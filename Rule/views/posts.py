@@ -3,6 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
 from Rule.models import User, PostWithMark
+import os
+from django.conf import settings
 
 def getPost(req):
     if req.method == 'GET':
@@ -118,6 +120,7 @@ def deletePost(req):
             for i in post.comments.all():
                 i.delete()
             for i in post.imgs.all():
+                os.remove(settings.MEDIA_ROOT + i.name)
                 i.delete()
             post.delete()
 

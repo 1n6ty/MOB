@@ -38,7 +38,7 @@ public class MOBServerAPI {
 
     private final MOBInterface MOBAPI;
 
-    interface MOBAPICallback{
+    public interface MOBAPICallback{
         public void funcOk(LinkedTreeMap<String, Object> obj);
         public void funcBad(LinkedTreeMap<String, Object> obj);
         public void fail(Throwable obj);
@@ -71,7 +71,7 @@ public class MOBServerAPI {
         };
     }
 
-    MOBServerAPI(String baseUrl){
+    public MOBServerAPI(String baseUrl){
         Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create()).build();
         MOBAPI = retrofit.create(MOBInterface.class);
     }
@@ -181,7 +181,7 @@ public class MOBServerAPI {
     }
     public void getComment(MOBAPICallback obj,
                     int postId, int commentId, boolean ind, String token){
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(postId, commentId, Integer.valueOf(ind), token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(postId, commentId, ind, token);
         call.enqueue(createResponseCallback(obj));
     }
 

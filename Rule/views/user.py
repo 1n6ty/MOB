@@ -1,3 +1,4 @@
+import hashlib
 from django.shortcuts import render
 from Rule.views.views import sessionTime, isCorruptedToken, getDataFromToken, createSessionToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
@@ -39,21 +40,34 @@ def auth(req):
 
 def register(req):
     if req.method == 'POST':
-        nickName = req.POST['nick']
-        password = req.POST['password']
-        phone = req.POST['phone']
-        email = req.POST['email']
-        name = req.POST['name']
+        try:
+            nickName = req.POST['nick_name']
+            password = req.POST['password']
+            phone = req.POST['phone']
+            email = req.POST['email']
+            name = req.POST['name']
+        except:
+            return JsonResponse({
+                'msg': "bad_request"
+            }, status = 400)
         query = Q(phone_number__startswith = phone) | Q(email__startswith = email)
         user = User.objects.filter(query)
         
         if len(user) == 0:
+            password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest()
+
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
             new_user.save()
-            return HttpResponse(status = 201)
+            return render(req, 'registration.html', {
+                "accept": True
+            })
         else:
-            return HttpResponse(status = 406)
-    return render(req, 'registration.html', {})
+            return JsonResponse({
+                'msg': "same_phone_or_email"
+            }, status = 406)
+    return render(req, 'registration.html', {
+        "accept": False
+    })
 
 @csrf_exempt
 def editUser(req):
