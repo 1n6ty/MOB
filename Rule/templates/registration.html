@@ -16,11 +16,11 @@
                         <div class="wrap">
                             <div class="group">
                                 <label for="name">Full Name</label>
-                                <input name="name" type="text" placeholder="Enter Full Name" required/>
+                                <input name="name" type="text" placeholder="Enter Full Name" value="{% if name %}{{ name }}{% endif %}" required/>
                             </div>
                             <div class="group">
                                 <label for="nick_name">Nick Name</label>
-                                <input name="nick_name" placeholder="Enter Nick Name" required/>
+                                <input name="nick_name" placeholder="Enter Nick Name" value="{% if nick %}{{ nick }}{% endif %}" required>
                             </div>
                         </div>
                         <div class="group">
@@ -35,6 +35,9 @@
                             <label for="password">Password</label>
                             <input type="password" name="password" placeholder="Enter Password" required/>
                         </div>
+                        {% if err %}
+                        <p>Try different phone number or email</p>
+                        {% endif %}
                         <button type="submit">Create Account</button>
                     </form>
                 {% else %}

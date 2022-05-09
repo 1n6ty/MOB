@@ -59,14 +59,23 @@ def register(req):
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
             new_user.save()
             return render(req, 'registration.html', {
-                "accept": True
+                "accept": True,
+                'name': False,
+                'nick': False,
+                'err': False
             })
         else:
-            return JsonResponse({
-                'msg': "same_phone_or_email"
-            }, status = 406)
+            return render(req, 'registration.html', {
+                "accept": False,
+                'err': True,
+                'name': name,
+                'nick': nickName
+            })
     return render(req, 'registration.html', {
-        "accept": False
+        "accept": False,
+        'name': False,
+        'nick': False,
+        'err': False
     })
 
 @csrf_exempt
