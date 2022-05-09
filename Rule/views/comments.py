@@ -6,13 +6,18 @@ from Rule.models import User, Comment
 
 sessionTime = 3600
 
+is_true_bool = lambda value: bool(value) and value.lower() not in ('false', '0')
+
 def getComment(req):
     if req.method == 'GET':
         try:
             token = req.GET['token']
             post_id = req.GET['post_id']
             comment_id = req.GET['comment_id']
-            ind = int(req.GET['ind'])
+            if is_true_bool(req.GET['ind']):
+                ind = True
+            else:
+                ind = False
         except:
             return JsonResponse({
                 'msg': 'bad_request'
