@@ -1,9 +1,8 @@
-from Rule.views.views import sessionTime, isCorruptedToken, getDataFromToken, sessionTimeExpired
+from Rule.views.views import isCorruptedToken, getDataFromToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
 from Rule.models import User, Comment
-from datetime import datetime
 
 sessionTime = 3600
 
@@ -13,8 +12,11 @@ def getComment(req):
             token = req.GET['token']
             post_id = req.GET['post_id']
             comment_id = req.GET['comment_id']
+            ind = int(req.GET['ind'])
         except:
-            return HttpResponse(status = 400)
+            return JsonResponse({
+                'msg': 'bad_request'
+            }, status = 400)
         try:
             token_data = getDataFromToken(token)
             post_id = int(post_id)
@@ -27,7 +29,10 @@ def getComment(req):
             user = User.objects.get(id = token_data['id'])
             address = user.addresses.get(id = token_data['location_id'])
             post = address.posts.get(id = post_id)
-            e = post.comments.all()[comment_id]
+            if ind:
+                e = post.comments.all()[comment_id]
+            else:
+                e = post.comments.get(id = comment_id)
         except (ObjectDoesNotExist, IndexError) as e:
             return JsonResponse({
                 'msg': "not_found"

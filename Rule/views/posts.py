@@ -3,7 +3,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
 from Rule.models import User, PostWithMark
-from datetime import datetime
 
 def getPost(req):
     if req.method == 'GET':
@@ -142,7 +141,6 @@ def createPost(req):
                 'msg': "bad_request"
             }, status = 400)
         try:
-            print()
             token_data = getDataFromToken(token)
         except:
             return JsonResponse({

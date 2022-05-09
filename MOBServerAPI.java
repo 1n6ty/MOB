@@ -86,7 +86,7 @@ public class MOBServerAPI {
         @GET("getPost/")
         Call<LinkedTreeMap<String, Object>> getPost(@Query("post_id") int post_id, @Query("token") String token);
         @GET("getComment/")
-        Call<LinkedTreeMap<String, Object>> getComment(@Query("post_id") int post_id, @Query("comment_id") int comment_id, @Query("token") String token);
+        Call<LinkedTreeMap<String, Object>> getComment(@Query("post_id") int post_id, @Query("comment_id") int comment_id, @Query("ind") boolean ind, @Query("token") String token);
         @GET
         Call<LinkedTreeMap<String, Object>> refresh(@Query("token") String token, @Query("token") String refresh);
 
@@ -180,8 +180,8 @@ public class MOBServerAPI {
         call.enqueue(createResponseCallback(obj));
     }
     public void getComment(MOBAPICallback obj,
-                    int postId, int commentId, String token){
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(postId, commentId, token);
+                    int postId, int commentId, boolean ind, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(postId, commentId, Integer.valueOf(ind), token);
         call.enqueue(createResponseCallback(obj));
     }
 

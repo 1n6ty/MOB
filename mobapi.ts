@@ -83,8 +83,8 @@ function post(text: string, imgs_urls: string[], token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function getComment(post_id: number, comment_id: number, token: string): { // post_id -> real id of post; comment_id -> next index of list that you don't have
-    'response': {
+function getComment(post_id: number, comment_id: number, ind: boolean, token: string): { // post_id -> real id of post; comment_id -> next index of list that you don't have (ind = true)
+    'response': {                                                                        // comment_id -> real id of comment (ind = true)
         'user': {
             'nick_name': string,
             'name': string,
