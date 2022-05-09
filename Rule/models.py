@@ -55,4 +55,5 @@ def post_directory_path(instance, filename):
     return 'posts/{0}.{1}'.format(str(instance.id), filename.split('.')[-1])
 
 class Image(models.Model):
+    id = models. AutoField(primary_key=True)
     img = models.ImageField(upload_to = post_directory_path)
