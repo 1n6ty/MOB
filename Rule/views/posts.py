@@ -138,11 +138,14 @@ def createPost(req):
         print(req.POST)
         try:
             token = str(req.POST['token']).replace("\"", "")
-            text = str(req.POST['text']).replace("\"", "")
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
+        try:
+            text = str(req.POST['text']).replace("\"", "")
+        except:
+            text = ""
         try:
             token_data = getDataFromToken(token)
         except:
