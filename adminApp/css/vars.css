@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+@font-face {
+  font-family: LatoSemibold;
+  font-weight: 600;
+  src: url("../fonts/Lato-Semibold.woff") format("woff");
+}
+
+html[data-device="desktop"]{
+    --border-radius-lg: 16px;
+    --border-radius-xl: 50px;
+    --border-radius-md: 10px;
+    --border-radius-sm: 6px;
+
+    --nav-size: 18rem;
+    --nav-size-slim: 4.5rem;
+
+    --primary: #1ea8e7;
+    --secondary: #6cdbef;
+    --tertiary: #5de3c8;
+    --quaternary: #558df3;
+    --primary-rgb: 30, 168, 231;
+    --secondary-rgb: 108, 219, 239;
+    --tertiary-rgb: 93, 227, 200;
+    --quaternary-rgb: 85, 141, 243;
+    --primary-darker: #1b9ad4;
+    --secondary-darker: #61c6d8;
+    --tertiary-darker: #54ccb4;
+    --quaternary-darker: #4c7dd6;
+    --gradient-1: #1ea8e7;
+    --gradient-2: #21aff0;
+    --gradient-3: #23b3f4;
+    --gradient-1-lighter: #2abdff;
+    --gradient-1-darker: #1fa5e2;
+    --text-color-dark: #343a40;
+    --text-color-light: #fff;
+    --text-color-light-rgb: 255, 255, 255;
+
+    --menu-shadow: 0px 3px 10px rgba(0, 0, 0, 0.12);
+
+    --main-spacing-vertical: 2rem;
+
+    --transition-time-short: 200ms;
+    --transition-time: 400ms;
+
+    --font: "Lato", sans-serif;
+    --font-semibold: "LatoSemibold", sans-serif;
+    --font-heading: "Montserrat",sans-serif;
+}
+
+body{
+    font-family: var(--font);
+    font-weight: 400;
+    font-size: 87.5%;
+}
+
+a{
+    transition: color var(--transition-time-short);
+    cursor: pointer;
+    text-decoration: none;
+}
