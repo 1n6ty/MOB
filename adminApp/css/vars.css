@@ -14,7 +14,6 @@ html[data-device="desktop"]{
     --border-radius-sm: 6px;
 
     --nav-size: 18rem;
-    --nav-size-slim: 4.5rem;
 
     --primary: #1ea8e7;
     --secondary: #6cdbef;
@@ -36,6 +35,11 @@ html[data-device="desktop"]{
     --text-color-dark: #343a40;
     --text-color-light: #fff;
     --text-color-light-rgb: 255, 255, 255;
+    --foreground: #fff;
+    --background: #f9f9f9;
+    --body: #4e4e4e;
+    --muted: #afafaf;
+    --alternate: #7c7c7c;
 
     --menu-shadow: 0px 3px 10px rgba(0, 0, 0, 0.12);
 
@@ -47,16 +51,110 @@ html[data-device="desktop"]{
     --font: "Lato", sans-serif;
     --font-semibold: "LatoSemibold", sans-serif;
     --font-heading: "Montserrat",sans-serif;
+
+    --main-spacing-vertical: 2rem;
+    --main-spacing-horizontal: 2.5rem;
+
+    --small-title-heading: 2rem;
+
+    --card-spacing: 2rem;
 }
 
 body{
+    width: 100%;
     font-family: var(--font);
     font-weight: 400;
     font-size: 87.5%;
+    background-color: var(--background);
+    overflow: hidden;
+}
+
+main{
+    width: calc(100% - var(--nav-size));
+    min-height: 100%;
+    padding-left: var(--main-spacing-horizontal);
+    padding-right: var(--main-spacing-horizontal);
+    padding-top: var(--main-spacing-vertical);
+    padding-bottom: var(--main-spacing-vertical);
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--body);
+    font-weight: 400;
+    line-height: 1.25;
+}
+.h5, h5 {
+    font-size: 1.1em;
 }
 
 a{
     transition: color var(--transition-time-short);
     cursor: pointer;
     text-decoration: none;
+}
+
+.display-4 {
+    font-family: var(--font-heading);
+    font-size: 1.85em;
+    line-height: 1.2;
+    font-weight: 300;
+}
+.display-6 {
+    font-family: var(--font-heading);
+    font-size: 1.6em;
+    line-height: 1.2;
+    font-weight: 300;
+}
+
+.small-title {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    margin-bottom: 1rem;
+    font-size: 1em;
+    color: var(--primary);
+    height: var(--small-title-height);
+}
+
+.sw-13 {
+    width: 6.5rem !important;
+}
+.sh-13{
+    height: 6.5rem !important;
+} 
+.sw-3 {
+    width: 1.5rem !important;
+}
+.sh-8 {
+    height: 4rem !important;
+}
+.sw-8 {
+    width: 4rem !important;
+}
+
+.card {
+    box-shadow: 0 4px 10px rgba(0,0,0,.03)!important;
+    background: var(--foreground);
+    border-radius: var(--border-radius-lg);
+    border: initial;
+}
+.card .card-body{
+    padding: var(--card-spacing);
+}
+
+.text-muted {
+    color: var(--muted)!important;
+}
+
+.text-small {
+    font-size: .8em !important;
+    text-transform: uppercase;
+}
+
+.text-alternate {
+    color: var(--alternate)!important;
+}
+
+.rounded-xl{
+    border-radius: var(--border-radius-xl)!important;
 }
