@@ -7,13 +7,14 @@
   src: url("../fonts/Lato-Semibold.woff") format("woff");
 }
 
-html[data-device="desktop"]{
+html{
     --border-radius-lg: 16px;
     --border-radius-xl: 50px;
     --border-radius-md: 10px;
     --border-radius-sm: 6px;
 
     --nav-size: 18rem;
+    --nav-slim: 4rem;
 
     --primary: #1ea8e7;
     --secondary: #6cdbef;
@@ -43,8 +44,6 @@ html[data-device="desktop"]{
     --alternate: #7c7c7c;
 
     --menu-shadow: 0px 3px 10px rgba(0, 0, 0, 0.12);
-
-    --main-spacing-vertical: 2rem;
 
     --transition-time-short: 200ms;
     --transition-time: 400ms;
@@ -80,6 +79,11 @@ main{
     padding-right: var(--main-spacing-horizontal);
     padding-top: var(--main-spacing-vertical);
     padding-bottom: var(--main-spacing-vertical);
+    transition: all var(--transition-time) ease-in-out;
+}
+html[data-nav-show="false"] main,
+html[data-device="mobile"] main{
+    width: 100% !important;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
