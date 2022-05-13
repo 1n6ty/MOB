@@ -36,6 +36,7 @@ html[data-device="desktop"]{
     --text-color-light: #fff;
     --text-color-light-rgb: 255, 255, 255;
     --foreground: #fff;
+    --foreground-rgb: 255, 255, 255;
     --background: #f9f9f9;
     --body: #4e4e4e;
     --muted: #afafaf;
@@ -90,11 +91,15 @@ main{
 .h5, h5 {
     font-size: 1.1em;
 }
+.h4, h4 {
+    font-size: 1.35em;
+}
 
 a{
     transition: color var(--transition-time-short);
     cursor: pointer;
     text-decoration: none;
+    text-transform: capitalize;
 }
 
 .display-4 {
@@ -125,6 +130,9 @@ a{
 .sh-13{
     height: 6.5rem !important;
 } 
+.sh-11{
+    height: 5.5rem !important;
+} 
 .sw-3 {
     width: 1.5rem !important;
 }
@@ -140,12 +148,18 @@ a{
 .sw-6{
     width: 3rem !important;
 }
+.sw-10{
+    width: 5rem !important;
+}
+.sh-40 {
+    height: 20rem !important;
+}
 
 .card {
     box-shadow: 0 4px 10px rgba(0,0,0,.03)!important;
     background: var(--foreground);
     border-radius: var(--border-radius-lg);
-    border: initial;
+    border: 1px solid var(--foreground);
 }
 .card .card-body{
     padding: var(--card-spacing);
@@ -208,4 +222,24 @@ a{
  }
 .form-control:focus{
     border-color: var(--secondary);
+}
+
+.card .card-img-top {
+    width: 100%;
+    border-radius: initial;
+    border-top-left-radius: var(--border-radius-lg);
+    border-top-right-radius: var(--border-radius-lg);
+    object-fit: cover;
+}
+.card [class*=card-img-horizontal] {
+    border-top-left-radius: var(--border-radius-lg);
+    border-bottom-left-radius: var(--border-radius-lg);
+    border-bottom-right-radius: none;
+    border-top-right-radius: none;
+    height: 100%;
+    object-fit: cover;
+}
+
+.body-link{
+    color: var(--body) !important;
 }

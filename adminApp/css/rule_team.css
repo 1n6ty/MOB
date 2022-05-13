@@ -1,6 +1,7 @@
 main{
     height: 100vh;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 main .title{
     margin-bottom: 1.25rem;
@@ -22,7 +23,7 @@ main .conteiner .card:hover{
     text-transform: none;
 }
 .memberTeam .btn{
-    margin-left: 7px;
+    margin-left: 7px !important;
 }
 .memberTeam .btn.dropdown-toggle,
 .memberTeam .btn-submit{
@@ -43,4 +44,36 @@ main .conteiner .card:hover{
 }
 .memberTeam .btn-add:hover{
     color: var(--primary) !important;
+}
+
+.updates .container .col:nth-child(1){
+    margin-right: .5rem;
+}
+.updates .container .col:nth-child(2){
+    margin-left: .5rem;
+}
+
+.blured{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1001;
+}
+.blured > div{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+    background-color: rgba(var(--foreground-rgb), .7);
+}
+.blured img{
+    height: 80%;
+    z-index: 1002;
 }
