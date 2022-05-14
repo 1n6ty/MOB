@@ -1,0 +1,42 @@
+main .title{
+    margin-bottom: 1.25rem;
+}
+main .title h1{
+    line-height: 1;
+}
+
+.search > div{
+    border-radius: var(--border-radius-md);
+}
+
+.countChanger button{
+    border: none !important;
+    background-color: var(--foreground);
+    padding: 10px 20px !important;
+}
+.countChanger button:hover{
+    background-color: var(--foreground);
+    color: var(--primary) !important;
+}
+.countChanger button:hover span{
+    color: var(--primary);
+}
+.countChanger .dropdown-item.active{
+    background-color: var(--foreground);
+    color: var(--primary);
+}
+
+.helpTitles{
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.address{
+    cursor: pointer;
+}
+.address a{
+    color: var(--body);
+}
+.address:hover a{
+    color: var(--primary);
+}

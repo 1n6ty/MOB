@@ -68,7 +68,7 @@ html[data-nav-show="false"] .top-nav,
     border-bottom-left-radius: var(--border-radius-lg);
 }
 html[data-nav-show="false"] nav.leftSide{
-    transform: translateX(-18rem);
+    transform: translateX(-19rem);
 }
 .nav-shadow{
     width: 100%;
@@ -128,18 +128,14 @@ html[data-nav-show="false"] nav.leftSide{
     line-height: 1;
     font-size: 13px;
 }
-html[data-left_nav_lock="true"] .nav-content ul .locker .open{
-    display: none;
-}
-html[data-left_nav_lock="false"] .nav-content ul .locker .lock{
-    display: none;
-}
-html[data-light-mode="true"] .nav-content ul .theme .dark{
-    display: none;
-}
+html[data-left_nav_lock="true"] .nav-content ul .locker .open,
+html[data-device="mobile"] .nav-content ul .locker,
+html[data-left_nav_lock="false"] .nav-content ul .locker .lock,
+html[data-light-mode="true"] .nav-content ul .theme .dark,
 html[data-light-mode="false"] .nav-content ul .theme .light{
     display: none;
 }
+
 .nav-content ul.options a{
     padding: 0.25rem 0.5rem;
     border-radius: var(--border-radius-md);

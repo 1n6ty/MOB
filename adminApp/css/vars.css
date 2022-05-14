@@ -74,16 +74,24 @@ body{
 
 main{
     width: calc(100% - var(--nav-size));
-    min-height: 100%;
     padding-left: var(--main-spacing-horizontal);
     padding-right: var(--main-spacing-horizontal);
     padding-top: var(--main-spacing-vertical);
     padding-bottom: var(--main-spacing-vertical);
     transition: all var(--transition-time) ease-in-out;
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
-html[data-nav-show="false"] main,
-html[data-device="mobile"] main{
+
+html[data-main-full="true"] main{
     width: 100% !important;
+}
+html[data-nav-show="false"] main{
+    padding-top: 6rem !important;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
@@ -246,4 +254,72 @@ a{
 
 .body-link{
     color: var(--body) !important;
+}
+
+.search-input-container input {
+    width: calc(100% - 25px);
+    border: initial;
+}
+.bg-foreground {
+    background-color: var(--foreground)!important;
+    color: var(--primary)!important;
+}
+.shadow {
+    box-shadow: 0 4px 10px rgba(0,0,0,.03)!important;
+}
+
+.search-magnifier-icon{
+    color: var(--muted);
+    position: absolute;
+    right: 0;
+    margin-right: 1rem;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-foreground-alternate{
+    color: var(--alternate) !important;
+}
+
+.dropdown-menu {
+    line-height: 1.3;
+    background-color: var(--foreground);
+    border-radius: var(--border-radius-md);
+    border: none !important;
+    color: var(--body);
+    font-family: var(--font);
+    font-size: 1em;
+}
+.dropdown-menu a{
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    color: var(--body);
+}
+
+.page-item {
+    margin: 0 5px;
+    text-align: center;
+}
+
+.page-link {
+    outline: initial!important;
+    box-shadow: initial!important;
+    border: initial;
+    padding: 8px 9px;
+    line-height: 1.5;
+    font-size: 1em;
+    width: var(--input-height);
+    height: var(--input-height);
+    color: var(--primary);
+    border-radius: var(--border-radius-md)!important;
+    background: var(--foreground);
+}
+.page-item.active a{
+    background-color: var(--primary) !important;
+}
+.page-item.disabled svg{
+    stroke: var(--alternate);
 }
