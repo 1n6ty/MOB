@@ -1,0 +1,75 @@
+html[data-device="desktop"] .carousel{
+    margin-top: 5rem !important;
+}
+
+.carousel-inner{
+    position: relative;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 87%;
+    border-radius: var(--border-radius-lg);
+}
+
+.carousel-control-next{
+    right: -4.5%;
+}
+.carousel-control-prev{
+    left: -4.5%;
+}
+
+html[data-device="mobile"] .carousel-control-prev span,
+html[data-device="mobile"] .carousel-control-next span{
+    display: none;
+}
+html[data-device="mobile"] .carousel-inner{
+    width: 100%;
+}
+
+.card-body{
+    width: 88%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.card-body .text{
+    margin-top: 2rem;
+}
+.card-body a{
+    color: var(--primary);
+}
+.card-body a:hover{
+    color: rgba(var(--primary-rgb), 0.7);
+}
+
+.react:nth-child(1){
+    margin-left: 0;
+}
+.react{
+    margin-left: 1rem;
+}
+
+.react svg{
+    height: 15px;
+    width: 15px;
+    fill: var(--primary);
+}
+.react span{
+    margin-left: .1rem;
+    color: var(--body);
+}
+
+.reactions{
+    margin-top: 2rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.reactions::-webkit-scrollbar{
+    display: none;
+}
+
+.user-comment h5{
+    color: var(--primary);
+    font-size: 87.5%;
+}

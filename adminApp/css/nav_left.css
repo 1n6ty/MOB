@@ -1,4 +1,7 @@
 nav.leftSide{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: hidden;
     z-index: 1002;
     transition: all var(--transition-time) ease-in-out;
     height: 100vh;
@@ -12,8 +15,12 @@ nav.leftSide{
     background-position: center;
     background-image: linear-gradient(160deg, var(--gradient-1), var(--gradient-1), var(--gradient-2), var(--gradient-3));
 }
-html[data-nav-show="true"] nav.leftSide, 
-html[data-nav-show="true"] .nav-shadow{
+nav.leftSide::-webkit-scrollbar {
+  display: none;
+}
+
+
+html[data-nav-show="true"] nav.leftSide{
     border-top-left-radius: 0;
     border-top-right-radius: var(--border-radius-lg);
     border-bottom-right-radius: var(--border-radius-lg);

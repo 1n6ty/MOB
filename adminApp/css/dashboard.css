@@ -40,3 +40,41 @@ main .title h1{
 .address:hover a{
     color: var(--primary);
 }
+
+.post h5{
+    transition: color var(--transition-time-short) ease-in-out;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+}
+
+.post a:hover h5{
+    color: var(--primary);
+}
+
+.react:nth-child(1){
+    margin-left: 0;
+}
+.react{
+    margin-left: 1rem;
+}
+
+.react svg{
+    height: 15px;
+    width: 15px;
+    fill: var(--primary);
+}
+.react span{
+    margin-left: .1rem;
+    color: var(--body);
+}
+
+.reactions{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.reactions::-webkit-scrollbar{
+    display: none;
+}

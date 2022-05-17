@@ -63,6 +63,13 @@ html{
     --input-height-small: 1.825rem;
 }
 
+html[data-device="mobile"]{
+    --main-spacing-vertical: 1rem;
+    --main-spacing-horizontal: 1.25rem;
+
+    --card-spacing: 1.75rem;
+}
+
 body{
     width: 100%;
     font-family: var(--font);
@@ -157,6 +164,12 @@ a{
 .sh-6{
     height: 3rem !important;
 }
+.sw-5{
+    width: 2.5rem !important;
+}
+.sh-5{
+    height: 2.5rem !important;
+}
 .sw-6{
     width: 3rem !important;
 }
@@ -165,6 +178,22 @@ a{
 }
 .sh-40 {
     height: 20rem !important;
+}
+.sh-17{
+    height: 8.5rem;
+}
+.sh-75{
+    height: 37.5rem !important;
+}
+
+.heading{
+    font-size: 1.1em;
+    font-weight: 500;
+    margin-bottom: 0.7em;
+}
+
+.title a:hover{
+    color: var(--primary) !important;
 }
 
 .card {
