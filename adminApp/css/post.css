@@ -1,6 +1,12 @@
 html[data-device="desktop"] .carousel{
     margin-top: 5rem !important;
 }
+html[data-device="mobile"] .carousel{
+    height: 15rem !important;
+}
+html[data-device="tablet"] .carousel{
+    height: 25rem !important;
+}
 
 .carousel-inner{
     position: relative;
@@ -19,10 +25,13 @@ html[data-device="desktop"] .carousel{
 }
 
 html[data-device="mobile"] .carousel-control-prev span,
-html[data-device="mobile"] .carousel-control-next span{
+html[data-device="mobile"] .carousel-control-next span,
+html[data-device="tablet"] .carousel-control-prev span,
+html[data-device="tablet"] .carousel-control-next span{
     display: none;
 }
-html[data-device="mobile"] .carousel-inner{
+html[data-device="mobile"] .carousel-inner,
+html[data-device="tablet"] .carousel-inner{
     width: 100%;
 }
 
