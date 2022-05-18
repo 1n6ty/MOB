@@ -1,0 +1,41 @@
+.photoInput{
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    cursor: pointer;
+    transition: all var(--transition-time) ease;
+}
+
+.photoInput svg{
+    transition: all var(--transition-time) ease;
+    height: 50%;
+    width: 50%;
+    fill: rgba(var(--foreground-rgb), 0);
+}
+.photoInput:hover,
+html[data-device="mobile"] .photoInput{
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.photoInput:hover svg,
+html[data-device="mobile"] .photoInput svg{
+    fill: rgba(var(--foreground-rgb), 0.8);
+}
+
+.persInfo .form-control{
+    height: auto !important;
+}
+
+.persInfo button{
+    border-color: var(--primary) !important;
+    padding: 10px 20px;
+}
+.persInfo button:hover{
+    background-color: var(--primary);
+}

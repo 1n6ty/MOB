@@ -1,11 +1,12 @@
 html[data-device="desktop"] .carousel{
     margin-top: 5rem !important;
+    height: 37.5rem !important;
 }
 html[data-device="mobile"] .carousel{
     height: 15rem !important;
 }
 html[data-device="tablet"] .carousel{
-    height: 25rem !important;
+    height: 22rem !important;
 }
 
 .carousel-inner{
