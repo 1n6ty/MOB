@@ -150,6 +150,9 @@ a{
     text-transform: capitalize;
     color: var(--primary);
 }
+main a:hover{
+    color: var(--primary) !important;
+}
 
 .display-4 {
     font-family: var(--font-heading);
