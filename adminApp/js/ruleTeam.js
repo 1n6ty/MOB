@@ -8,8 +8,7 @@ function htmlToElement(htmlText) {
     return template.content.firstChild;
 }
 
-let new_member = htmlToElement(
-    `<div class="memberTeamNew mb-3 pb-3 border-bottom border-separator-light position-relative addition">
+let new_member = `<div class="memberTeamNew mb-3 pb-3 border-bottom border-separator-light position-relative addition">
         <div class="row g-0">
             <div class="col-auto">
                 <img class="card-img rounded-xl sh-6 sw-6" alt="team member" src="img/1.jpg">
@@ -26,26 +25,29 @@ let new_member = htmlToElement(
                 </div>
             </div>
         </div>
-    </div>`),
-    blur = htmlToElement(
-    `<div class="blured">
+    </div>`,
+    blur = `<div class="blured">
         <div></div>
         <img src="img/preloader.gif">
-    </div>`);
+    </div>`;
 
 let queue_members = true;
 
-new_member.querySelector('.cncl').onclick = (event) => {
-    memberTeam_body.removeChild(memberTeam_body.firstChild);
-    queue_members = true;
-};
-new_member.querySelector('.subm').onclick = (event) => {
-
-};
-
 btn_add_new_user.onclick = (event) => {
     if(queue_members){
-        memberTeam_body.insertBefore(new_member, memberTeam_body.firstChild);
+        member = htmlToElement(new_member);
+        member.querySelector('.cncl').onclick = (e) => {
+            memberTeam_body.removeChild(memberTeam_body.firstChild);
+            queue_members = true;
+        };
+        member.querySelector('.subm').onclick = (e) => {
+            let blur_node = htmlToElement(blur);
+            member.insertBefore(blur_node, member.firstChild);
+            queue_members = true;
+            member.querySelector('.cncl').onclick = undefined;
+            member.querySelector('.subm').onclick = undefined;
+        };
+        memberTeam_body.insertBefore(member, memberTeam_body.firstChild);
         queue_members = false;
     }
 };
