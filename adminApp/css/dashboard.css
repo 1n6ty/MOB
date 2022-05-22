@@ -22,7 +22,6 @@ main .title h1{
     color: var(--primary);
 }
 .countChanger .dropdown-item.active{
-    background-color: var(--foreground);
     color: var(--primary);
 }
 
@@ -37,7 +36,10 @@ main .title h1{
 .address a{
     color: var(--body);
 }
-.address:hover a{
+.address a > div{
+    transition: color var(--transition-time-short) ease-in-out;
+}
+.address:hover a > div{
     color: var(--primary);
 }
 

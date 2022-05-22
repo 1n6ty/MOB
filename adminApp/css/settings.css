@@ -39,3 +39,12 @@ html[data-device="mobile"] .photoInput svg{
 .persInfo button:hover{
     background-color: var(--primary);
 }
+
+@media screen and (max-width: 512px){
+    .photoInput{
+        background-color: rgba(0, 0, 0, 0.2);
+    } 
+    .photoInput svg{
+        fill: rgba(var(--foreground-rgb), 0.8);
+    }
+}

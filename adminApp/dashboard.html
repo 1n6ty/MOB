@@ -1,6 +1,6 @@
 <!doctype html>
-<html data-device="mobile" data-nav-show="false"
-        data-light-mode="true" data-left_nav_lock="true" data-main-full="true">
+<html data-nav-show="true"
+        data-light-mode="true" data-left_nav_lock="true" data-main-full="false">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,6 +13,10 @@
     <title>ruleTeamApp</title>
   </head>
   <body>
+    <div class="load">
+        <img alt="load" src="img/preloader.gif"/>
+    </div>
+    <script src="js/nav.js"></script>
     <nav class="leftSide d-flex">
         <div class="nav-content d-flex">
             <div class="logo position-relative">
@@ -62,14 +66,14 @@
                     <a href="#">MOB</a>
                 </div>
                 <div class="button-menu h-100">
-                    <a href="#">
+                    <a href="#" class="menu-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="acorn-icons acorn-icons-menu undefined"><path d="M2 3 18 3M2 10 18 10M2 17 18 17"></path></svg>
                     </a>
                 </div>
             </div>
             <div class="nav-shadow"></div>
         </div>
-        <main class="addresses d-none">
+        <main class="addresses">
             <div class="container">
                 <div class="title">
                     <div class="row">
@@ -80,7 +84,7 @@
                     </div>
                 </div>
                 <div class="row mb-3 d-flex flex-row">
-                    <div class="search col-sm-12 col-md-5 col-lg-3 col-xxl-2 mb-1 position-relative">
+                    <div class="search col-sm-12 col-md-5 col-lg-3 mb-1 position-relative">
                         <div class="d-inline-block float-md-start p-1 me-1 search-input-container w-100 shadow bg-foreground">
                             <input class="form-control" placeholder="Search"/>
                         </div>
@@ -182,7 +186,7 @@
                 </div>
             </div>
         </main>
-        <main class="posts">
+        <main class="posts d-none">
             <div class="container">
                 <div class="title">
                     <div class="row">
@@ -193,7 +197,7 @@
                     </div>
                 </div>
                 <div class="row mb-3 d-flex flex-row">
-                    <div class="search col-sm-12 col-md-5 col-lg-3 col-xxl-2 mb-1 position-relative">
+                    <div class="search col-sm-12 col-md-5 col-lg-3 mb-1 position-relative">
                         <div class="d-inline-block float-md-start p-1 me-1 search-input-container w-100 shadow bg-foreground">
                             <input class="form-control" placeholder="Search"/>
                         </div>
@@ -336,7 +340,6 @@
                 </div>
             </div>
         </main>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   </body>
 </html>

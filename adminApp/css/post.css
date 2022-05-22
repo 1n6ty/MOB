@@ -1,12 +1,5 @@
-html[data-device="desktop"] .carousel{
-    margin-top: 5rem !important;
+.carousel{
     height: 37.5rem !important;
-}
-html[data-device="mobile"] .carousel{
-    height: 15rem !important;
-}
-html[data-device="tablet"] .carousel{
-    height: 22rem !important;
 }
 
 .carousel-inner{
@@ -14,26 +7,14 @@ html[data-device="tablet"] .carousel{
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 87%;
-    border-radius: var(--border-radius-lg);
+    width: 85%;
 }
 
 .carousel-control-next{
-    right: -4.5%;
+    right: -4%;
 }
 .carousel-control-prev{
-    left: -4.5%;
-}
-
-html[data-device="mobile"] .carousel-control-prev span,
-html[data-device="mobile"] .carousel-control-next span,
-html[data-device="tablet"] .carousel-control-prev span,
-html[data-device="tablet"] .carousel-control-next span{
-    display: none;
-}
-html[data-device="mobile"] .carousel-inner,
-html[data-device="tablet"] .carousel-inner{
-    width: 100%;
+    left: -4%;
 }
 
 .card-body{
@@ -82,4 +63,24 @@ html[data-device="tablet"] .carousel-inner{
 .user-comment h5{
     color: var(--primary);
     font-size: 87.5%;
+}
+
+@media screen and (max-width: 768px){
+    .carousel-control-prev span,
+    .carousel-control-next span{
+        display: none;
+    }
+    .carousel-inner{
+        width: 100%;
+    }  
+
+    .carousel{
+        height: 22rem !important;
+    }
+}
+
+@media screen and (max-width: 512px){
+    .carousel{
+        height: 15rem !important;
+    }
 }

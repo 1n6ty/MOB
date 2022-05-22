@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-device="desktop" data-nav-show="true"
+<html data-nav-show="true"
         data-light-mode="true" data-left_nav_lock="true" data-main-full="false">
   <head>
     <meta charset="utf-8">
@@ -13,6 +13,10 @@
     <title>ruleTeamApp</title>
   </head>
   <body class="d-flex">
+    <div class="load">
+        <img alt="load" src="img/preloader.gif"/>
+    </div>
+    <script src="js/nav.js"></script>
       <nav class="leftSide d-flex">
         <div class="nav-content d-flex">
             <div class="logo position-relative">
@@ -62,7 +66,7 @@
                     <a href="#">MOB</a>
                 </div>
                 <div class="button-menu h-100">
-                    <a href="#">
+                    <a href="#" class="menu-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="acorn-icons acorn-icons-menu undefined"><path d="M2 3 18 3M2 10 18 10M2 17 18 17"></path></svg>
                     </a>
                 </div>
@@ -120,13 +124,13 @@
                             <div class="col">
                                 <div class="card mb-2">
                                     <div class="h-100 d-flex flex-column justify-content-between card-body align-items-center">
-                                        <div class="sw-8 sh-8 rounded-xl d-flex justify-content-center align-items-center border border-primary">
+                                        <div class="sw-8 sh-8 rounded-xl d-flex justify-content-center align-items-center border">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="acorn-icons acorn-icons-heart text-primary"><path d="M8.76342 3.53821L9.38606 4.02249C9.74717 4.30335 10.2528 4.30335 10.6139 4.02249L11.2366 3.53822C13.0089 2.15977 15.5753 2.55317 16.8533 4.39919C18.1181 6.22616 17.9917 8.67633 16.5456 10.3635L10.7593 17.1142C10.3602 17.5798 9.63984 17.5798 9.24074 17.1142L3.45439 10.3635C2.00828 8.67633 1.88189 6.22616 3.14672 4.39919C4.42473 2.55317 6.99113 2.15977 8.76342 3.53821Z"></path></svg>
                                         </div>
                                         <div class="text-center mb-0 sh-8 d-flex align-items-center lh-1-5">
                                             Posts
                                         </div>
-                                        <div class="display-6 text-primary">
+                                        <div class="display-6">
                                             57
                                         </div>
                                     </div>
@@ -135,13 +139,13 @@
                             <div class="col">
                                 <div class="card mb-2">
                                     <div class="h-100 d-flex flex-column justify-content-between card-body align-items-center">
-                                        <div class="sw-8 sh-8 rounded-xl d-flex justify-content-center align-items-center border border-primary">
+                                        <div class="sw-8 sh-8 rounded-xl d-flex justify-content-center align-items-center border">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="acorn-icons acorn-icons-heart text-primary"><path d="M8.76342 3.53821L9.38606 4.02249C9.74717 4.30335 10.2528 4.30335 10.6139 4.02249L11.2366 3.53822C13.0089 2.15977 15.5753 2.55317 16.8533 4.39919C18.1181 6.22616 17.9917 8.67633 16.5456 10.3635L10.7593 17.1142C10.3602 17.5798 9.63984 17.5798 9.24074 17.1142L3.45439 10.3635C2.00828 8.67633 1.88189 6.22616 3.14672 4.39919C4.42473 2.55317 6.99113 2.15977 8.76342 3.53821Z"></path></svg>
                                         </div>
                                         <div class="text-center mb-0 sh-8 d-flex align-items-center lh-1-5">
                                             Users
                                         </div>
-                                        <div class="display-6 text-primary">
+                                        <div class="display-6">
                                             112
                                         </div>
                                     </div>
@@ -217,8 +221,9 @@
                         </button>
                     </div>
                     <div class="card h-100-card">
-                        <div class="card-body mb-n3 border-last-none">
-                            <div class="mb-3 pb-3 border-bottom border-separator-light position-relative addition">
+                        <div class="card-body">
+                            <div class="border-bottom mb-3"></div>
+                            <div class="memberTeam mb-3 pb-3 border-bottom border-separator-light position-relative addition">
                                 <div class="row g-0">
                                     <div class="col-auto">
                                         <img class="card-img rounded-xl sh-6 sw-6" alt="team member" src="img/1.jpg"/>
@@ -236,7 +241,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 pb-3 border-bottom border-separator-light position-relative addition">
+                            <div class="memberTeam mb-3 pb-3 border-bottom border-separator-light position-relative addition">
                                 <div class="blured">
                                     <div></div>
                                     <img src="img/preloader.gif"/>
@@ -258,7 +263,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 pb-3 border-bottom border-separator-light position-relative">
+                            <div class="memberTeam mb-3 pb-3 border-bottom border-separator-light position-relative">
                                 <div class="row g-0">
                                     <div class="col-auto">
                                         <img class="card-img rounded-xl sh-6 sw-6" alt="team member" src="img/1.jpg"/>
@@ -288,7 +293,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="memberTeam mb-1 pb-3 border-bottom border-separator-light position-relative">
+                            <div class="memberTeam pb-3 border-bottom border-separator-light position-relative">
                                 <div class="row g-0">
                                     <div class="col-auto">
                                         <img class="card-img rounded-xl sh-6 sw-6" alt="team member" src="img/1.jpg"/>
@@ -324,7 +329,7 @@
             </div>
           </div>
       </main>
-      
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-  </body>
+    <script src="./js/ruleTeam.js"></script>
+</body>
 </html>
