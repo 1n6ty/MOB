@@ -1,11 +1,11 @@
 package com.example.mobv2.ui.fragments;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,8 +17,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.utils.BitmapConverter;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 
-public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
+public class BaseFragment<T extends ViewDataBinding> extends Fragment
 {
     protected MainActivity mainActivity;
     protected T binding;
@@ -40,7 +42,8 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
 
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false);
 
-        binding.getRoot().setBackgroundResource(R.color.white);
+        binding.getRoot()
+               .setBackgroundResource(R.color.white);
         return binding.getRoot();
     }
 
@@ -72,19 +75,16 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
     }
 
     protected void initToolbar(Toolbar toolbar,
-                               @StringRes int title,
+                               @DrawableRes int resId,
                                View.OnClickListener onClickListener)
     {
-        toolbar.setTitle(title);
+        toolbar.setNavigationIcon(resId);
         toolbar.setNavigationOnClickListener(onClickListener);
     }
 
-    protected void initToolbar(Toolbar toolbar,
-                               Drawable icon,
-                               View.OnClickListener onClickListener)
+    protected BitmapDescriptor getBitmapDescriptor(@DrawableRes int resId)
     {
-        toolbar.setNavigationIcon(icon);
-        toolbar.setNavigationOnClickListener(onClickListener);
+        return BitmapConverter.drawableToBitmapDescriptor(getResources(), resId);
     }
 
     private void defaultOnClick(View v)

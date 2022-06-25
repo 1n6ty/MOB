@@ -28,6 +28,7 @@ public class LanguageFragment extends BaseFragment<FragmentLanguageBinding>
         initToolbar();
     }
 
+    @Override
     protected void initToolbar()
     {
         toolbar = binding.toolbar;

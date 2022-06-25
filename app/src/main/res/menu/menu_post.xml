@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_copy_post"
+        android:title="@string/menu_copy_post"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_forward_post"
+        android:title="@string/menu_forward_post"
+        app:showAsAction="never" />
+
+    <!--  For marker's owner  -->
+    <item
+        android:id="@+id/menu_edit_post"
+        android:title="@string/menu_edit_post"
+        android:visible="false"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_delete_post"
+        android:title="@string/menu_delete_post"
+        android:visible="false"
+        app:showAsAction="never" />
+</menu>

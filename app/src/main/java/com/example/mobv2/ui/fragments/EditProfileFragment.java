@@ -28,21 +28,10 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         initToolbar();
     }
 
-
     @Override
     protected void initToolbar()
     {
         this.toolbar = binding.toolbar;
         super.initToolbar(toolbar, "Fullname");
     }
-
-//    private void initToolbar()
-//    {
-//        toolbar = binding.toolbar;
-//        toolbar.setTitle("Fullname");
-//        toolbar.setNavigationOnClickListener(v ->
-//        {
-//            requireActivity().onBackPressed();
-//        });
-//    }
 }

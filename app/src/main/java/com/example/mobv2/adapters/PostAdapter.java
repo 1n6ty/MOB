@@ -1,28 +1,44 @@
 package com.example.mobv2.adapters;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.ContextThemeWrapper;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.Post;
+import com.example.mobv2.models.Reaction;
+import com.example.mobv2.utils.abstractions.Operation;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder>
 {
-    private List<Post> posts;
+    private final Context context;
+    private final List<Post> posts;
 
-    public PostAdapter(List<Post> posts)
+    public PostAdapter(
+            Context context,
+            List<Post> posts)
     {
+        this.context = context;
         this.posts = posts;
     }
 
@@ -43,19 +59,141 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     {
         Post post = posts.get(position);
 
-        if (post.getAvatar() != null) holder.avatar.setImageBitmap(post.getAvatar());
-        holder.fullname.setText(post.getUser()
-                                    .toString());
-        holder.date.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
+//        holder.avatar.setImageBitmap(post.getAvatar());  not yet
 
-        holder.menu.setOnClickListener(
-                v ->
+        holder.fullnameView.setText(post.getUser()
+                                        .toString());
+        holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
+
+        initPopupMenu(holder.menuView, position);
+
+        initContent(holder.content, position);
+
+        post.getReactions().add(new Reaction(Reaction.PLUS, 0));
+
+        holder.reactionsView.setAdapter(new ReactionAdapter(post.getReactions()));
+    }
+
+    private void initPopupMenu(ImageView menuView,
+                               int position)
+    {
+        Context contextThemeWrapper =
+                new ContextThemeWrapper(context, R.style.Theme_MOBv2_PopupOverlay);
+        PopupMenu popupMenu = new PopupMenu(contextThemeWrapper, menuView);
+        popupMenu.inflate(R.menu.menu_post);
+
+        menuView.setOnClickListener(v ->
+        {
+            initMenu(popupMenu, position);
+            // inflate menu
+            popupMenu.show();
+        });
+    }
+
+    private void initMenu(PopupMenu popupMenu,
+                          int position)
+    {
+        Post post = posts.get(position);
+
+        Menu menu = popupMenu.getMenu();
+
+        if (true) // if the user is a post's owner
+        {
+            menu.findItem(R.id.menu_edit_post)
+                .setVisible(true);
+            menu.findItem(R.id.menu_delete_post)
+                .setVisible(true);
+        }
+
+//        menu.findItem(R.id.menu_copy_post)
+//            .setOnMenuItemClickListener(item -> menuCopyPost(post));
+
+        switch (post.getType())
+        {
+            case Post.POST_ONLY_TEXT:
+            case Post.POST_FULL:
+                menu.findItem(R.id.menu_copy_post)
+                    .setVisible(true);
+                break;
+            case Post.POST_ONLY_IMAGES:
+                menu.findItem(R.id.menu_copy_post)
+                    .setVisible(false);
+                break;
+        }
+
+        HashMap<Integer, Operation<Post, Boolean>> popupMenuCommands =
+                new HashMap<Integer, Operation<Post, Boolean>>()
                 {
-// inflate menu
-                });
-//        holder.reactions.setLayoutManager(new LinearLayoutManager(c));
-        holder.reactions.setAdapter(new ReactionAdapter(post.getReactions()));
+                    {
+                        put(R.id.menu_copy_post, PostAdapter.this::copyPost);
+                        put(R.id.menu_forward_post, PostAdapter.this::forwardPost);
+                        put(R.id.menu_edit_post, PostAdapter.this::editPost);
+                        put(R.id.menu_delete_post, PostAdapter.this::deletePost);
+                    }
+                };
 
+        for (Integer id : popupMenuCommands.keySet())
+        {
+            menu.findItem(id)
+                .setOnMenuItemClickListener(item -> Objects.requireNonNull(popupMenuCommands.get(id))
+                                                           .execute(post));
+        }
+    }
+
+    private void initContent(@NonNull Pair<TextView, ImageView> content,
+                             int position)
+    {
+        Post post = posts.get(position);
+
+        switch (post.getType())
+        {
+            case Post.POST_ONLY_TEXT:
+                content.first.setText(post.getText());
+                content.first.setVisibility(View.VISIBLE);
+                content.second.setVisibility(View.GONE);
+                break;
+            case Post.POST_FULL:
+                content.first.setText(post.getText());
+                content.first.setVisibility(View.VISIBLE);
+                content.second.setVisibility(View.VISIBLE);
+                break;
+            case Post.POST_ONLY_IMAGES:
+                content.first.setVisibility(View.GONE);
+                content.second.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private boolean copyPost(Post post)
+    {
+        ClipboardManager clipboard = (ClipboardManager) context
+                .getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("simple text", post.getText());
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(context, "Copied", Toast.LENGTH_LONG)
+             .show();
+        return true;
+    }
+
+    private boolean forwardPost(Post post)
+    {
+        Toast.makeText(context, "Forwarded", Toast.LENGTH_LONG)
+             .show();
+        return true;
+    }
+
+    private boolean editPost(Post post)
+    {
+        Toast.makeText(context, "Edited", Toast.LENGTH_LONG)
+             .show();
+        return true;
+    }
+
+    private boolean deletePost(Post post)
+    {
+        Toast.makeText(context, "Deleted", Toast.LENGTH_LONG)
+             .show();
+        return true;
     }
 
     @Override
@@ -64,24 +202,28 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         return posts.size();
     }
 
-    protected class PostViewHolder extends RecyclerView.ViewHolder
+    protected static class PostViewHolder extends RecyclerView.ViewHolder
     {
-        private ShapeableImageView avatar;
-        private TextView fullname;
-        private TextView date;
-        private ImageView menu;
-        private RecyclerView reactions;
+        private ShapeableImageView avatarView;
+        private TextView fullnameView;
+        private TextView dateView;
+        private ImageView menuView;
+//        private TextView textView;
+        private Pair<TextView, ImageView> content;
+//        private ImageView
+        private RecyclerView reactionsView;
 
         public PostViewHolder(@NonNull View itemView)
         {
             super(itemView);
 
             ItemPostBinding binding = ItemPostBinding.bind(itemView);
-            avatar = binding.avatarPost;
-            fullname = binding.fullnameField;
-            date = binding.dateField;
-            menu = binding.menu;
-            reactions = binding.reactions;
+            avatarView = binding.avatarView;
+            fullnameView = binding.fullnameView;
+            dateView = binding.dateView;
+            menuView = binding.menuView;
+            content = new Pair<>(binding.postText, binding.postImage);
+            reactionsView = binding.reactionsView;
         }
     }
 }

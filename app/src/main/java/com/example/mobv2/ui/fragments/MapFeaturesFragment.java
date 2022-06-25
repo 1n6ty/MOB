@@ -28,10 +28,10 @@ public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding
         initToolbar();
     }
 
+    @Override
     protected void initToolbar()
     {
         toolbar = binding.toolbar;
-
         super.initToolbar(toolbar, R.string.menu_map_features);
     }
 }

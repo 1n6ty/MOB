@@ -34,7 +34,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-                        android:theme="@style/Theme.MOBv2.AppBarOverlay"
+                        android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
                         app:menu="@menu/menu_edit_profile"
                         app:navigationIcon="@drawable/ic_arrow"
                         app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />

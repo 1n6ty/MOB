@@ -5,27 +5,27 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_marginTop="@dimen/vertical_margin"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/vertical_margin"
         android:elevation="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/horizontal_margin"
-            android:orientation="vertical">
+            android:layout_marginHorizontal="@dimen/horizontal_margin">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vertical_margin"
+                android:layout_marginVertical="@dimen/vertical_margin"
+                app:layout_constraintBottom_toTopOf="@+id/post_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/avatar_post"
+                    android:id="@+id/avatar_view"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginHorizontal="@dimen/horizontal_small_margin"
@@ -42,27 +42,30 @@
                     android:id="@+id/linearLayout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:gravity="center"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/menu"
-                    app:layout_constraintStart_toEndOf="@+id/avatar_post"
+                    app:layout_constraintEnd_toStartOf="@+id/menu_view"
+                    app:layout_constraintStart_toEndOf="@+id/avatar_view"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/fullname_field"
+                        android:id="@+id/fullname_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sample_fullName" />
+                        android:text="@string/sample_fullName"
+                        android:textAppearance="@style/postItemHeaderTextStyle" />
 
                     <TextView
-                        android:id="@+id/date_field"
+                        android:id="@+id/date_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sample_date" />
+                        android:text="@string/sample_date"
+                        android:textAppearance="@style/postItemSubheaderTextStyle" />
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/menu"
+                    android:id="@+id/menu_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -74,19 +77,26 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <TextView
+                android:id="@+id/post_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/post_image"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                tools:text="Content" />
+
             <ImageView
-                android:id="@+id/post_content"
+                android:id="@+id/post_image"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="@dimen/vertical_margin"
+                android:layout_height="200dp"
                 android:background="@drawable/background_content_post"
-                app:layout_constraintBottom_toTopOf="@+id/reactions"
+                app:layout_constraintBottom_toTopOf="@+id/reactions_view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/post_text" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reactions"
+                android:id="@+id/reactions_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/vertical_small_margin"
@@ -95,7 +105,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_content"
+                app:layout_constraintTop_toBottomOf="@+id/post_image"
                 tools:listitem="@layout/item_reaction" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,7 +17,6 @@ import com.example.mobv2.models.MenuItemMetadatum;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.EditProfileFragment;
 import com.example.mobv2.ui.fragments.LanguageFragment;
-import com.example.mobv2.ui.fragments.main.MainFragment;
 import com.example.mobv2.ui.fragments.MapFeaturesFragment;
 import com.example.mobv2.ui.fragments.NotificationAndSoundFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -28,11 +26,9 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     private final int PROFILE_GROUP = 0, SETTINGS_GROUP = 1;
 
     private MainActivity mainActivity;
-    private MainFragment mainFragment;
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private ActionBarDrawerToggle drawerToggle;
     private View navigationHeader;
     private ImageView avatarView;
     private TextView fullNameView;

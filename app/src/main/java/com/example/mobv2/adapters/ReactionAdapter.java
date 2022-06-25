@@ -48,8 +48,19 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
 
         holder.reaction.setText(item.getReaction()
                                     .getEmoji());
+
         holder.count.setText(String.valueOf(item.getReaction()
                                                 .getCount()));
+
+        if (item.getReaction()
+                .getType() == Reaction.ADD)
+        {
+            holder.count.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.count.setVisibility(View.VISIBLE);
+        }
 
         holder.itemView.setOnClickListener(v -> toggleChecked(position));
 

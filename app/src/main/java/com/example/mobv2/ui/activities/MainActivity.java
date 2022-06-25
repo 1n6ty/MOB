@@ -52,6 +52,11 @@ public class MainActivity extends AppCompatActivity
         transactionToFragment(new AuthFragment());
     }
 
+    public void transactionToMainFragment()
+    {
+        transactionToFragment(mainFragment);
+    }
+
     public void transactionToFragment(@NonNull Fragment fragment)
     {
         String fragmentName = fragment.getClass()

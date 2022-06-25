@@ -1,8 +1,5 @@
 package com.example.mobv2.ui.fragments.main;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 
@@ -21,22 +18,19 @@ import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.utils.MarkerAddition;
-import com.example.mobv2.utils.BitmapConverter;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
 {
-    public static final int ZOOM = 14;
+    public static final int ZOOM = 18;
 
+    private MainFragmentViewModel viewModel;
 
     private Toolbar toolbar;
 
@@ -44,10 +38,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private BottomSheetBehavior sheetBehavior;
     private Toolbar postsToolbar;
     private RecyclerView postsRecycler;
-    private AppBarLayout postsAppBar;
-    private View dragger;
+
     private GoogleMap googleMap;
-    private MainFragmentViewModel viewModel;
+    private Marker marker;
 
     public MainFragment()
     {
@@ -58,7 +51,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
-
         super.onViewCreated(view, savedInstanceState);
 
         initViewModel();
@@ -76,16 +68,10 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     protected void initToolbar()
     {
-        dragger = binding.dragger;
         toolbar = binding.toolbar;
         navDrawer = new NavDrawer(mainActivity);
 
-        // a half-measure
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sample_avatar);
-        Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 72, 72, false);
-        BitmapDrawable icon = new BitmapDrawable(getResources(), bitmapScaled);
-
-        super.initToolbar(toolbar, icon, v -> navDrawer.open());
+        super.initToolbar(toolbar, R.drawable.sample_avatar_rounded, v -> navDrawer.open());
     }
 
 
@@ -93,7 +79,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null)
+        if (mapFragment != null && !viewModel.isMapReady())
         {
             mapFragment.getMapAsync(this::onMapReady);
         }
@@ -101,7 +87,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void initBottomSheet()
     {
-        postsAppBar = binding.postsAppBar;
         postsToolbar = binding.postsToolbar;
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
@@ -109,20 +94,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
 
         sheetBehavior.addBottomSheetCallback(
-                new PostsSheetCallback(
-                        sheetBehavior,
-                        postsAppBar,
-                        postsToolbar,
-                        dragger
-                ));
+                new PostsSheetCallback(binding.postsAppBarContainer, this::refreshMarker));
 
-
-        int actionBarHeight = getContext()
-                .getTheme()
-                .obtainStyledAttributes(new int[]{android.R.attr.actionBarSize})
-                .getDimensionPixelSize(0, -1);
-
-        sheetBehavior.setPeekHeight(actionBarHeight);
+        sheetBehavior.setPeekHeight(200);
         sheetBehavior.setHalfExpandedRatio(0.6f);
 
         postsToolbar.setNavigationOnClickListener(
@@ -134,23 +108,24 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         postsRecycler = binding.postsRecycler;
 
         postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        postsRecycler.setAdapter(new PostAdapter(Database.postsDb));
+        postsRecycler.setAdapter(new PostAdapter(getContext(), Database.postsDb));
     }
 
     private void onMapReady(GoogleMap googleMap)
     {
+        viewModel.setMapReady(true);
+
         this.googleMap = googleMap;
 
-//        if (viewModel.getMarker() == null)
-//            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(55.0415, 82.9346), ZOOM));
-//        else
-//            onMarkerClick(viewModel.getMarker());
-//        googleMap.animateCamera(viewModel.getLastCoordinates());
+        setMapMarkers(googleMap);
 
+        googleMap.setOnMarkerClickListener(this::onMarkerClick);
+        googleMap.setOnMapClickListener(this::onMapClick);
+    }
 
-        BitmapDescriptor descriptor =
-                BitmapConverter.drawableToBitmapDescriptor(getContext(), R.drawable.ic_marker);
-
+    private void setMapMarkers(GoogleMap googleMap)
+    {
+        BitmapDescriptor descriptor = getBitmapDescriptor(R.drawable.ic_marker_24dp);
 
         MarkerAddition[] markerAdditions =
                 new MarkerAddition[]{
@@ -163,29 +138,53 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         {
             googleMap.addMarker(markerAddition.create());
         }
-
-        googleMap.setOnMarkerClickListener(this::onMarkerClick);
     }
 
     private boolean onMarkerClick(Marker marker)
     {
+        refreshMarker();
+
+        this.marker = marker;
+
+        marker.setIcon(getBitmapDescriptor(R.drawable.ic_marker_36dp));
+
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM));
+// переход по адресу
+/*        try
+        {
+            Geocoder geocoder = new Geocoder(getContext());
+            List<Address> addresses =
+                    geocoder.getFromLocationName("Россия Новосибирск Ватутина 19", 1);
+            double latitude = addresses.get(0)
+                                       .getLatitude();
+            double longitude = addresses.get(0)
+                                        .getLongitude();
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), ZOOM));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }*/
+
 
         sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         postsToolbar.setTitle(marker.getTitle());
 
-//        if (viewModel.getMarker() != marker) viewModel.setMarker(marker);
-
         return true;
     }
 
-    @Override
-    public void onDestroyView()
+    private void onMapClick(LatLng latLng)
     {
-        super.onDestroyView();
+        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        refreshMarker();
+    }
 
-        CameraPosition cameraPosition = googleMap.getCameraPosition();
-
-        viewModel.setLastCoordinates(CameraUpdateFactory.newLatLngZoom(cameraPosition.target, cameraPosition.zoom));
+    private void refreshMarker()
+    {
+        if (marker != null)
+        {
+            marker.setIcon(getBitmapDescriptor(R.drawable.ic_marker_24dp));
+            marker = null;
+        }
     }
 }

@@ -37,7 +37,7 @@
                         android:layout_marginTop="@dimen/toolbar_main_margin_top"
                         android:background="@drawable/background_toolbar_main"
                         android:elevation="2dp"
-                        android:theme="@style/Theme.MOBv2.AppBarOverlay"
+                        android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
                         app:navigationIcon="@drawable/ic_menu_drawer"
                         app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -60,6 +60,7 @@
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
                 <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:id="@+id/posts_app_bar_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -80,7 +81,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="?attr/actionBarSize"
                             android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-                            android:theme="@style/Theme.MOBv2.AppBarOverlay"
+                            android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
                             app:navigationIcon="@drawable/ic_close"
                             app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
                     </com.google.android.material.appbar.AppBarLayout>
@@ -90,6 +91,7 @@
                     android:id="@+id/posts_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="#f4f4f4"
                     tools:listitem="@layout/item_post" />
             </LinearLayout>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

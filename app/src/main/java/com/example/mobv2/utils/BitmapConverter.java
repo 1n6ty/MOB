@@ -1,34 +1,42 @@
 package com.example.mobv2.utils;
 
-import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-
-import androidx.appcompat.content.res.AppCompatResources;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 public class BitmapConverter
 {
-    public static BitmapDescriptor drawableToBitmapDescriptor(Context context,
+    public static BitmapDescriptor drawableToBitmapDescriptor(Resources resources,
                                                               int id)
     {
-        Drawable vectorDrawable;
-        vectorDrawable = AppCompatResources.getDrawable(context, id);
+        return BitmapDescriptorFactory.fromBitmap(getBitmap(resources.getDrawable(id)));
+    }
+
+    public static Bitmap drawableToBitmap(Resources resources,
+                                          int id)
+    {
+        return getBitmap(resources.getDrawable(id));
+    }
+
+    private static Bitmap getBitmap(Drawable vectorDrawable)
+    {
         if (vectorDrawable != null)
         {
-            int w = vectorDrawable.getIntrinsicWidth();
-            int h = vectorDrawable.getIntrinsicHeight();
+            int width = vectorDrawable.getIntrinsicWidth();
+            int height = vectorDrawable.getIntrinsicHeight();
 
-            vectorDrawable.setBounds(0, 0, w, h);
-            Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bm);
+            vectorDrawable.setBounds(0, 0, width, height);
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
             vectorDrawable.draw(canvas);
 
-            return BitmapDescriptorFactory.fromBitmap(bm);
+            return bitmap;
         }
+
         return null;
     }
 }

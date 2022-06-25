@@ -13,8 +13,10 @@
     <dimen name="toolbar_rest_margin_top">32dp</dimen>
 
     <dimen name="nav_header_height">200dp</dimen>
-    <dimen name="nav_width">280dp</dimen>
+    <dimen name="nav_width">300dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="textSize_medium">16sp</dimen>
-    <dimen name="textSize_small">12sp</dimen>
+    <dimen name="title_text_size">20sp</dimen>
+    <dimen name="medium_text_size">16sp</dimen>
+    <dimen name="pre_medium_text_size">14sp</dimen>
+    <dimen name="small_text_size">12sp</dimen>
 </resources>

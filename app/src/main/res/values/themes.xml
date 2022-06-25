@@ -14,7 +14,9 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/blue_100_alpha</item>
     </style>
 
-    <style name="Theme.MOBv2.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.MOBv2.AppBarOverlayLight" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.MOBv2.AppBarOverlayDark" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
 
     <style name="Theme.MOBv2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 

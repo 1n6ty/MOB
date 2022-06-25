@@ -27,12 +27,11 @@
     <string name="preference_title_home">Your home-points</string>
     <string name="preference_summary_home">Tap to change your places of residence</string>
 
-    <!--  edit profile menu  -->
+    <!--  edit profile menu item titles  -->
     <string name="menu_set_new_photo">Set new photo</string>
     <string name="menu_save_to_gallery">Save to gallery</string>
     <string name="menu_delete_photo">Delete photo</string>
     <string name="menu_log_out">Log out</string>
-
 
     <!--  item reactions  -->
     <string name="item_reaction_count">200</string>
@@ -42,4 +41,10 @@
     <string name="auth_desc">You do not need to enter your phone number. It happens automatically.</string>
     <string name="auth_hint">Enter your password</string>
     <string name="auth_button">Next -&gt;</string>
+
+    <!--  post menu item titles  -->
+    <string name="menu_copy_post">Copy</string>
+    <string name="menu_forward_post">Forward</string>
+    <string name="menu_edit_post">Edit</string>
+    <string name="menu_delete_post">Delete</string>
 </resources>

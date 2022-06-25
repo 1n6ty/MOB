@@ -7,24 +7,23 @@
     </style>
 
     <style name="navHeaderTitleStyle">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">@dimen/title_text_size</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="navSubheaderTitleStyle">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="navSubheaderStyle">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
         <item name="android:textColor">@color/blue_500</item>
     </style>
 
     <style name="navItemTextStyle">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/pre_medium_text_size</item>
     </style>
-
 
     <style name="settingsItemStyle">
         <item name="android:layout_width">match_parent</item>
@@ -34,23 +33,23 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:paddingStart">@dimen/horizontal_margin</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">@dimen/horizontal_small_margin</item>
+        <item name="android:paddingBottom">@dimen/horizontal_small_margin</item>
     </style>
 
     <style name="settingsItemHeaderTextStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:textColor">@color/gray_700</item>
-        <item name="android:textSize">@dimen/textSize_medium</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
     </style>
 
     <style name="settingsItemSubheaderTextStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginTop">@dimen/vertical_very_small_margin</item>
         <item name="android:textColor">@color/gray_300</item>
-        <item name="android:textSize">@dimen/textSize_small</item>
+        <item name="android:textSize">@dimen/small_text_size</item>
     </style>
 
     <style name="authPasswordTextStyle">
@@ -60,12 +59,17 @@
     </style>
 
     <style name="nextButtonTextStyle">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="nextButtonStyle">
-        <item name="android:background">@drawable/background_button_auth_selector</item>
-        <item name="android:stateListAnimator">@animator/hover_up_button</item>
+    <style name="postItemHeaderTextStyle">
+        <item name="android:textColor">@color/gray_700</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+    </style>
+
+    <style name="postItemSubheaderTextStyle">
+        <item name="android:textColor">@color/gray_300</item>
+        <item name="android:textSize">@dimen/pre_medium_text_size</item>
     </style>
 </resources>

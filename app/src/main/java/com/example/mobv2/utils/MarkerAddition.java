@@ -1,5 +1,8 @@
 package com.example.mobv2.utils;
 
+import android.content.res.Resources;
+
+import com.example.mobv2.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -28,11 +31,4 @@ public class MarkerAddition
                 .title(title)
                 .icon(descriptor);
     }
-
-//    public static MarkerOptions recreate(Marker marker)
-//    {
-//        return new MarkerOptions().position(marker.getPosition())
-//                                  .title(marker.getTitle())
-//                                  .icon(marker.getIcon());
-//    }
 }

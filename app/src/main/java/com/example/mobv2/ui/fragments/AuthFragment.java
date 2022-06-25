@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,6 +13,7 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.serverapi.MOBServerAPI;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -36,9 +36,8 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
-        super.onViewCreated(view, savedInstanceState);
-
         connectToServer();
+        super.onViewCreated(view, savedInstanceState);
 
         initPasswordView();
         initPhoneView();
@@ -69,17 +68,30 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
             try
             {
                 mobServerAPI.auth(
-                        obj ->
+                        new MOBServerAPI.MOBAPICallback()
                         {
-                            Log.v("DEBUG", obj.toString());
-                            return null;
-                        },
-                        num ->
-                        {
-                            Log.v("DEBUG", num.toString());
-                            Toast.makeText(getContext(), "This user is not exist", Toast.LENGTH_LONG)
-                                 .show();
-                            return null;
+                            @Override
+                            public void funcOk(LinkedTreeMap<String, Object> obj)
+                            {
+                                Log.v("DEBUG", obj.toString());
+                                mainActivity.transactionToMainFragment();
+                            }
+
+                            @Override
+                            public void funcBad(LinkedTreeMap<String, Object> obj)
+                            {
+                                Log.v("DEBUG", obj.toString());
+                                Toast.makeText(getContext(), "This user is not exist", Toast.LENGTH_LONG)
+                                     .show();
+                            }
+
+                            @Override
+                            public void fail(Throwable obj)
+                            {
+                                Log.v("DEBUG", obj.toString());
+                                Toast.makeText(getContext(), "Something is wrong", Toast.LENGTH_LONG)
+                                     .show();
+                            }
                         },
                         phone.getText()
                              .toString(),
@@ -90,9 +102,11 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
             {
                 e.printStackTrace();
             }
-
-            mainActivity.transactionToFragment(mainActivity.getMainFragment());
-
         });
+
+        // unnecessary
+        binding.skipAuthButton.setOnClickListener(v -> mainActivity.transactionToMainFragment());
     }
+
+
 }

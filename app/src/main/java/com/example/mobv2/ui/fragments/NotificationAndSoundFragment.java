@@ -28,10 +28,10 @@ public class NotificationAndSoundFragment extends BaseFragment<FragmentNotificat
         initToolbar();
     }
 
+    @Override
     protected void initToolbar()
     {
         toolbar = binding.toolbar;
-
         super.initToolbar(toolbar, R.string.menu_notification_and_sound);
     }
 }

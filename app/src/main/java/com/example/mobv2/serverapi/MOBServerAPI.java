@@ -1,145 +1,211 @@
 package com.example.mobv2.serverapi;
 
-import com.example.mobv2.serverapi.callbacks.ArrayListSuccessCallback;
-import com.example.mobv2.serverapi.callbacks.CreateSuccessCallback;
-import com.example.mobv2.serverapi.callbacks.HashMapSuccessCallback;
-import com.example.mobv2.serverapi.callbacks.StringSuccessCallback;
-import com.example.mobv2.serverapi.callbacks.VoidSuccessCallback;
+import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.function.Function;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public class MOBServerAPI
 {
+
     private final MOBInterface MOBAPI;
+
+    public interface MOBAPICallback
+    {
+        public void funcOk(LinkedTreeMap<String, Object> obj);
+
+        public void funcBad(LinkedTreeMap<String, Object> obj);
+
+        public void fail(Throwable obj);
+    }
+
+    private Callback<LinkedTreeMap<String, Object>> createResponseCallback(MOBAPICallback obj)
+    {
+        return new Callback<LinkedTreeMap<String, Object>>()
+        {
+            @Override
+            public void onResponse(@NonNull Call<LinkedTreeMap<String, Object>> call,
+                                   @NonNull Response<LinkedTreeMap<String, Object>> response)
+            {
+                LinkedTreeMap<String, Object> body = new LinkedTreeMap<>();
+                body.put("status_code", response.code());
+                if (response.isSuccessful())
+                {
+                    body.put("response", response.body()
+                                                 .get("response"));
+                    obj.funcOk(body);
+                }
+                else
+                {
+                    try
+                    {
+                        LinkedTreeMap<String, Object> msg = new Gson().fromJson(response.errorBody()
+                                                                                        .string(), new TypeToken<LinkedTreeMap<String, Object>>()
+                        {
+                        }.getType());
+                        body.put("msg", msg.get("msg"));
+                    }
+                    catch (IOException e)
+                    {
+                        obj.fail(e.getCause());
+                    }
+                    obj.funcBad(body);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<LinkedTreeMap<String, Object>> call,
+                                  @NonNull Throwable t)
+            {
+                obj.fail(t);
+            }
+        };
+    }
 
     public MOBServerAPI(String baseUrl)
     {
-        Retrofit retrofit =
-                new Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create()).build();
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl)
+                                                  .addConverterFactory(GsonConverterFactory.create())
+                                                  .build();
         MOBAPI = retrofit.create(MOBInterface.class);
     }
 
     public interface MOBInterface
     {
         @GET("auth/")
-        Call<HashMap<String, String>> auth(@Query("l") String login,
-                                           @Query("p") String passwordHashed);
+        Call<LinkedTreeMap<String, Object>> auth(@Query("l") String login,
+                                                 @Query("p") String passwordHashed);
 
         @GET("getLocations/")
-        Call<HashMap<String, ArrayList<HashMap<String, String>>>> getLocations(@Query("token") String token);
+        Call<LinkedTreeMap<String, Object>> getLocations(@Query("token") String token);
 
         @GET("getMarks/")
-        Call<HashMap<String, ArrayList<HashMap<String, String>>>> getMarks(@Query("token") String token);
+        Call<LinkedTreeMap<String, Object>> getMarks(@Query("token") String token);
 
         @GET("getPost/")
-        Call<HashMap<String, Object>> getPost(@Query("post_id") int post_id,
-                                              @Query("token") String token);
+        Call<LinkedTreeMap<String, Object>> getPost(@Query("post_id") int post_id,
+                                                    @Query("token") String token);
 
         @GET("getComment/")
-        Call<HashMap<String, Object>> getComment(@Query("post_id") int post_id,
-                                                 @Query("comment_id") int comment_id,
-                                                 @Query("token") String token);
+        Call<LinkedTreeMap<String, Object>> getComment(@Query("post_id") int post_id,
+                                                       @Query("comment_id") int comment_id,
+                                                       @Query("ind") boolean ind,
+                                                       @Query("token") String token);
 
-        @FormUrlEncoded
+        @GET
+        Call<LinkedTreeMap<String, Object>> refresh(@Query("token") String token,
+                                                    @Query("token") String refresh);
+
+        @Multipart
         @POST("createPost/")
-        Call<HashMap<String, Integer>> createPost(@Field("text") String text,
-                                                  @Field("img") String img,
-                                                  @Field("markx") double markx,
-                                                  @Field("marky") double marky,
-                                                  @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> createPost(@Part("text") String text,
+                                                       @Part("markx") double markx,
+                                                       @Part("marky") double marky,
+                                                       @Part("token") String token,
+                                                       @Part MultipartBody.Part[] imgs);
 
         @FormUrlEncoded
         @POST("comment/")
-        Call<HashMap<String, Integer>> comment(@Field("post_id") int post_id,
-                                               @Field("text") String text,
-                                               @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> comment(@Field("post_id") int post_id,
+                                                    @Field("text") String text,
+                                                    @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("setLocation/")
-        Call<HashMap<String, String>> setLocation(@Field("location_id") int location_id,
-                                                  @Field("token") String token);
-
-        @FormUrlEncoded
-        @PUT("setUpdate/")
-        Call<HashMap<String, String>> setUpdate(@Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> setLocation(@Field("location_id") int location_id,
+                                                        @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("editUser/")
-        Call<Void> editUser(@Field("nickName") String nickName, @Field("name") String name,
-                            @Field("surname") String surname, @Field("password") String password,
-                            @Field("email") String email, @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> editUser(@Field("nickName") String nickName,
+                                                     @Field("name") String name,
+                                                     @Field("password") String password,
+                                                     @Field("email") String email,
+                                                     @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("postInc/")
-        Call<Void> postInc(@Field("post_id") int post_id, @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> postInc(@Field("post_id") int post_id,
+                                                    @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("postDec/")
-        Call<Void> postDec(@Field("post_id") int post_id, @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> postDec(@Field("post_id") int post_id,
+                                                    @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("commentInc/")
-        Call<Void> commentInc(@Field("post_id") int post_id,
-                              @Field("comment_id") int comment_id,
-                              @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> commentInc(@Field("post_id") int post_id,
+                                                       @Field("comment_id") int comment_id,
+                                                       @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("commentDec/")
-        Call<Void> commentDec(@Field("post_id") int post_id,
-                              @Field("comment_id") int comment_id,
-                              @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> commentDec(@Field("post_id") int post_id,
+                                                       @Field("comment_id") int comment_id,
+                                                       @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("postReact/")
-        Call<Void> postReact(@Field("post_id") int post_id,
-                             @Field("reaction") String reaction,
-                             @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> postReact(@Field("post_id") int post_id,
+                                                      @Field("reaction") String reaction,
+                                                      @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("postUnreact/")
-        Call<Void> postUnreact(@Field("post_id") int post_id,
-                               @Field("reaction") String reaction,
-                               @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> postUnreact(@Field("post_id") int post_id,
+                                                        @Field("reaction") String reaction,
+                                                        @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("commentReact/")
-        Call<Void> commentReact(@Field("post_id") int post_id,
-                                @Field("comment_id") int comment_id,
-                                @Field("reaction") String reaction,
-                                @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> commentReact(@Field("post_id") int post_id,
+                                                         @Field("comment_id") int comment_id,
+                                                         @Field("reaction") String reaction,
+                                                         @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("commentUnreact/")
-        Call<Void> commentUnreact(@Field("post_id") int post_id,
-                                  @Field("comment_id") int comment_id,
-                                  @Field("reaction") String reaction,
-                                  @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> commentUnreact(@Field("post_id") int post_id,
+                                                           @Field("comment_id") int comment_id,
+                                                           @Field("reaction") String reaction,
+                                                           @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("deleteComment/")
-        Call<Void> deleteComment(@Field("post_id") int post_id,
-                                 @Field("comment_id") int comment_id,
-                                 @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> deleteComment(@Field("post_id") int post_id,
+                                                          @Field("comment_id") int comment_id,
+                                                          @Field("token") String token);
 
         @FormUrlEncoded
         @PUT("deletePost/")
-        Call<Void> deletePost(@Field("post_id") int post_id, @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> deletePost(@Field("post_id") int post_id,
+                                                       @Field("token") String token);
     }
 
     private static byte[] getSHA(String input) throws NoSuchAlgorithmException
@@ -159,200 +225,193 @@ public class MOBServerAPI
         return hexString.toString();
     }
 
-    public void auth(Function<String, Void> funcOk,
-                     Function<Integer, Void> funcBad,
+    public void refreshToken(MOBAPICallback obj,
+                             String token,
+                             String refreshToken)
+    {
+        Call<LinkedTreeMap<String, Object>> refreshCall = MOBAPI.refresh(token, refreshToken);
+        refreshCall.enqueue(createResponseCallback(obj));
+    }
+
+    public void auth(MOBAPICallback obj,
                      String login,
                      String password) throws NoSuchAlgorithmException
     {
-        Call<HashMap<String, String>> authCall = MOBAPI.auth(login, toHexString(getSHA(password)));
-        authCall.enqueue(new StringSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> authCall =
+                MOBAPI.auth(login, toHexString(getSHA(password)));
+        authCall.enqueue(createResponseCallback(obj));
     }
 
-    public void getLocations(Function<ArrayList<HashMap<String, String>>, Void> funcOk,
-                             Function<Integer, Void> funcBad,
+    public void getLocations(MOBAPICallback obj,
                              String token)
     {
-        Call<HashMap<String, ArrayList<HashMap<String, String>>>> getFunc =
-                MOBAPI.getLocations(token);
-        getFunc.enqueue(new ArrayListSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getLocations(token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void getMarks(Function<ArrayList<HashMap<String, String>>, Void> funcOk,
-                         Function<Integer, Void> funcBad,
+    public void getMarks(MOBAPICallback obj,
                          String token)
     {
-        Call<HashMap<String, ArrayList<HashMap<String, String>>>> getFunc = MOBAPI.getMarks(token);
-        getFunc.enqueue(new ArrayListSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getMarks(token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void getPost(Function<HashMap<String, Object>, Void> funcOk,
-                        Function<Integer, Void> funcBad,
-                        int post_id,
+    public void getPost(MOBAPICallback obj,
+                        int postId,
                         String token)
     {
-        Call<HashMap<String, Object>> getFunc = MOBAPI.getPost(post_id, token);
-        getFunc.enqueue(new HashMapSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getPost(postId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void getComment(Function<HashMap<String, Object>, Void> funcOk,
-                           Function<Integer, Void> funcBad,
-                           int post_id,
-                           int comment_id,
+    public void getComment(MOBAPICallback obj,
+                           int postId,
+                           int commentId,
+                           boolean ind,
                            String token)
     {
-        Call<HashMap<String, Object>> getFunc = MOBAPI.getComment(post_id, comment_id, token);
-        getFunc.enqueue(new HashMapSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(postId, commentId, ind, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void createPost(Function<Integer, Void> funcOk,
-                           Function<Integer, Void> funcBad,
-                           String text,
-                           String img,
-                           double markx,
-                           double marky,
-                           String token)
+    public void post(MOBAPICallback obj,
+                     String text,
+                     float markX,
+                     float markY,
+                     String[] imgPaths,
+                     String token)
     {
-        Call<HashMap<String, Integer>> crpost = MOBAPI.createPost(text, img, markx, marky, token);
-        crpost.enqueue(new CreateSuccessCallback(funcOk, funcBad));
+
+        MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.length];
+        for (int i = 0; i < imgPaths.length; i++)
+        {
+            File file = new File(imgPaths[i]);
+            imgs[i] =
+                    MultipartBody.Part.createFormData("imgs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+        }
+
+        Call<LinkedTreeMap<String, Object>> call =
+                MOBAPI.createPost(text, markX, markY, token, imgs);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void comment(Function<Integer, Void> funcOk,
-                        Function<Integer, Void> funcBad,
-                        int post_id,
+    public void comment(MOBAPICallback obj,
                         String text,
+                        int postId,
                         String token)
     {
-        Call<HashMap<String, Integer>> crcomment = MOBAPI.comment(post_id, text, token);
-        crcomment.enqueue(new CreateSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.comment(postId, text, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void setLocation(Function<String, Void> funcOk,
-                            Function<Integer, Void> funcBad,
-                            int location_id,
+    public void setLocation(MOBAPICallback obj,
+                            int locationId,
                             String token)
     {
-        Call<HashMap<String, String>> setL = MOBAPI.setLocation(location_id, token);
-        setL.enqueue(new StringSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(locationId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void setUpdate(Function<String, Void> funcOk,
-                          Function<Integer, Void> funcBad,
-                          String token)
-    {
-        Call<HashMap<String, String>> setU = MOBAPI.setUpdate(token);
-        setU.enqueue(new StringSuccessCallback(funcOk, funcBad));
-    }
-
-    public void editUser(Function<Integer, Void> funcOk,
-                         Function<Integer, Void> funcBad,
-                         String nickName,
+    public void editUser(MOBAPICallback obj,
                          String name,
-                         String surname,
+                         String nick,
                          String password,
                          String email,
                          String token) throws NoSuchAlgorithmException
     {
-        Call<Void> editU =
-                MOBAPI.editUser(nickName, name, surname, toHexString(getSHA(password)), email, token);
-        editU.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call =
+                MOBAPI.editUser(nick, name, toHexString(getSHA(password)), email, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void postInc(Function<Integer, Void> funcOk,
-                        Function<Integer, Void> funcBad,
-                        int post_id,
+    public void postInc(MOBAPICallback obj,
+                        int postId,
                         String token)
     {
-        Call<Void> postinc = MOBAPI.postInc(post_id, token);
-        postinc.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.postInc(postId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void postDec(Function<Integer, Void> funcOk,
-                        Function<Integer, Void> funcBad,
-                        int post_id,
+    public void postDec(MOBAPICallback obj,
+                        int postId,
                         String token)
     {
-        Call<Void> postdec = MOBAPI.postDec(post_id, token);
-        postdec.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.postDec(postId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void commentInc(Function<Integer, Void> funcOk,
-                           Function<Integer, Void> funcBad,
-                           int post_id,
-                           int comment_id,
+    public void commentInc(MOBAPICallback obj,
+                           int postId,
+                           int commentId,
                            String token)
     {
-        Call<Void> commentinc = MOBAPI.commentInc(post_id, comment_id, token);
-        commentinc.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentInc(postId, commentId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void commentDec(Function<Integer, Void> funcOk,
-                           Function<Integer, Void> funcBad,
-                           int post_id,
-                           int comment_id,
+    public void commentDec(MOBAPICallback obj,
+                           int postId,
+                           int commentId,
                            String token)
     {
-        Call<Void> commentdec = MOBAPI.commentDec(post_id, comment_id, token);
-        commentdec.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentDec(postId, commentId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void postReact(Function<Integer, Void> funcOk,
-                          Function<Integer, Void> funcBad,
-                          int post_id,
+    public void postReact(MOBAPICallback obj,
+                          int postId,
                           String reaction,
                           String token)
     {
-        Call<Void> postr = MOBAPI.postReact(post_id, reaction, token);
-        postr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.postReact(postId, reaction, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void postUnreact(Function<Integer, Void> funcOk,
-                            Function<Integer, Void> funcBad,
-                            int post_id,
+    public void postUnreact(MOBAPICallback obj,
+                            int postId,
                             String reaction,
                             String token)
     {
-        Call<Void> postunr = MOBAPI.postUnreact(post_id, reaction, token);
-        postunr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.postUnreact(postId, reaction, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void commentReact(Function<Integer, Void> funcOk,
-                             Function<Integer, Void> funcBad,
-                             int post_id,
-                             int comment_id,
+    public void commentReact(MOBAPICallback obj,
+                             int postId,
+                             int commentId,
                              String reaction,
                              String token)
     {
-        Call<Void> commentr = MOBAPI.commentReact(post_id, comment_id, reaction, token);
-        commentr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call =
+                MOBAPI.commentReact(postId, commentId, reaction, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void commentUnreact(Function<Integer, Void> funcOk,
-                               Function<Integer, Void> funcBad,
-                               int post_id,
-                               int comment_id,
+    public void commentUnreact(MOBAPICallback obj,
+                               int postId,
+                               int commentId,
                                String reaction,
                                String token)
     {
-        Call<Void> commentunr = MOBAPI.commentUnreact(post_id, comment_id, reaction, token);
-        commentunr.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call =
+                MOBAPI.commentUnreact(postId, commentId, reaction, token);
+        call.enqueue(createResponseCallback(obj));
     }
 
-    public void deleteComment(Function<Integer, Void> funcOk,
-                              Function<Integer, Void> funcBad,
-                              int post_id,
-                              int comment_id,
-                              String token)
-    {
-        Call<Void> deletec = MOBAPI.deleteComment(post_id, comment_id, token);
-        deletec.enqueue(new VoidSuccessCallback(funcOk, funcBad));
-    }
-
-    public void deletePost(Function<Integer, Void> funcOk,
-                           Function<Integer, Void> funcBad,
-                           int post_id,
+    public void postDelete(MOBAPICallback obj,
+                           int postId,
                            String token)
     {
-        Call<Void> deletep = MOBAPI.deletePost(post_id, token);
-        deletep.enqueue(new VoidSuccessCallback(funcOk, funcBad));
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.deletePost(postId, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+
+    public void commentDelete(MOBAPICallback obj,
+                              int postId,
+                              int commentId,
+                              String token)
+    {
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.deleteComment(postId, commentId, token);
+        call.enqueue(createResponseCallback(obj));
     }
 }
