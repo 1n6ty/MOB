@@ -1,6 +1,9 @@
 from ast import Add
 from django.contrib import admin
-from .models import RuleCompany, Address, User, PostWithMark, Comment
+from .models import RuleCompany, Address, User, PostWithMark, Comment, Image
+
+class Image(admin.ModelAdmin):
+    pass
 
 class RuleCompanyAdmin(admin.ModelAdmin):
     exclude = ()
