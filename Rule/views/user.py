@@ -57,7 +57,7 @@ def register(req):
             password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest()
 
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
-            new_user.profile_img.create(img = open('./data/default.jpg', 'rb'));
+            #new_user.profile_img.create(img = open('./data/default_profile.jpg', 'rb'));
             new_user.save()
             return render(req, 'registration.html', {
                 "accept": True,
