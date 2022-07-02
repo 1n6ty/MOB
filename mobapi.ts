@@ -9,7 +9,15 @@
 function auth(login: string, password: string): { // login is a phone_number only!
     'response': {
         'refresh': string,
-        'token': string
+        'token': string,
+        'user': {
+            'id': number,
+            'email': string,
+            'phone': string,
+            'name': string,
+            'nick': string,
+            'profile_img_url': string 
+        }
     } //status 200
     'msg': 'error' //status 400, 404
 }{return;}
