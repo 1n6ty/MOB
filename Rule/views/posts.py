@@ -20,7 +20,7 @@ def getPost(req):
         try:
             user = User.objects.get(id = token_data['id'])
             address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.all()[post_id]
+            post = address.posts.get(id = post_id)
         except (ObjectDoesNotExist, IndexError) as e:
             return JsonResponse({
                 'msg': "not_found"
@@ -60,11 +60,11 @@ def getPost(req):
             'date': str(post.date),
             'id': post.id,
             'user': {
-                'nick_name': user.nickName,
-                'name': user.name,
-                'email': user.email,
-                'phone_number': user.phone_number,
-                'id': user.id
+                'nick_name': post.user.nickName,
+                'name': post.user.name,
+                'email': post.user.email,
+                'phone_number': post.user.phone_number,
+                'id': post.user.id
             },
             'data': {
                 'img_urls': imgs,

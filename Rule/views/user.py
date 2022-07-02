@@ -57,6 +57,7 @@ def register(req):
             password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest()
 
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
+            new_user.profile_img.create(img = open('./data/default.jpg', 'rb'));
             new_user.save()
             return render(req, 'registration.html', {
                 "accept": True,
@@ -123,10 +124,15 @@ def editUser(req):
             new_password = data.get('password')
         if data.get('email'):
             new_email = data.get('email')
+        try:
+            user.profile_img.img = req.FILES.getlist('imgs')[0];
+        except:
+            pass
         user.nickName = new_nick
         user.name = new_name
         user.password = new_password
-        user.email = new_email
+        if  len(User.objects.get(email = new_email)) == 0:
+            user.email = new_email
         user.save()
 
         return JsonResponse({

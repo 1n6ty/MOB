@@ -14,6 +14,7 @@ class Address(models.Model):
 
 class User(models.Model):
     nickName = models.CharField(max_length = 255, unique=True)
+    profile_img = models.ForeignKey("Image", on_delete=models.CASCADE, blank=True)
     name = models.CharField(max_length = 255)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length= 17, unique=True)

@@ -41,6 +41,8 @@ btn_add_new_user.onclick = (event) => {
             queue_members = true;
         };
         member.querySelector('.subm').onclick = (e) => {
+            
+
             let blur_node = htmlToElement(blur);
             member.insertBefore(blur_node, member.firstChild);
             queue_members = true;
