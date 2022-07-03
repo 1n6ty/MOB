@@ -10,11 +10,17 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
+import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.main.MainFragment;
 
 public class MainActivity extends AppCompatActivity
 {
+    // UNSAFE
+    public static final MOBServerAPI MOB_SERVER_API = new MOBServerAPI("http://192.168.0.104:8000/rules/");
+    public static String token = "";
+
+
     private ActivityMainBinding binding;
 
     private MainFragment mainFragment;

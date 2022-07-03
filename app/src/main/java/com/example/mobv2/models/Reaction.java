@@ -2,24 +2,30 @@ package com.example.mobv2.models;
 
 public class Reaction
 {
-    public static int EMOJI = 0, ADD = 1;
-
     public static String EMOJI_LIKE = "\uD83D\uDC4D";
     public static String EMOJI_DISLIKE = "\uD83D\uDC4E";
     public static String EMOJI_LOVE = "❤";
 
     public static String PLUS = "+";
 
-    private String emoji;
+    private
+    String emoji;
     private int count;
-    private int type;
+    private boolean add;
 
     public Reaction(String emoji,
                     int count)
     {
+        this(emoji, count, false);
+    }
+
+    public Reaction(String emoji,
+                    int count,
+                    boolean add)
+    {
         this.emoji = emoji;
         this.count = count;
-        this.type = emoji.equals(PLUS) ? ADD : EMOJI;
+        this.add = add;
     }
 
     public String getEmoji()
@@ -37,8 +43,8 @@ public class Reaction
         this.count = count;
     }
 
-    public int getType()
+    public boolean isAdd()
     {
-        return type;
+        return add;
     }
 }

@@ -32,7 +32,6 @@ import retrofit2.http.Query;
 
 public class MOBServerAPI
 {
-
     private final MOBInterface MOBAPI;
 
     public interface MOBAPICallback

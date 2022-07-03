@@ -1,4 +1,7 @@
 <resources>
+    <string name="check_internet_connection">"Check your Internet connection"</string>
+    <string name="user_is_not_exist">This user is not exist</string>
+
     <string name="app_name">MOB</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -33,10 +36,6 @@
     <string name="menu_delete_photo">Delete photo</string>
     <string name="menu_log_out">Log out</string>
 
-    <!--  item reactions  -->
-    <string name="item_reaction_count">200</string>
-    <string name="item_reaction_this">👍</string>
-
     <!--  auth fragment  -->
     <string name="auth_desc">You do not need to enter your phone number. It happens automatically.</string>
     <string name="auth_hint">Enter your password</string>
@@ -47,4 +46,11 @@
     <string name="menu_forward_post">Forward</string>
     <string name="menu_edit_post">Edit</string>
     <string name="menu_delete_post">Delete</string>
+
+    <!--  menu reactions  -->
+    <string name="menu_reaction_count">200</string>
+    <string name="menu_reaction_like">👍</string>
+    <string name="menu_reaction_dislike">👎</string>
+    <string name="menu_reaction_love">❤</string>
+    <string name="menu_reaction_plus">+</string>
 </resources>

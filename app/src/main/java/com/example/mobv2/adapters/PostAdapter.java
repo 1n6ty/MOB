@@ -69,9 +69,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         initContent(holder.content, position);
 
-        post.getReactions().add(new Reaction(Reaction.PLUS, 0));
+        Reaction addButton = new Reaction(Reaction.PLUS, -1, true);
 
-        holder.reactionsView.setAdapter(new ReactionAdapter(post.getReactions()));
+        if (!post.getReactions()
+                 .get(post.getReactions()
+                          .size() - 1)
+                 .isAdd())
+        {
+            post.getReactions()
+                .add(addButton);
+        }
+
+
+        holder.reactionsView.setAdapter(new ReactionAdapter(context, post.getReactions()));
     }
 
     private void initPopupMenu(ImageView menuView,
@@ -104,9 +114,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             menu.findItem(R.id.menu_delete_post)
                 .setVisible(true);
         }
-
-//        menu.findItem(R.id.menu_copy_post)
-//            .setOnMenuItemClickListener(item -> menuCopyPost(post));
 
         switch (post.getType())
         {
@@ -170,6 +177,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 .getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("simple text", post.getText());
         clipboard.setPrimaryClip(clip);
+
         Toast.makeText(context, "Copied", Toast.LENGTH_LONG)
              .show();
         return true;
@@ -208,9 +216,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         private TextView fullnameView;
         private TextView dateView;
         private ImageView menuView;
-//        private TextView textView;
         private Pair<TextView, ImageView> content;
-//        private ImageView
         private RecyclerView reactionsView;
 
         public PostViewHolder(@NonNull View itemView)

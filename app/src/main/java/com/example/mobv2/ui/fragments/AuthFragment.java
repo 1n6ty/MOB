@@ -13,16 +13,13 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.security.NoSuchAlgorithmException;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding>
 {
-    private final String TOKEN =
-            "65794a705a4349364944457349434a7762334e3063794936494673334c43413458537767496d4e766257316c626e527a496a6f6765794a7762334e3058326c6b496a6f674c54457349434a6a623231745a573530637949364946746466537767496d7876593246306157397558326c6b496a6f67496a456966513d3d.9b050ae9045df53498a86d18ff5d565dd47a2455f8518ccd699a03fe8763a738";
-    private MOBServerAPI mobServerAPI;
-
     private EditText password;
     private EditText phone;
     private Button next;
@@ -36,17 +33,11 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
-        connectToServer();
         super.onViewCreated(view, savedInstanceState);
 
         initPasswordView();
         initPhoneView();
         initNextButton();
-    }
-
-    private void connectToServer()
-    {
-        mobServerAPI = new MOBServerAPI("http://192.168.0.104:8000/rules/");
     }
 
     private void initPasswordView()
@@ -67,13 +58,15 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
         {
             try
             {
-                mobServerAPI.auth(
+                MainActivity.MOB_SERVER_API.auth(
                         new MOBServerAPI.MOBAPICallback()
                         {
                             @Override
                             public void funcOk(LinkedTreeMap<String, Object> obj)
                             {
                                 Log.v("DEBUG", obj.toString());
+                                MainActivity.token =
+                                        (String) ((LinkedTreeMap<String, Object>) obj.get("response")).get("token");
                                 mainActivity.transactionToMainFragment();
                             }
 
@@ -81,7 +74,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
                             public void funcBad(LinkedTreeMap<String, Object> obj)
                             {
                                 Log.v("DEBUG", obj.toString());
-                                Toast.makeText(getContext(), "This user is not exist", Toast.LENGTH_LONG)
+                                Toast.makeText(getContext(), R.string.user_is_not_exist, Toast.LENGTH_LONG)
                                      .show();
                             }
 
@@ -89,7 +82,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
                             public void fail(Throwable obj)
                             {
                                 Log.v("DEBUG", obj.toString());
-                                Toast.makeText(getContext(), "Something is wrong", Toast.LENGTH_LONG)
+                                Toast.makeText(getContext(), R.string.check_internet_connection, Toast.LENGTH_LONG)
                                      .show();
                             }
                         },

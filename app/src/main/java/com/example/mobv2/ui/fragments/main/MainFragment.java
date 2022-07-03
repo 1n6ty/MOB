@@ -1,7 +1,9 @@
 package com.example.mobv2.ui.fragments.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.PostAdapter;
-import com.example.mobv2.databaseimprovisation.Database;
 import com.example.mobv2.databinding.FragmentMainBinding;
+import com.example.mobv2.models.Post;
+import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
@@ -25,6 +29,9 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.gson.internal.LinkedTreeMap;
+
+import java.util.ArrayList;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
 {
@@ -35,12 +42,13 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private Toolbar toolbar;
 
     private NavDrawer navDrawer;
-    private BottomSheetBehavior sheetBehavior;
+    private BottomSheetBehavior<View> sheetBehavior;
     private Toolbar postsToolbar;
     private RecyclerView postsRecycler;
 
     private GoogleMap googleMap;
     private Marker marker;
+    private ArrayList<Post> posts = new ArrayList<>();
 
     public MainFragment()
     {
@@ -58,7 +66,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         initToolbar();
         initMap();
         initBottomSheet();
-        initPostsRecycler();
     }
 
     private void initViewModel()
@@ -94,7 +101,15 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
 
         sheetBehavior.addBottomSheetCallback(
-                new PostsSheetCallback(binding.postsAppBarContainer, this::refreshMarker));
+                new PostsSheetCallback(binding.postsAppBarContainer,
+                        this::initPostsRecycler,
+                        () ->
+                        {
+                            // fix will be better
+                            postsRecycler.setAdapter(null);
+                            posts.clear();
+                            refreshMarker();
+                        }));
 
         sheetBehavior.setPeekHeight(200);
         sheetBehavior.setHalfExpandedRatio(0.6f);
@@ -105,10 +120,44 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void initPostsRecycler()
     {
+        for (int i = 1; i < 4; i++)
+        {
+            MainActivity.MOB_SERVER_API.getPost(new MOBServerAPI.MOBAPICallback()
+            {
+                @Override
+                public void funcOk(LinkedTreeMap<String, Object> obj)
+                {
+                    Log.v("DEBUG", obj.toString());
+
+                    LinkedTreeMap<String, Object> response =
+                            (LinkedTreeMap<String, Object>) obj.get("response");
+
+                    Post post = Post.parseFromMap(response);
+                    posts.add(post);
+                    postsRecycler.setAdapter(new PostAdapter(getContext(), posts));
+                }
+
+                @Override
+                public void funcBad(LinkedTreeMap<String, Object> obj)
+                {
+                    Log.v("DEBUG", obj.toString());
+                    Toast.makeText(getContext(), "Post is not available", Toast.LENGTH_LONG)
+                         .show();
+                }
+
+                @Override
+                public void fail(Throwable obj)
+                {
+                    Log.v("DEBUG", obj.toString());
+                    Toast.makeText(getContext(), R.string.check_internet_connection, Toast.LENGTH_LONG)
+                         .show();
+                }
+            }, i, MainActivity.token);
+        }
+
         postsRecycler = binding.postsRecycler;
 
         postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        postsRecycler.setAdapter(new PostAdapter(getContext(), Database.postsDb));
     }
 
     private void onMapReady(GoogleMap googleMap)

@@ -5,4 +5,14 @@
         <item name="android:textColor">@color/gray_700</item>
         <item name="android:iconTint">@color/gray_500</item>
     </style>
+
+    <!-- Popup Other Style -->
+    <style name="MyPopupOtherStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/gray_300</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">@color/white</item>
+        <!-- Used for the background -->
+<!--        <item name="android:background">@color/black</item>-->
+    </style>
 </resources>

@@ -20,14 +20,14 @@
                 android:id="@+id/reaction"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="@string/item_reaction_this" />
+                android:text="@string/menu_reaction_like" />
 
             <TextView
                 android:id="@+id/count"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/horizontal_very_small_margin"
-                android:text="@string/item_reaction_count"
+                android:text="@string/menu_reaction_count"
                 android:textColor="@color/blue_500" />
         </LinearLayout>
     </LinearLayout>

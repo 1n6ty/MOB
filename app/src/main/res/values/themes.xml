@@ -18,8 +18,6 @@
 
     <style name="Theme.MOBv2.AppBarOverlayDark" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
 
-    <style name="Theme.MOBv2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
     <style name="Theme.MOBv2.NavigationView">
         <item name="android:listDivider">@color/white</item>
     </style>
