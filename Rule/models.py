@@ -15,7 +15,7 @@ class Address(models.Model):
     marky = models.FloatField(default=-1, blank=False)
 
 class User(models.Model):
-    nickName = models.CharField(max_length = 255, unique=True)
+    nickName = models.CharField(max_length = 255)
     profile_img = models.ForeignKey("Image", on_delete=models.CASCADE, default="", null=True)
     name = models.CharField(max_length = 255)
     email = models.EmailField(unique=True)
