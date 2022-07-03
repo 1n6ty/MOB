@@ -59,7 +59,7 @@ function getPost(post_id: number, token: string): { // post_id -> real id of pos
         'id': number,
         'date': string,
         'reactions': {
-            '*reaction*': number // like '😂': 10
+            '*reaction*': [number] // like '😂': [10, 13, ...]
             //...
         },
         'appreciations': number,
@@ -73,7 +73,8 @@ function getPost(post_id: number, token: string): { // post_id -> real id of pos
             'name': string,
             'email': string,
             'phone_number': string,
-            'id': number
+            'id': number,
+            'profile_img_url': string
         }
     } //status 200
     'msg': 'error' //status 400, 403, 404
@@ -98,13 +99,14 @@ function getComment(post_id: number, comment_id: number, ind: boolean, token: st
             'name': string,
             'email': string,
             'phone_number': string,
-            'id': number
+            'id': number,
+            'profile_img_url': string
         },
         'id': number,
         'text': string,
         'date': string,
         'reactions': {
-            '*reaction*': number // like '😂': 10
+            '*reaction*': [number] // like '😂': [10, 13, ...] 'ids'
             //...
         },
         'appreciations': number,

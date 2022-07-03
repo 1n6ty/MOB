@@ -69,8 +69,8 @@ def getComment(req):
         except:
             pass
         new_react = {}
-        for k in post.reacted:
-            new_react[k] = len(e.reacted[k])
+        for k in e.reacted:
+            new_react[k] = e.reacted[k]
 
         return JsonResponse({
             'response': {
@@ -361,7 +361,7 @@ def reactComment(req):
             if len(list(filter(lambda x: x == user.id, comment.reacted[reaction]))) == 0:
                 comment.reacted[reaction].append(user.id)
         except:
-            comment.reacted[reaction] = [user.id]
+            comment.reacted[reaction] = [user.id, ]
         comment.save()
 
         return JsonResponse({

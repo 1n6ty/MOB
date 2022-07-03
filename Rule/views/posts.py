@@ -53,7 +53,7 @@ def getPost(req):
             pass
         new_react = {}
         for k in post.reacted:
-            new_react[k] = len(post.reacted[k])
+            new_react[k] = post.reacted[k]
 
         imgs = [i.url for i in post.imgs.all()]
         res = {
@@ -358,7 +358,7 @@ def reactPost(req):
             if len(list(filter(lambda x: x == user.id, post.reacted[reaction]))) == 0:
                 post.reacted[reaction].append(user.id)
         except:
-            post.reacted[reaction] = [user.id]
+            post.reacted[reaction] = [user.id, ]
         post.save()
 
         return JsonResponse({

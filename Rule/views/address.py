@@ -38,7 +38,9 @@ def getLocations(req):
                 'city': i.city,
                 'district': i.district,
                 'house': i.house,
-                'id': i.id
+                'id': i.id,
+                'x': i.markx,
+                'y': i.marky
             })
         return JsonResponse({
             'response': res

@@ -11,6 +11,8 @@ class Address(models.Model):
     district = models.CharField(max_length = 255)
     house = models.PositiveIntegerField()
     posts = models.ManyToManyField('PostWithMark', blank = True)
+    markx = models.FloatField(default=-1, blank=False)
+    marky = models.FloatField(default=-1, blank=False)
 
 class User(models.Model):
     nickName = models.CharField(max_length = 255, unique=True)
