@@ -4,8 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
 from Rule.models import User, Comment
 
-sessionTime = 3600
-
 is_true_bool = lambda value: bool(value) and value.lower() not in ('false', '0')
 
 def getComment(req):
@@ -68,9 +66,6 @@ def getComment(req):
             app = False
         except:
             pass
-        new_react = {}
-        for k in e.reacted:
-            new_react[k] = e.reacted[k]
 
         return JsonResponse({
             'response': {
@@ -80,12 +75,12 @@ def getComment(req):
                     'email': e.user.email,
                     'phone_number': e.user.phone_number,
                     'id': e.user.id,
-                    'profile_img_url': e.user.profile_img.url
+                    'profile_img_url': e.user.profile_img.img.url
                 },
                 'id': e.id,
                 'text': e.text,
                 'date': str(e.date),
-                'reactions': new_react,
+                'reactions': e.reacted,
                 'appreciations': e.appreciations,
                 'appreciated': app
             }

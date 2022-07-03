@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponse, QueryDict
 from django.db.models import Q
 from Rule.models import User, Image
 import random, time, string
-from MOB.settings import BASE_DIR
+from MOB.settings import BASE_DIR, MEDIA_URL
 from django.core.files import File
 
 def auth(req):
@@ -39,10 +39,10 @@ def auth(req):
                 'user': {
                     'id': user.id,
                     'email': user.email,
-                    'phone': user.phone,
+                    'phone_number': user.phone_number,
                     'name': user.name,
                     'nick': user.nickName,
-                    'profile_img_url': user.profile_img.url 
+                    'profile_img_url': user.profile_img.img.url 
                 }
             }
         }, status = 200)

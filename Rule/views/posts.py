@@ -51,9 +51,6 @@ def getPost(req):
             app = False
         except:
             pass
-        new_react = {}
-        for k in post.reacted:
-            new_react[k] = post.reacted[k]
 
         imgs = [i.url for i in post.imgs.all()]
         res = {
@@ -65,13 +62,13 @@ def getPost(req):
                 'email': post.user.email,
                 'phone_number': post.user.phone_number,
                 'id': post.user.id,
-                'profile_img_url': post.user.profile_img.url
+                'profile_img_url': post.user.profile_img.img.url
             },
             'data': {
                 'img_urls': imgs,
                 'text': post.text
             },
-            'reactions': new_react,
+            'reactions': post.reacted,
             'appreciations': post.appreciations,
             'appreciated': app
         }
