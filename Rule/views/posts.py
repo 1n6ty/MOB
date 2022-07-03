@@ -52,7 +52,7 @@ def getPost(req):
         except:
             pass
 
-        imgs = [i.url for i in post.imgs.all()]
+        imgs = [i.img.url for i in post.imgs.all()]
         res = {
             'date': str(post.date),
             'id': post.id,
