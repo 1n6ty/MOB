@@ -2,7 +2,7 @@ from Rule.views.views import isCorruptedToken, getDataFromToken, sessionTimeExpi
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
-from Rule.models import User, PostWithMark
+from Rule.models import Image, User, PostWithMark
 import os
 from django.conf import settings
 
@@ -64,7 +64,8 @@ def getPost(req):
                 'name': post.user.name,
                 'email': post.user.email,
                 'phone_number': post.user.phone_number,
-                'id': post.user.id
+                'id': post.user.id,
+                'profile_img_url': post.user.profile_img.url
             },
             'data': {
                 'img_urls': imgs,
@@ -120,7 +121,7 @@ def deletePost(req):
             for i in post.comments.all():
                 i.delete()
             for i in post.imgs.all():
-                os.remove(settings.MEDIA_ROOT + i.name)
+                os.remove(settings.MEDIA_ROOT / i.name)
                 i.delete()
             post.delete()
 
@@ -143,7 +144,7 @@ def createPost(req):
                 'msg': "bad_request"
             }, status = 400)
         try:
-            text = str(req.POST['text']).replace("\"", "")
+            text = str(req.POST['text'])[1:-2]
         except:
             text = ""
         try:
@@ -181,7 +182,9 @@ def createPost(req):
         post.save()
         
         for f in req.FILES.getlist('imgs'):
-            post.imgs.create(img = f)
+            img = Image.objects.create(img = f)
+            img.save()
+            post.imgs.add(img)
 
         post.save()
         address.posts.add(post)

@@ -35,7 +35,7 @@ class PostWithMark(models.Model):
     appreciatedUsers = models.TextField(blank=True)
     unappreciatedUsers = models.TextField(blank=True)
     comments = models.ManyToManyField('Comment', blank=True)
-    reacted = models.JSONField(default={})
+    reacted = models.JSONField(default={}, blank=True)
 
     class Meta:
         ordering = ['-appreciations', '-date']
@@ -47,13 +47,13 @@ class Comment(models.Model):
     appreciatedUsers = models.TextField(blank=True)
     unappreciatedUsers = models.TextField(blank=True)
     date = models.DateField(default=time.now())
-    reacted = models.JSONField(default={})
+    reacted = models.JSONField(default={}, blank=True)
 
     class Meta:
         ordering = ['-appreciations', '-date']
 
 def post_directory_path(instance, filename):
-    return 'posts/{0}.{1}'.format(str(instance.id), filename.split('.')[-1])
+    return filename
 
 class Image(models.Model):
     img = models.ImageField(upload_to = post_directory_path)

@@ -5,8 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
 from django.db.models import Q
-from Rule.models import User
+from Rule.models import User, Image
 import random, time, string
+from MOB.settings import BASE_DIR
+from django.core.files import File
 
 def auth(req):
     if req.method == 'GET':
@@ -33,7 +35,15 @@ def auth(req):
                     'id': user.id,
                     'location_id': -1
                 }, user.prv_key),
-                'refresh': user.refresh
+                'refresh': user.refresh,
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'phone': user.phone,
+                    'name': user.name,
+                    'nick': user.nickName,
+                    'profile_img_url': user.profile_img.url 
+                }
             }
         }, status = 200)
     return HttpResponse(status = 405)
@@ -57,7 +67,9 @@ def register(req):
             password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest()
 
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
-            #new_user.profile_img.create(img = open('./data/default_profile.jpg', 'rb'));
+            profile = Image.objects.create(img = File(open(BASE_DIR / 'data/default_profile.jpg', 'rb'), 'profile_' + phone + '.jpg'))
+            profile.save()
+            new_user.profile_img = profile
             new_user.save()
             return render(req, 'registration.html', {
                 "accept": True,
