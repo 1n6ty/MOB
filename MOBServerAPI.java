@@ -209,9 +209,9 @@ public class MOBServerAPI {
         call.enqueue(createResponseCallback(obj));
     }
 
-    public void setLocation(MOBAPICallback obj,
-                     int locationId, String token){
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(locationId, token);
+    public void setAddress(MOBAPICallback obj,
+                     int AddressId, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(AddressId, token);
         call.enqueue(createResponseCallback(obj));
     }
     public void editUser(MOBAPICallback obj,
