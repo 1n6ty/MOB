@@ -48,6 +48,61 @@ def auth(req):
         }, status = 200)
     return HttpResponse(status = 405)
 
+@csrf_exempt
+def getMe(req):
+    if req.method == 'GET':
+        try:
+            token = req.GET['token']
+            token_data = getDataFromToken(token)
+        except:
+            return JsonResponse({
+                'msg': 'bad_request'
+            }, status = 400)
+
+        try:
+            user = User.objects.get(id = token_data['id'])
+            if token_data['location_id'] == -1:
+                address = 'none'
+            else:
+                address = user.addresses.get(id = token_data['location_id'])
+        except (ObjectDoesNotExist, IndexError) as e:
+            return JsonResponse({
+                'msg': "not_found"
+            }, status = 404)
+
+        if sessionTimeExpired(user.sessionExpTime):
+            return JsonResponse({
+                'msg': "session_time_expired"
+            }, status = 404)
+
+        if isCorruptedToken(req.GET['token'], user.prv_key):
+            return JsonResponse({
+                'msg': "token_corrupted"
+            }, status = 403)
+
+        return JsonResponse({
+            'response': {
+                'user': {
+                    'nick_name': user.nickName,
+                    'name': user.name,
+                    'email': user.email,
+                    'phone_number': user.phone_number,
+                    'id': user.id,
+                    'profile_img_url': user.profile_img.url
+                },
+                'address': address if address == 'none' else {
+                    'country': address.country,
+                    'city': address.city,
+                    'street': address.district,
+                    'house': address.house,
+                    'x': address.markx,
+                    'y': address.marky
+                }
+            }
+        }, status = 200)
+
+    return HttpResponse(status = 405)
+
 def register(req):
     if req.method == 'POST':
         try:
