@@ -44,7 +44,7 @@ function me(token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function getLocations(token: string): {
+function getAddresses(token: string): {
     'response': {
             'country': string,
             'city': string,
@@ -57,7 +57,7 @@ function getLocations(token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function setLocation(location_id: number, token: string): {
+function setAddress(location_id: number, token: string): {
     'response': {
         'token': string
     } //status 200
