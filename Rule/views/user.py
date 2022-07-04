@@ -7,7 +7,7 @@ from django.http import JsonResponse, HttpResponse, QueryDict
 from django.db.models import Q
 from Rule.models import User, Image
 import random, time, string
-from MOB.settings import BASE_DIR, MEDIA_URL
+from MOB.settings import BASE_DIR
 from django.core.files import File
 
 def auth(req):
@@ -42,7 +42,7 @@ def auth(req):
                     'phone_number': user.phone_number,
                     'name': user.name,
                     'nick': user.nickName,
-                    'profile_img_url': user.profile_img.img.url 
+                    'profile_img_url': user.profile_img.url 
                 }
             }
         }, status = 200)
@@ -67,9 +67,7 @@ def register(req):
             password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest()
 
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
-            profile = Image.objects.create(img = File(open(BASE_DIR / 'data/default_profile.jpg', 'rb'), 'profile_' + phone + '.jpg'))
-            profile.save()
-            new_user.profile_img = profile
+            new_user.profile_img = File(open(BASE_DIR / 'data/default_profile.jpg', 'rb'), 'profile_' + phone + '.jpg')
             new_user.save()
             return render(req, 'registration.html', {
                 "accept": True,
@@ -96,6 +94,7 @@ def editUser(req):
     if req.method == 'PUT':
         data = QueryDict(req.body)
         token = data.get('token')
+
         if token == None:
             return JsonResponse({
                 'msg': 'bad_request'
@@ -119,7 +118,7 @@ def editUser(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -136,14 +135,15 @@ def editUser(req):
             new_password = data.get('password')
         if data.get('email'):
             new_email = data.get('email')
+        print(req.FILES)
         try:
-            user.profile_img.img = req.FILES.getlist('imgs')[0];
+            user.profile_img = File(req.FILES.getlist('imgs')[0])
         except:
             pass
         user.nickName = new_nick
         user.name = new_name
         user.password = new_password
-        if  len(User.objects.get(email = new_email)) == 0:
+        if  len(User.objects.filter(email = new_email)) == 0:
             user.email = new_email
         user.save()
 

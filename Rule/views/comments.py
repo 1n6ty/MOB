@@ -75,7 +75,7 @@ def getComment(req):
                     'email': e.user.email,
                     'phone_number': e.user.phone_number,
                     'id': e.user.id,
-                    'profile_img_url': e.user.profile_img.img.url
+                    'profile_img_url': e.user.profile_img.url
                 },
                 'id': e.id,
                 'text': e.text,

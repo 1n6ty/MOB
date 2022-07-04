@@ -1,5 +1,9 @@
+from distutils.command.upload import upload
 import django.utils.timezone as time
 from django.db import models
+
+def post_directory_path(instance, filename):
+    return filename
 
 class RuleCompany(models.Model):
     name = models.CharField(max_length = 255)
@@ -16,7 +20,7 @@ class Address(models.Model):
 
 class User(models.Model):
     nickName = models.CharField(max_length = 255)
-    profile_img = models.ForeignKey("Image", on_delete=models.CASCADE, default="", null=True)
+    profile_img = models.ImageField(upload_to = post_directory_path)
     name = models.CharField(max_length = 255)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length= 17, unique=True)
@@ -53,9 +57,6 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-appreciations', '-date']
-
-def post_directory_path(instance, filename):
-    return filename
 
 class Image(models.Model):
     img = models.ImageField(upload_to = post_directory_path)

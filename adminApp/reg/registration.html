@@ -1,7 +1,6 @@
-{% load static %}
 <html>
     <head>
-        <link rel="stylesheet" href="{% static 'registration/css/index.css' %}"/>
+        <link rel="stylesheet" href="./registration/css/index.css"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="viewport" content="height=device-height, initial-scale=1">
     </head>
@@ -9,18 +8,16 @@
         <div class="leftBar"></div>
         <main>
             <div class="content">
-                {% if not accept %}
                     <h4>Sign up to MOB</h4>
-                    <form method="post" action="" name="registration_form">
-                        {% csrf_token %}
+                    <form method="post" action="">
                         <div class="wrap">
                             <div class="group">
                                 <label for="name">Full Name</label>
-                                <input name="name" type="text" placeholder="Enter Full Name" value="{% if name %}{{ name }}{% endif %}" required/>
+                                <input name="name" type="text" placeholder="Enter Full Name" required/>
                             </div>
                             <div class="group">
                                 <label for="nick_name">Nick Name</label>
-                                <input name="nick_name" placeholder="Enter Nick Name" value="{% if nick %}{{ nick }}{% endif %}" required>
+                                <input name="nick_name" placeholder="Enter Nick Name" required>
                             </div>
                         </div>
                         <div class="group">
@@ -35,14 +32,8 @@
                             <label for="password">Password</label>
                             <input type="password" name="password" placeholder="Enter Password" required/>
                         </div>
-                        {% if err %}
-                        <p>Try different phone number or email</p>
-                        {% endif %}
                         <button type="submit">Create Account</button>
                     </form>
-                {% else %}
-                    <h4>Now you have an account in MOB</h4>
-                {% endif %}
             </div>
         </main>
         <script>
@@ -50,7 +41,7 @@
             window.addEventListener("mousemove", function(e){
                 gr.style.backgroundPosition = `${50 - (e.clientX - window.innerWidth / 2) * 0.01}% ${50 - (e.clientY - window.innerHeight / 2) * 0.01}%`;
             });
-
+            
         </script>
     </body>
 </html>

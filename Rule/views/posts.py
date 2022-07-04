@@ -62,7 +62,7 @@ def getPost(req):
                 'email': post.user.email,
                 'phone_number': post.user.phone_number,
                 'id': post.user.id,
-                'profile_img_url': post.user.profile_img.img.url
+                'profile_img_url': post.user.profile_img.url
             },
             'data': {
                 'img_urls': imgs,
