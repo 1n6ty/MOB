@@ -89,6 +89,8 @@ public class MOBServerAPI {
         Call<LinkedTreeMap<String, Object>> getComment(@Query("post_id") int post_id, @Query("comment_id") int comment_id, @Query("ind") boolean ind, @Query("token") String token);
         @GET
         Call<LinkedTreeMap<String, Object>> refresh(@Query("token") String token, @Query("token") String refresh);
+        @GET
+        Call<LinkedTreeMap<String, Object>> me(@Query("token") String token);
 
         @Multipart
         @POST("createPost/")
@@ -165,6 +167,10 @@ public class MOBServerAPI {
               String login, String password) throws NoSuchAlgorithmException {
         Call<LinkedTreeMap<String, Object>> authCall = MOBAPI.auth(login, toHexString(getSHA(password)));
         authCall.enqueue(createResponseCallback(obj));
+    }
+    public void me(MOBAPICallback obj, String token){
+        Call<LinkedTreeMap<String, Object>> meCall = MOBAPI.me(token);
+        meCall.enqueue(createResponseCallback(obj));
     }
     public void getLocations(MOBAPICallback obj, String token){
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.getLocations(token);
