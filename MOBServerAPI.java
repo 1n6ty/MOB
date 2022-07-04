@@ -172,7 +172,7 @@ public class MOBServerAPI {
         Call<LinkedTreeMap<String, Object>> meCall = MOBAPI.me(token);
         meCall.enqueue(createResponseCallback(obj));
     }
-    public void getLocations(MOBAPICallback obj, String token){
+    public void getAddresses(MOBAPICallback obj, String token){
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.getLocations(token);
         call.enqueue(createResponseCallback(obj));
     }
