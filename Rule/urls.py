@@ -3,7 +3,7 @@ from django.urls import path
 from Rule.views.address import getLocations, setLocation, getMarks
 from Rule.views.comments import commentInc, commentDec, comment, deleteComment, reactComment, unreactComment, getComment, deleteComment
 from Rule.views.posts import createPost, getPost, deletePost, postInc, postDec, reactPost, unreactPost
-from Rule.views.user import auth, editUser, refreshToken, register
+from Rule.views.user import auth, editUser, getMe, refreshToken, register
 
 urlpatterns = [
     path('auth/', auth),
@@ -27,4 +27,5 @@ urlpatterns = [
     path('commentReact/', reactComment),
     path('commentUnreact/', unreactComment),
     path('refreshToken', refreshToken),
+    path('me/', getMe),
 ]

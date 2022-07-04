@@ -36,7 +36,7 @@ def getLocations(req):
             res.append({
                 'country': i.country,
                 'city': i.city,
-                'district': i.district,
+                'street': i.district,
                 'house': i.house,
                 'id': i.id,
                 'x': i.markx,

@@ -22,13 +22,37 @@ function auth(login: string, password: string): { // login is a phone_number onl
     'msg': 'error' //status 400, 404
 }{return;}
 
+function me(token: string): {
+    'response': {
+        'user': {
+            'nick_name': string,
+            'name': string,
+            'email': string,
+            'phone_number': string,
+            'id': number,
+            'profile_img_url': string
+        },
+        'address': {
+            'country': string,
+            'city': string,
+            'street': string,
+            'house': number,
+            'x': number, // float
+            'y': number // float
+        } | 'none'
+    }
+    'msg': 'error' //status 400, 403, 404
+}{return;}
+
 function getLocations(token: string): {
     'response': {
             'country': string,
             'city': string,
-            'district': string,
+            'street': string,
             'house': number,
-            'id': number
+            'id': number,
+            'x': number, // float
+            'y': number // float
         }[] //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
