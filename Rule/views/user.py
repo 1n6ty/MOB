@@ -20,7 +20,7 @@ def auth(req):
                 'msg': "bad_request"
             }, status = 400)
         try:
-            user = User.objects.get(phone_number = login, password = password)
+            user = User.objects.get(phone_number = login, password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest())
         except ObjectDoesNotExist:
             return JsonResponse({
                 'msg': "not_found"
@@ -149,7 +149,8 @@ def editUser(req):
     if req.method == 'PUT':
         data = QueryDict(req.body)
         token = data.get('token')
-
+        for i in data.items():
+            print(i)
         if token == None:
             return JsonResponse({
                 'msg': 'bad_request'

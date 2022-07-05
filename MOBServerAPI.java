@@ -107,11 +107,23 @@ public class MOBServerAPI {
         @FormUrlEncoded
         @PUT("setLocation/")
         Call<LinkedTreeMap<String, Object>> setLocation(@Field("location_id") int location_id, @Field("token") String token);
+        
         @FormUrlEncoded
         @PUT("editUser/")
-        Call<LinkedTreeMap<String, Object>> editUser(@Field("nickName") String nickName, @Field("name") String name,
-                                               @Field("password") String password,
-                                               @Field("email") String email, @Field("token") String token);
+        Call<LinkedTreeMap<String, Object>> editUserNickName(@Field("nickName") String nickName, @Field("token") String token);
+        @FormUrlEncoded
+        @PUT("editUser/")
+        Call<LinkedTreeMap<String, Object>> editUserName(@Field("name") String name, @Field("token") String token);
+        @FormUrlEncoded
+        @PUT("editUser/")
+        Call<LinkedTreeMap<String, Object>> editUserPassword(@Field("password") String password, @Field("token") String token);
+        @FormUrlEncoded
+        @PUT("editUser/")
+        Call<LinkedTreeMap<String, Object>> editUserEmail(@Field("email") String email, @Field("token") String token);
+        @Multipart
+        @PUT("editUser/")
+        Call<LinkedTreeMap<String, Object>> editUserProfileImg(@Part MultipartBody.Part[] img, @Part("token") String token);
+
         @FormUrlEncoded
         @PUT("postInc/")
         Call<LinkedTreeMap<String, Object>> postInc(@Field("post_id") int post_id, @Field("token") String token);
@@ -145,27 +157,13 @@ public class MOBServerAPI {
         Call<LinkedTreeMap<String, Object>> deletePost(@Field("post_id") int post_id, @Field("token") String token);
     }
 
-    private static byte[] getSHA(String input) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        return md.digest(input.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private static String toHexString(byte[] hash){
-        BigInteger number = new BigInteger(1, hash);
-        StringBuilder hexString = new StringBuilder(number.toString(16));
-        while (hexString.length() < 32){
-            hexString.insert(0, '0');
-        }
-        return hexString.toString();
-    }
-
     public void refreshToken(MOBAPICallback obj, String token, String refreshToken){
         Call<LinkedTreeMap<String, Object>> refreshCall = MOBAPI.refresh(token, refreshToken);
         refreshCall.enqueue(createResponseCallback(obj));
     }
     public void auth(MOBAPICallback obj,
-              String login, String password) throws NoSuchAlgorithmException {
-        Call<LinkedTreeMap<String, Object>> authCall = MOBAPI.auth(login, toHexString(getSHA(password)));
+              String login, String password){
+        Call<LinkedTreeMap<String, Object>> authCall = MOBAPI.auth(login, password);
         authCall.enqueue(createResponseCallback(obj));
     }
     public void me(MOBAPICallback obj, String token){
@@ -215,9 +213,30 @@ public class MOBServerAPI {
         call.enqueue(createResponseCallback(obj));
     }
     public void editUser(MOBAPICallback obj,
-                  String name, String nick, String password, String email, String token) throws NoSuchAlgorithmException {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUser(nick, name, toHexString(getSHA(password)), email, token);
-        call.enqueue(createResponseCallback(obj));
+                  String name, String nick_name, String password, String email, String new_profile_img_url, String token){
+        if(name != null){
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserName(name, token);
+            call.enqueue(createResponseCallback(obj));
+        }
+        if(nick_name != null){
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserNickName(nick_name, token);
+            call.enqueue(createResponseCallback(obj));
+        }
+        if(password != null){
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserPassword(password, token);
+            call.enqueue(createResponseCallback(obj));
+        }
+        if(email != null){
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserEmail(email, token);
+            call.enqueue(createResponseCallback(obj));
+        }
+        if(new_profile_img_url != null){
+            MultipartBody.Part[] img = new MultipartBody.Part[1];
+            File file = new File(new_profile_img_url);
+            img[0] = MultipartBody.Part.createFormData("imgs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserProfileImg(img, token);
+            call.enqueue(createResponseCallback(obj));
+        }
     }
     public void postInc(MOBAPICallback obj,
                  int postId, String token){

@@ -148,8 +148,8 @@ function deleteComment(post_id: number, comment_id: number, token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function editUser(nick_name: string, name: string,
-                    email: string, password: string, token: string): {
+function editUser(nick_name: string | null, name: string | null,
+                    email: string | null, password: string | null, new_profile_img_url: string | null, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}

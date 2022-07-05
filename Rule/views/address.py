@@ -53,6 +53,7 @@ def setLocation(req):
         data = QueryDict(req.body)
         new_location_id = data.get('location_id')
         token = data.get('token')
+        print(token)
         if token == None or new_location_id == None:
             return JsonResponse({
                 'msg': "bad_request"
