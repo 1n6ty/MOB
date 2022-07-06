@@ -1,5 +1,6 @@
 package com.example.mobv2.ui.views.navigationdrawer;
 
+import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,12 +28,8 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
     private MainActivity mainActivity;
 
-    private DrawerLayout drawerLayout;
+    private final DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    private View navigationHeader;
-    private ImageView avatarView;
-    private TextView fullNameView;
-    private TextView homepointsView;
 
 
     public NavDrawer(MainActivity mainActivity)
@@ -40,20 +37,34 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         this.mainActivity = mainActivity;
 
         drawerLayout = mainActivity.findViewById(R.id.drawer_layout);
-        navigationHeader = mainActivity.getLayoutInflater()
-                                       .inflate(R.layout.nav_header_main, null);
-        navigationView = mainActivity.findViewById(R.id.navigation_view);
-        avatarView = navigationHeader.findViewById(R.id.avatar);
-        fullNameView = navigationHeader.findViewById(R.id.fullname);
-        homepointsView = navigationHeader.findViewById(R.id.homepoints);
 
-        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
-
-
-        initNavigationDrawer();
+        initNavigationView();
+        initHeaderView();
+        initNavigationMenu();
     }
 
-    public void initNavigationDrawer()
+    private void initNavigationView()
+    {
+        navigationView = mainActivity.findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+    }
+
+    private void initHeaderView()
+    {
+        View headerView = navigationView.getHeaderView(0);
+
+        ImageView avatarView = headerView.findViewById(R.id.avatar_view);
+
+        TextView fullNameView = headerView.findViewById(R.id.fullname_view);
+        fullNameView.setText(mainActivity.getPreferences(Context.MODE_PRIVATE)
+                                         .getString(MainActivity.USER_FULLNAME_KEY, ""));
+
+        TextView addressesView = headerView.findViewById(R.id.address_view);
+        addressesView.setText(mainActivity.getPreferences(Context.MODE_PRIVATE)
+                                          .getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
+    }
+
+    public void initNavigationMenu()
     {
         Menu menu = navigationView.getMenu();
         menu.clear();
@@ -134,7 +145,6 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     }
 
 
-
     private void addNavigationMenuItem(Menu menu,
                                        int groupId,
                                        int order,
@@ -164,7 +174,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
     public boolean isOpen()
     {
-        return drawerLayout.isDrawerOpen(navigationHeader);
+        return drawerLayout.isDrawerOpen(navigationView);
     }
 
     public void open()
@@ -174,7 +184,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
     public boolean isClosed()
     {
-        return !drawerLayout.isDrawerOpen(navigationHeader);
+        return !drawerLayout.isDrawerOpen(navigationView);
     }
 
     public void close()

@@ -47,8 +47,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private RecyclerView postsRecycler;
 
     private GoogleMap googleMap;
-    private Marker marker;
-    private ArrayList<Post> posts = new ArrayList<>();
 
     public MainFragment()
     {
@@ -65,7 +63,23 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         initToolbar();
         initMap();
+        if (viewModel.isMapReady())
+        {
+            setMapMarkers();
+        }
+
         initBottomSheet();
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+
+        refreshMarker();
+        googleMap.clear();
+        viewModel.getPostIds()
+                 .clear();
     }
 
     private void initViewModel()
@@ -98,7 +112,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_ALL);
+        sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_NONE);
 
         sheetBehavior.addBottomSheetCallback(
                 new PostsSheetCallback(binding.postsAppBarContainer,
@@ -106,8 +120,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                         () ->
                         {
                             // fix will be better
-                            postsRecycler.setAdapter(null);
-                            posts.clear();
                             refreshMarker();
                         }));
 
@@ -116,11 +128,18 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         postsToolbar.setNavigationOnClickListener(
                 v -> sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN));
+        postsToolbar.setOnMenuItemClickListener(item -> false);
     }
 
     private void initPostsRecycler()
     {
-        for (int i = 1; i < 4; i++)
+        postsRecycler = binding.postsRecycler;
+
+        postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        PostAdapter adapter = new PostAdapter(getContext(), new ArrayList<>());
+        postsRecycler.setAdapter(adapter);
+
+        for (int id : viewModel.getPostIds())
         {
             MainActivity.MOB_SERVER_API.getPost(new MOBServerAPI.MOBAPICallback()
             {
@@ -133,31 +152,26 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                             (LinkedTreeMap<String, Object>) obj.get("response");
 
                     Post post = Post.parseFromMap(response);
-                    posts.add(post);
-                    postsRecycler.setAdapter(new PostAdapter(getContext(), posts));
+                    adapter.addPost(post);
                 }
 
                 @Override
                 public void funcBad(LinkedTreeMap<String, Object> obj)
                 {
                     Log.v("DEBUG", obj.toString());
-                    Toast.makeText(getContext(), "Post is not available", Toast.LENGTH_LONG)
-                         .show();
+//                    Toast.makeText(getContext(), "Post is not available", Toast.LENGTH_LONG)
+//                         .show();
                 }
 
                 @Override
                 public void fail(Throwable obj)
                 {
                     Log.v("DEBUG", obj.toString());
-                    Toast.makeText(getContext(), R.string.check_internet_connection, Toast.LENGTH_LONG)
-                         .show();
+//                    Toast.makeText(getContext(), R.string.check_internet_connection, Toast.LENGTH_LONG)
+//                         .show();
                 }
-            }, i, MainActivity.token);
+            }, id, MainActivity.token);
         }
-
-        postsRecycler = binding.postsRecycler;
-
-        postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     private void onMapReady(GoogleMap googleMap)
@@ -166,17 +180,17 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         this.googleMap = googleMap;
 
-        setMapMarkers(googleMap);
+        setMapMarkers();
 
         googleMap.setOnMarkerClickListener(this::onMarkerClick);
         googleMap.setOnMapClickListener(this::onMapClick);
     }
 
-    private void setMapMarkers(GoogleMap googleMap)
+    private void setMapMarkers()
     {
         BitmapDescriptor descriptor = getBitmapDescriptor(R.drawable.ic_marker_24dp);
 
-        MarkerAddition[] markerAdditions =
+        /*MarkerAddition[] markerAdditions =
                 new MarkerAddition[]{
                         new MarkerAddition(-34, 151, "Sydney", descriptor),
                         new MarkerAddition(55, 37, "Moscow", descriptor),
@@ -186,18 +200,51 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         for (MarkerAddition markerAddition : markerAdditions)
         {
             googleMap.addMarker(markerAddition.create());
-        }
+        }*/
+
+        MainActivity.MOB_SERVER_API.getMarks(new MOBServerAPI.MOBAPICallback()
+        {
+            @Override
+            public void funcOk(LinkedTreeMap<String, Object> obj)
+            {
+                LinkedTreeMap<String, LinkedTreeMap<String, Double>> response =
+                        (LinkedTreeMap<String, LinkedTreeMap<String, Double>>) obj.get("response");
+
+                for (String postId : response.keySet())
+                {
+                    viewModel.addPostId(Integer.parseInt(postId));
+                    LinkedTreeMap<String, Double> coordinates = response.get(postId);
+                    double x = coordinates.get("x");
+                    double y = coordinates.get("y");
+                    googleMap.addMarker(new MarkerAddition(x, y, "The mark", descriptor).create());
+
+                }
+            }
+
+            @Override
+            public void funcBad(LinkedTreeMap<String, Object> obj)
+            {
+                Toast.makeText(getContext(), "There are not markers, yet", Toast.LENGTH_LONG)
+                     .show();
+            }
+
+            @Override
+            public void fail(Throwable obj)
+            {
+
+            }
+        }, MainActivity.token);
     }
 
-    private boolean onMarkerClick(Marker marker)
+    private boolean onMarkerClick(@NonNull Marker marker)
     {
-        refreshMarker();
+        viewModel.setMarker(marker);
 
-        this.marker = marker;
+        viewModel.getMarker()
+                 .setIcon(getBitmapDescriptor(R.drawable.ic_marker_36dp));
 
-        marker.setIcon(getBitmapDescriptor(R.drawable.ic_marker_36dp));
-
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), ZOOM));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getMarker()
+                                                                           .getPosition(), ZOOM));
 // переход по адресу
 /*        try
         {
@@ -217,7 +264,10 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
 
         sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-        postsToolbar.setTitle(marker.getTitle());
+        postsToolbar.setTitle(viewModel.getMarker()
+                                       .getTitle());
+
+//        MainActivity.MOB_SERVER_API.getPost();
 
         return true;
     }
@@ -230,10 +280,11 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void refreshMarker()
     {
-        if (marker != null)
+        if (viewModel.getMarker() != null)
         {
-            marker.setIcon(getBitmapDescriptor(R.drawable.ic_marker_24dp));
-            marker = null;
+            viewModel.getMarker()
+                     .setIcon(getBitmapDescriptor(R.drawable.ic_marker_24dp));
+            viewModel.setMarker(null);
         }
     }
 }

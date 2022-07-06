@@ -16,9 +16,29 @@ import com.example.mobv2.ui.fragments.main.MainFragment;
 
 public class MainActivity extends AppCompatActivity
 {
-    // UNSAFE
-    public static final MOBServerAPI MOB_SERVER_API = new MOBServerAPI("http://192.168.0.104:8000/rules/");
+    //WARNING UNSAFE
+    public static final MOBServerAPI MOB_SERVER_API =
+            new MOBServerAPI("http://192.168.0.104:8000/rules/");
     public static String token = "";
+
+    // USER
+    public static final String USER_ID_KEY = "USER_ID_KEY";
+    public static final String USER_NICKNAME_KEY = "USER_NICKNAME_KEY";
+    public static final String USER_FULLNAME_KEY = "USER_FULLNAME_KEY";
+    public static final String USER_EMAIL_KEY = "USER_EMAIL_KEY";
+    public static final String USER_PHONE_NUMBER_KEY = "USER_PHONE_NUMBER_KEY";
+
+    // ADDRESS
+    public static final String ADDRESS_ID_KEY = "ADDRESS_ID_KEY";
+    public static final String ADDRESS_FULL_KEY = "ADDRESS_FULL_KEY";
+    /*
+    public static final String ADDRESS_COUNTRY_KEY = "ADDRESS_COUNTRY_KEY";
+    public static final String ADDRESS_CITY_KEY = "ADDRESS_CITY_KEY";
+    public static final String ADDRESS_STREET_KEY = "ADDRESS_CITY_KEY";
+    public static final String ADDRESS_HOUSE_KEY = "ADDRESS_HOUSE_KEY";
+     */
+    public static final String ADDRESS_X_KEY = "ADDRESS_X_KEY";
+    public static final String ADDRESS_Y_KEY = "ADDRESS_Y_KEY";
 
 
     private ActivityMainBinding binding;
@@ -91,10 +111,5 @@ public class MainActivity extends AppCompatActivity
     public Fragment getFragmentAtFrame()
     {
         return getSupportFragmentManager().findFragmentById(navContentFrame.getId());
-    }
-
-    public MainFragment getMainFragment()
-    {
-        return mainFragment;
     }
 }

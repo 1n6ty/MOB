@@ -56,6 +56,12 @@
         <item name="android:backgroundTint">@color/blue_500</item>
         <item name="android:textColor">@color/gray_500</item>
         <item name="android:textColorHint">@color/gray_200</item>
+        <item name="android:textColorHighlight">@color/blue_100_alpha_40</item>
+        <item name="android:textCursorDrawable">@drawable/background_cursor</item>
+    </style>
+
+    <style name="wrongInputTextStyle">
+        <item name="android:textColor">@color/gray_500</item>
     </style>
 
     <style name="nextButtonTextStyle">
@@ -71,5 +77,15 @@
     <style name="postItemSubheaderTextStyle">
         <item name="android:textColor">@color/gray_300</item>
         <item name="android:textSize">@dimen/pre_medium_text_size</item>
+    </style>
+
+    <style name="addressItemHeaderTextStyle">
+        <item name="android:textColor">@color/gray_700</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
+    </style>
+
+    <style name="addressItemSubheaderTextStyle">
+        <item name="android:textColor">@color/gray_300</item>
+        <item name="android:textSize">@dimen/small_text_size</item>
     </style>
 </resources>

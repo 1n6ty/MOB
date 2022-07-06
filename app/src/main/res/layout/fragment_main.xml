@@ -103,6 +103,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
+
             android:theme="@style/Theme.MOBv2.NavigationView"
             app:headerLayout="@layout/nav_header_main"
             app:itemIconTint="@color/gray_300"

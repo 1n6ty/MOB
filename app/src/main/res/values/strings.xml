@@ -1,6 +1,7 @@
 <resources>
     <string name="check_internet_connection">"Check your Internet connection"</string>
     <string name="user_is_not_exist">This user is not exist</string>
+    <string name="field_is_necessary"><u>Field is necessary</u></string>
 
     <string name="app_name">MOB</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -12,7 +13,7 @@
     <string name="sample_phone_number">+78005553535</string>
     <string name="sample_avatar_desc">User\'s avatar</string>
     <string name="sample_nickname">\@user</string>
-    <string name="sample_home">Prospekt Kirova, 31; Karla Marksa, 59</string>  <!-- joined addresses array -->
+    <string name="sample_address">Russia, Kursk, Verhnyaya Lugovaya, 59</string>
     <string name="sample_date">15.04.2022</string>
 
     <!--  nav drawer item titles  -->
@@ -38,7 +39,8 @@
 
     <!--  auth fragment  -->
     <string name="auth_desc">You do not need to enter your phone number. It happens automatically.</string>
-    <string name="auth_hint">Enter your password</string>
+    <string name="auth_phone_hint">Enter your phone number</string>
+    <string name="auth_password_hint">Enter your password</string>
     <string name="auth_button">Next -&gt;</string>
 
     <!--  post menu item titles  -->
@@ -53,4 +55,8 @@
     <string name="menu_reaction_dislike">👎</string>
     <string name="menu_reaction_love">❤</string>
     <string name="menu_reaction_plus">+</string>
+
+    <!--  change addresses fragment  -->
+    <string name="address_primary">Russia, Kursk</string>
+    <string name="address_secondary">Centralniy okrug, Verhnyaya Lugovaya ulica, 59</string>
 </resources>

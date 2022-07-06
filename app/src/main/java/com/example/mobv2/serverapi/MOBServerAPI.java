@@ -32,6 +32,7 @@ import retrofit2.http.Query;
 
 public class MOBServerAPI
 {
+
     private final MOBInterface MOBAPI;
 
     public interface MOBAPICallback
@@ -119,6 +120,9 @@ public class MOBServerAPI
         @GET
         Call<LinkedTreeMap<String, Object>> refresh(@Query("token") String token,
                                                     @Query("token") String refresh);
+
+        @GET
+        Call<LinkedTreeMap<String, Object>> me(@Query("token") String token);
 
         @Multipart
         @POST("createPost/")
@@ -241,7 +245,14 @@ public class MOBServerAPI
         authCall.enqueue(createResponseCallback(obj));
     }
 
-    public void getLocations(MOBAPICallback obj,
+    public void me(MOBAPICallback obj,
+                   String token)
+    {
+        Call<LinkedTreeMap<String, Object>> meCall = MOBAPI.me(token);
+        meCall.enqueue(createResponseCallback(obj));
+    }
+
+    public void getAddresses(MOBAPICallback obj,
                              String token)
     {
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.getLocations(token);
@@ -303,11 +314,11 @@ public class MOBServerAPI
         call.enqueue(createResponseCallback(obj));
     }
 
-    public void setLocation(MOBAPICallback obj,
-                            int locationId,
-                            String token)
+    public void setAddress(MOBAPICallback obj,
+                           int AddressId,
+                           String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(locationId, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(AddressId, token);
         call.enqueue(createResponseCallback(obj));
     }
 

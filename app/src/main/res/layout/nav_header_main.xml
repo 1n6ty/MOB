@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/ic_background"
@@ -19,7 +20,7 @@
             android:orientation="vertical">
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/avatar"
+                android:id="@+id/avatar_view"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginBottom="@dimen/vertical_margin"
@@ -29,21 +30,21 @@
                 app:srcCompat="@drawable/sample_avatar" />
 
             <TextView
-                android:id="@+id/fullname"
+                android:id="@+id/fullname_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sample_fullName"
-                android:textAppearance="@style/navHeaderTitleStyle" />
+                android:textAppearance="@style/navHeaderTitleStyle"
+                tools:text="@string/sample_fullName" />
 
             <TextView
-                android:id="@+id/homepoints"
+                android:id="@+id/address_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/horizontal_margin"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@string/sample_home"
-                android:textAppearance="@style/navSubheaderTitleStyle" />
+                android:textAppearance="@style/navSubheaderTitleStyle"
+                tools:text="@string/sample_address" />
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

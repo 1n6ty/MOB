@@ -19,10 +19,10 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
     private final OnHiddenCallback onHiddenCallback;
 
     public PostsSheetCallback(CoordinatorLayout coordinatorLayout,
-                              OnExpandedCallback onDraggingCallback,
+                              OnExpandedCallback onExpandedCallback,
                               OnHiddenCallback onHiddenCallback)
     {
-        this.onExpanded = onDraggingCallback;
+        this.onExpanded = onExpandedCallback;
         this.onHiddenCallback = onHiddenCallback;
 
         appBar = coordinatorLayout.findViewById(R.id.posts_app_bar);

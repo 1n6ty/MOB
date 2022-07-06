@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable-v21/background_item_address.xml" value="0.2995" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable-v21/background_item_address_selector.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable-v21/background_item_reaction_selector.xml" value="0.1" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable-v21/background_selector_reaction.xml" value="0.122" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable-v24/ic_add_photo.xml" value="0.228" />
@@ -17,8 +19,12 @@
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable-v24/side_nav_bar.xml" value="0.228" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_.xml" value="0.1695" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_button_auth.xml" value="0.138" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_button_auth_selector.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_content_post.xml" value="0.138" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_dragger.xml" value="0.1315" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_item_address.xml" value="0.2995" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_item_address_selected.xml" value="0.2995" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_item_address_selector.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_item_reaction.xml" value="0.1315" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_item_reaction_selected.xml" value="0.122" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_item_reaction_selector.xml" value="0.1" />
@@ -26,14 +32,18 @@
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_selector_reaction.xml" value="0.122" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_sheet_post.xml" value="0.1315" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/background_toolbar_main.xml" value="0.241" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/color_cursor.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/content_post_background.xml" value="0.33" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_add.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_add_photo.xml" value="0.1705" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_arrow.xml" value="0.1315" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_delete_photo.xml" value="0.1705" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_launcher_background.xml" value="0.228" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_logout.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_marker.xml" value="0.1" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_marker_96.xml" value="0.1" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_menu_save_photo.xml" value="0.1705" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/ic_show_more.xml" value="0.2995" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/drawable/item_reaction_background.xml" value="0.33" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/activity_edit_profile.xml" value="0.21" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/activity_fullscreen.xml" value="0.223731884057971" />
@@ -42,12 +52,15 @@
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/activity_notification_and_sound.xml" value="0.3546195652173913" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/activity_select_language.xml" value="0.3546195652173913" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/content_main.xml" value="0.20208333333333334" />
-        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_auth.xml" value="0.25" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_auth.xml" value="0.22" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_change_addresses.xml" value="0.2504528985507246" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_edit_homepoints.xml" value="0.38645833333333335" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_edit_profile.xml" value="0.40802213001383125" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_language.xml" value="0.223731884057971" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_main.xml" value="0.25" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_map_features.xml" value="0.223731884057971" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/fragment_notification_and_sound.xml" value="0.223731884057971" />
+        <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/item_address.xml" value="0.5" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/item_post.xml" value="0.33" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/item_reaction.xml" value="0.67" />
         <entry key="..\:/Users/Admin/Desktop/DON'T DELETE/inventions/AndroidStudio/MOBv2/app/src/main/res/layout/nav_header_main.xml" value="0.3546195652173913" />

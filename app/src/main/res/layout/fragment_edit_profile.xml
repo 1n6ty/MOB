@@ -56,9 +56,12 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <LinearLayout style="@style/settingsItemStyle">
+                    <LinearLayout
+                        android:id="@+id/settings_phone_number_view"
+                        style="@style/settingsItemStyle">
 
                         <TextView
+                            android:id="@+id/phone_number_view"
                             style="@style/settingsItemHeaderTextStyle"
                             tools:text="+78005553535" />
 
@@ -67,9 +70,12 @@
                             android:text="@string/preference_summary_phone_number" />
                     </LinearLayout>
 
-                    <LinearLayout style="@style/settingsItemStyle">
+                    <LinearLayout
+                        android:id="@+id/settings_nickname_view"
+                        style="@style/settingsItemStyle">
 
                         <TextView
+                            android:id="@+id/nickname_view"
                             style="@style/settingsItemHeaderTextStyle"
                             tools:text="\@abobus" />
 
@@ -78,7 +84,9 @@
                             android:text="@string/preference_summary_nickname" />
                     </LinearLayout>
 
-                    <LinearLayout style="@style/settingsItemStyle">
+                    <LinearLayout
+                        android:id="@+id/settings_bio_view"
+                        style="@style/settingsItemStyle">
 
                         <TextView
                             style="@style/settingsItemHeaderTextStyle"
@@ -89,7 +97,9 @@
                             android:text="@string/preference_summary_bio" />
                     </LinearLayout>
 
-                    <LinearLayout style="@style/settingsItemStyle">
+                    <LinearLayout
+                        android:id="@+id/settings_addresses_view"
+                        style="@style/settingsItemStyle">
 
                         <TextView
                             style="@style/settingsItemHeaderTextStyle"
@@ -114,6 +124,7 @@
             app:elevation="2dp"
             app:layout_anchor="@id/appBarLayout"
             app:layout_anchorGravity="bottom|end"
-            app:srcCompat="@drawable/ic_add_photo" />
+            app:srcCompat="@drawable/ic_add_photo"
+            app:tint="@color/gray_300" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

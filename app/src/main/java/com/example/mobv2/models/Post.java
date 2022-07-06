@@ -17,6 +17,8 @@ public class Post
 {
     public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
 
+    private final int id;
+
     private Bitmap avatar;
     private User user;
     private Date date;
@@ -27,13 +29,15 @@ public class Post
 
     private int type;
 
-    public Post(Bitmap avatar,
+    public Post(int id,
+                Bitmap avatar,
                 User user,
                 Date date,
                 String text,
                 List<String> images,
                 List<Reaction> reactions)
     {
+        this.id = id;
         this.avatar = avatar;
         this.user = user;
         this.date = date;
@@ -46,6 +50,53 @@ public class Post
             type = POST_ONLY_IMAGES;
         else
             type = POST_FULL;
+    }
+
+    public static Post parseFromMap(Map<String, Object> map)
+    {
+        if (map == null)
+            return null;
+
+        // date
+        Date date;
+        try
+        {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            date = formatter.parse((String) Objects.requireNonNull(map.get("date")));
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+
+        // id
+        int id = ((Double) map.get("id")).intValue();
+
+        // user
+        LinkedTreeMap<String, Object> userMap = (LinkedTreeMap<String, Object>) map.get("user");
+        User user = User.parseFromMap(userMap);
+
+        // data
+        LinkedTreeMap<String, Object> dataMap = (LinkedTreeMap<String, Object>) map.get("data");
+        String text = (String) dataMap.get("text");
+        ArrayList<String> imageUrls = (ArrayList<String>) dataMap.get("img_urls");
+
+        // reactions
+        ArrayList<Reaction> reactions = new ArrayList<>();
+        LinkedTreeMap<String, Object> reactionsMap =
+                (LinkedTreeMap<String, Object>) map.get("reactions");
+        for (String key : reactionsMap.keySet())
+        {
+            Reaction reaction =
+                    new Reaction(key, ((Double) reactionsMap.get(key)).intValue());
+            reactions.add(reaction);
+        }
+
+        // appreciations
+
+
+        return new Post(id, null, user, date, text, imageUrls, reactions);
     }
 
     public Bitmap getAvatar()
@@ -81,49 +132,5 @@ public class Post
     public int getType()
     {
         return type;
-    }
-
-    public static Post parseFromMap(Map<String, Object> map)
-    {
-        if (map == null)
-            return null;
-
-        // date
-        Date date;
-        try
-        {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            date = formatter.parse((String) Objects.requireNonNull(map.get("date")));
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-
-        // user
-        LinkedTreeMap<String, Object> userMap = (LinkedTreeMap<String, Object>) map.get("user");
-        User user = User.parseFromMap(userMap);
-
-        // data
-        LinkedTreeMap<String, Object> dataMap = (LinkedTreeMap<String, Object>) map.get("data");
-        String text = (String) dataMap.get("text");
-        ArrayList<String> imageUrls = (ArrayList<String>) dataMap.get("img_urls");
-
-        // reactions
-        ArrayList<Reaction> reactions = new ArrayList<>();
-        LinkedTreeMap<String, Object> reactionsMap =
-                (LinkedTreeMap<String, Object>) map.get("reactions");
-        for (String key : reactionsMap.keySet())
-        {
-            Reaction reaction =
-                    new Reaction(key, ((Double) reactionsMap.get(key)).intValue());
-            reactions.add(reaction);
-        }
-
-        // appreciations
-
-
-        return new Post(null, user, date, text, imageUrls, reactions);
     }
 }

@@ -16,7 +16,6 @@ import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.utils.BitmapConverter;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -39,7 +38,12 @@ public class BaseFragment<T extends ViewDataBinding> extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
+
         mainActivity = (MainActivity) getActivity();
+        mainActivity.getWindow()
+                    .getDecorView()
+                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+
 
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false);
 

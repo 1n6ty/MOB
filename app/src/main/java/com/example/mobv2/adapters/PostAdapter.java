@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.Post;
-import com.example.mobv2.models.Reaction;
 import com.example.mobv2.utils.abstractions.Operation;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -65,49 +64,40 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                                         .toString());
         holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
 
-        initPopupMenu(holder.menuView, position);
+        holder.menuView.setOnClickListener(v -> onMenuViewClicked(v, position));
 
         initContent(holder.content, position);
-
-        Reaction addButton = new Reaction(Reaction.PLUS, -1, true);
-
-        if (!post.getReactions()
-                 .get(post.getReactions()
-                          .size() - 1)
-                 .isAdd())
-        {
-            post.getReactions()
-                .add(addButton);
-        }
-
 
         holder.reactionsView.setAdapter(new ReactionAdapter(context, post.getReactions()));
     }
 
-    private void initPopupMenu(ImageView menuView,
-                               int position)
+    public void addPost(Post post)
+    {
+        posts.add(post);
+        notifyItemInserted(posts.size() - 1);
+    }
+
+    private void onMenuViewClicked(View v,
+                                   int position)
     {
         Context contextThemeWrapper =
                 new ContextThemeWrapper(context, R.style.Theme_MOBv2_PopupOverlay);
-        PopupMenu popupMenu = new PopupMenu(contextThemeWrapper, menuView);
+        PopupMenu popupMenu = new PopupMenu(contextThemeWrapper, v);
         popupMenu.inflate(R.menu.menu_post);
 
-        menuView.setOnClickListener(v ->
-        {
-            initMenu(popupMenu, position);
-            // inflate menu
-            popupMenu.show();
-        });
+        initMenu(popupMenu, position);
+        // inflate menu
+        popupMenu.show();
     }
 
-    private void initMenu(PopupMenu popupMenu,
+    private void initMenu(@NonNull PopupMenu popupMenu,
                           int position)
     {
         Post post = posts.get(position);
 
         Menu menu = popupMenu.getMenu();
 
-        if (true) // if the user is a post's owner
+        if (true) // if the user is a post's creator
         {
             menu.findItem(R.id.menu_edit_post)
                 .setVisible(true);
@@ -171,7 +161,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
     }
 
-    private boolean copyPost(Post post)
+    private boolean copyPost(@NonNull Post post)
     {
         ClipboardManager clipboard = (ClipboardManager) context
                 .getSystemService(Context.CLIPBOARD_SERVICE);
@@ -212,12 +202,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     protected static class PostViewHolder extends RecyclerView.ViewHolder
     {
-        private ShapeableImageView avatarView;
-        private TextView fullnameView;
-        private TextView dateView;
-        private ImageView menuView;
-        private Pair<TextView, ImageView> content;
-        private RecyclerView reactionsView;
+        private final ShapeableImageView avatarView;
+        private final TextView fullnameView;
+        private final TextView dateView;
+        private final ImageView menuView;
+        private final Pair<TextView, ImageView> content;
+        private final RecyclerView reactionsView;
 
         public PostViewHolder(@NonNull View itemView)
         {
@@ -228,7 +218,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             fullnameView = binding.fullnameView;
             dateView = binding.dateView;
             menuView = binding.menuView;
-            content = new Pair<>(binding.postText, binding.postImage);
+            content = new Pair<>(binding.postTextView, binding.postImageView);
             reactionsView = binding.reactionsView;
         }
     }

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="positive">#61cd60</color>
+    <color name="negative">#f34f56</color>
+
     <color name="blue_100">#BDD7FB</color>
     <color name="blue_500">#72A4E8</color>
     <color name="blue_700">#538BD8</color>
@@ -12,5 +15,6 @@
     <color name="black">#FF000000</color>
 
     <!--  alpha colors  -->
-    <color name="blue_100_alpha">#0DBDD7FB</color>
+    <color name="blue_100_alpha_5">#0DBDD7FB</color>
+    <color name="blue_100_alpha_40">#66BDD7FB</color>
 </resources>
