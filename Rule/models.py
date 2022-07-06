@@ -1,9 +1,5 @@
-from distutils.command.upload import upload
 import django.utils.timezone as time
 from django.db import models
-
-def post_directory_path(instance, filename):
-    return filename
 
 class RuleCompany(models.Model):
     name = models.CharField(max_length = 255)
@@ -20,7 +16,7 @@ class Address(models.Model):
 
 class User(models.Model):
     nickName = models.CharField(max_length = 255)
-    profile_img = models.ImageField(upload_to = post_directory_path)
+    profile_img = models.ImageField(upload_to = 'profiles')
     name = models.CharField(max_length = 255)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length= 17, unique=True)
@@ -33,10 +29,11 @@ class User(models.Model):
 class PostWithMark(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     text = models.TextField()
-    imgs = models.ManyToManyField("Image", blank=True)
+    imgs = models.TextField(default='', blank=True)
     date = models.DateField(default=time.now())
     markx = models.FloatField(default=-1)
     marky = models.FloatField(default=-1)
+    title = models.CharField(max_length=255, default="")
     appreciations = models.IntegerField(default=0)
     appreciatedUsers = models.TextField(blank=True)
     unappreciatedUsers = models.TextField(blank=True)
@@ -57,6 +54,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['-appreciations', '-date']
-
-class Image(models.Model):
-    img = models.ImageField(upload_to = post_directory_path)

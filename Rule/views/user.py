@@ -1,11 +1,12 @@
 import hashlib
+import os
 from django.shortcuts import render
 from Rule.views.views import sessionTime, isCorruptedToken, getDataFromToken, createSessionToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
 from django.db.models import Q
-from Rule.models import User, Image
+from Rule.models import User
 import random, time, string
 from MOB.settings import BASE_DIR
 from django.core.files import File
@@ -41,7 +42,7 @@ def auth(req):
                     'email': user.email,
                     'phone_number': user.phone_number,
                     'name': user.name,
-                    'nick': user.nickName,
+                    'nick_name': user.nickName,
                     'profile_img_url': user.profile_img.url 
                 }
             }
@@ -122,7 +123,7 @@ def register(req):
             password = hashlib.sha256(str(password).encode('UTF-8')).hexdigest()
 
             new_user = User(nickName = nickName, name = name, email = email, phone_number = phone, password = password)
-            new_user.profile_img = File(open(BASE_DIR / 'data/default_profile.jpg', 'rb'), 'profile_' + phone + '.jpg')
+            new_user.profile_img = File(open(BASE_DIR / 'data/default_profile.jpg', 'rb'), 'profiles/profile_' + phone + '.jpg')
             new_user.save()
             return render(req, 'registration.html', {
                 "accept": True,
@@ -191,9 +192,10 @@ def editUser(req):
             new_password = data.get('password')
         if data.get('email'):
             new_email = data.get('email')
-        print(req.FILES)
         try:
-            user.profile_img = File(req.FILES.getlist('imgs')[0])
+            if req.FILES.getlist('imgs')[0]:
+                os.remove(str(BASE_DIR) + user.profile_img.url)
+                user.profile_img = File(req.FILES.getlist('imgs')[0], 'profiles/profile_' + user.phone_number + '.jpg')
         except:
             pass
         user.nickName = new_nick

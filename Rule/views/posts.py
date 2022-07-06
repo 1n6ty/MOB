@@ -1,10 +1,13 @@
+from MOB.settings import BASE_DIR, MEDIA_ROOT
 from Rule.views.views import isCorruptedToken, getDataFromToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse, QueryDict
-from Rule.models import Image, User, PostWithMark
+from Rule.models import User, PostWithMark
 import os
-from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+fs = FileSystemStorage(location = MEDIA_ROOT + 'posts/')
 
 def getPost(req):
     if req.method == 'GET':
@@ -51,10 +54,10 @@ def getPost(req):
             app = False
         except:
             pass
-
-        imgs = [i.img.url for i in post.imgs.all()]
+        imgs = [i.img.url for i in post.imgs.strip().split(' ')]
         res = {
             'date': str(post.date),
+            'title': post.title,
             'id': post.id,
             'user': {
                 'nick_name': post.user.nickName,
@@ -117,9 +120,9 @@ def deletePost(req):
         if post.user.id == token_data['id']:
             for i in post.comments.all():
                 i.delete()
-            for i in post.imgs.all():
-                os.remove(settings.MEDIA_ROOT / i.name)
-                i.delete()
+
+            for i in post.imgs.strip().split(' '):
+                os.remove(str(BASE_DIR) + i)
             post.delete()
 
             return JsonResponse({
@@ -154,7 +157,6 @@ def createPost(req):
         try:
             user = User.objects.get(id = token_data['id'])
             address = user.addresses.get(id = token_data['location_id'])
-            
         except ObjectDoesNotExist:
             return JsonResponse({
                 'msg': "not_found"
@@ -178,10 +180,11 @@ def createPost(req):
             post = PostWithMark(user = user, text = text)
         post.save()
         
+        idF = len([name for name in os.listdir(MEDIA_ROOT + '/posts/')])
         for f in req.FILES.getlist('imgs'):
-            img = Image.objects.create(img = f)
-            img.save()
-            post.imgs.add(img)
+            fs.save('post_' + idF + '.jpg', f);
+            post.imgs += '/media/posts/post_' + idF + '.jpg '
+            idF += 1
 
         post.save()
         address.posts.add(post)
