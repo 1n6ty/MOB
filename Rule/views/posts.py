@@ -54,7 +54,7 @@ def getPost(req):
             app = False
         except:
             pass
-        imgs = [i.img.url for i in post.imgs.strip().split(' ')]
+        imgs = [i for i in post.imgs.strip().split(' ')]
         res = {
             'date': str(post.date),
             'title': post.title,
@@ -412,7 +412,6 @@ def unreactPost(req):
         post.save()
 
         return JsonResponse({
-            'token': token,
             'response': {}
         }, status = 200)
     return HttpResponse(status = 405)
