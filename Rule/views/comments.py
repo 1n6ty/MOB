@@ -46,7 +46,7 @@ def getComment(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -122,7 +122,7 @@ def deleteComment(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -173,7 +173,7 @@ def commentInc(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -234,7 +234,7 @@ def commentDec(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -296,7 +296,7 @@ def comment(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -347,7 +347,7 @@ def reactComment(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -400,13 +400,17 @@ def unreactComment(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
 
         if len(list(filter(lambda x: x == user.id, comment.reacted[reaction]))) != 0:
-            comment.reacted[reaction] = list(filter(lambda x: x != user.id, comment.reacted[reaction]))
+            cur = list(filter(lambda x: x != user.id, comment.reacted[reaction]))
+            if len(cur) == 0:
+                comment.reacted.pop(reaction, None)
+            else:
+                comment.reacted[reaction] = cur
         comment.save()
 
         return JsonResponse({

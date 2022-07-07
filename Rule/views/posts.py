@@ -34,15 +34,15 @@ def getPost(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
 
 
 
-        appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', post.appreciatedUsers.split(' '))))
-        unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', post.unappreciatedUsers.split(' '))))
+        appUsers = post.appreciatedUsers.strip().split(' ')
+        unappUsers = post.unappreciatedUsers.strip().split(' ')
         app = -1
         try:
             appUsers.index(user.id)
@@ -112,7 +112,7 @@ def deletePost(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -229,13 +229,13 @@ def postInc(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
 
-        appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', post.appreciatedUsers.split(' '))))
-        unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', post.unappreciatedUsers.split(' '))))
+        appUsers = post.appreciatedUsers.strip().split(' ')
+        unappUsers = post.unappreciatedUsers.strip().split(' ')
         try:
             ind = appUsers.index(user.id)
         except:
@@ -287,13 +287,13 @@ def postDec(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
 
-        appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', post.appreciatedUsers.split(' '))))
-        unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', post.unappreciatedUsers.split(' '))))
+        appUsers = post.appreciatedUsers.strip().split(' ')
+        unappUsers = post.unappreciatedUsers.strip().split(' ')
         try:
             ind = unappUsers.index(user.id)
         except:
@@ -346,7 +346,7 @@ def reactPost(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -399,7 +399,7 @@ def unreactPost(req):
                 'msg': "session_time_expired"
             }, status = 404)
 
-        if isCorruptedToken(req.GET['token'], user.prv_key):
+        if isCorruptedToken(token, user.prv_key):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
@@ -408,7 +408,11 @@ def unreactPost(req):
             return HttpResponse(status = 403)
 
         if len(list(filter(lambda x: x == user.id, post.reacted[reaction]))) != 0:
-            post.reacted[reaction] = list(filter(lambda x: x != user.id, post.reacted[reaction]))
+            cur = list(filter(lambda x: x != user.id, post.reacted[reaction]))
+            if len(cur) == 0:
+                post.reacted.pop(reaction, None)
+            else:
+                post.reacted[reaction] = cur
         post.save()
 
         return JsonResponse({
