@@ -73,7 +73,8 @@ def getPost(req):
             },
             'reactions': post.reacted,
             'appreciations': post.appreciations,
-            'appreciated': app
+            'appreciated': app,
+            'comments_count': len(post.comments.all())
         }
         
         return JsonResponse({

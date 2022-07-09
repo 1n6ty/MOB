@@ -40,9 +40,6 @@ class PostWithMark(models.Model):
     comments = models.ManyToManyField('Comment', blank=True)
     reacted = models.JSONField(default={}, blank=True)
 
-    class Meta:
-        ordering = ['-appreciations', '-date']
-
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     text = models.TextField()
