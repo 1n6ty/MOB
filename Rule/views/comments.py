@@ -23,6 +23,7 @@ def getComment(req):
         try:
             token_data = getDataFromToken(token)
             post_id = int(post_id)
+            comment_id = int(comment_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
