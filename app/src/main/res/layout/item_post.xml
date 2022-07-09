@@ -9,16 +9,18 @@
         android:layout_marginBottom="@dimen/vertical_margin"
         android:elevation="2dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/horizontal_margin">
+            android:layout_marginHorizontal="@dimen/horizontal_margin"
+            android:layout_marginTop="@dimen/vertical_margin"
+            android:layout_marginBottom="@dimen/vertical_small_margin"
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/vertical_margin"
+                android:layout_height="match_parent"
                 app:layout_constraintBottom_toTopOf="@+id/post_text_view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -28,7 +30,7 @@
                     android:id="@+id/avatar_view"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_marginHorizontal="@dimen/horizontal_small_margin"
+                    android:layout_marginRight="@dimen/horizontal_small_margin"
                     android:contentDescription="@string/sample_avatar_desc"
                     android:scaleType="centerCrop"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -42,10 +44,9 @@
                     android:id="@+id/linearLayout"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:gravity="center"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/menu_view"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/avatar_view"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -53,61 +54,129 @@
                         android:id="@+id/fullname_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sample_fullName"
+                        android:text="@string/sample_fullname"
                         android:textAppearance="@style/postItemHeaderTextStyle" />
 
                     <TextView
                         android:id="@+id/date_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:text="@string/sample_date"
                         android:textAppearance="@style/postItemSubheaderTextStyle" />
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/menu_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.0"
-                    app:srcCompat="@drawable/ic_show_more"
-                    app:tint="@color/gray_200" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/post_text_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/vertical_margin"
+                android:layout_marginBottom="@dimen/vertical_small_margin"
                 app:layout_constraintBottom_toTopOf="@+id/post_image_view"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
                 tools:text="Content" />
 
             <ImageView
                 android:id="@+id/post_image_view"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:background="@drawable/background_content_post"
-                app:layout_constraintBottom_toTopOf="@+id/reactions_view"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/post_text_view" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reactions_view"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/vertical_small_margin"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/vertical_margin"
+                android:layout_marginBottom="@dimen/vertical_small_margin"
                 android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_image_view"
-                tools:listitem="@layout/item_reaction" />
+                app:layout_constraintTop_toBottomOf="@+id/post_image_view">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <LinearLayout
+                    android:id="@+id/linearLayout3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/appreciation_up_view"
+                        style="@style/ButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="@dimen/vertical_small_margin"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_add"
+                        app:tint="@color/gray_200" />
+
+                    <TextView
+                        android:id="@+id/appreciations_count_view"
+                        style="@style/appreciationsTextStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="@dimen/vertical_small_margin"
+                        tools:text="100" />
+
+                    <ImageView
+                        android:id="@+id/appreciation_down_view"
+                        style="@style/ButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_remove"
+                        app:tint="@color/gray_200" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/show_reactions_view"
+                        style="@style/ButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="@dimen/vertical_small_margin"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:srcCompat="@drawable/ic_arrow_down"
+                        app:tint="@color/gray_200" />
+
+                    <ImageView
+                        android:id="@+id/comment_view"
+                        style="@style/ButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:srcCompat="@drawable/ic_comment"
+                        app:tint="@color/gray_200" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reactions_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_reaction" />
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

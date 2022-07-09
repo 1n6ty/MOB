@@ -1,5 +1,7 @@
 package com.example.mobv2.ui.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity
 
     // USER
     public static final String USER_ID_KEY = "USER_ID_KEY";
+    public static final String USER_AVATAR_URL_KEY = "USER_AVATAR_URL_KEY";
     public static final String USER_NICKNAME_KEY = "USER_NICKNAME_KEY";
     public static final String USER_FULLNAME_KEY = "USER_FULLNAME_KEY";
     public static final String USER_EMAIL_KEY = "USER_EMAIL_KEY";
@@ -111,5 +114,10 @@ public class MainActivity extends AppCompatActivity
     public Fragment getFragmentAtFrame()
     {
         return getSupportFragmentManager().findFragmentById(navContentFrame.getId());
+    }
+
+    public SharedPreferences getPrivatePreferences()
+    {
+        return getPreferences(Context.MODE_PRIVATE);
     }
 }

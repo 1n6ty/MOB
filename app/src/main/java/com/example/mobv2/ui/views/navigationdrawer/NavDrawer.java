@@ -1,6 +1,5 @@
 package com.example.mobv2.ui.views.navigationdrawer;
 
-import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +12,7 @@ import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.models.MenuItemMetadatum;
 import com.example.mobv2.ui.activities.MainActivity;
@@ -22,11 +22,14 @@ import com.example.mobv2.ui.fragments.MapFeaturesFragment;
 import com.example.mobv2.ui.fragments.NotificationAndSoundFragment;
 import com.google.android.material.navigation.NavigationView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class NavDrawer implements NavigationView.OnNavigationItemSelectedListener
 {
-    private final int PROFILE_GROUP = 0, SETTINGS_GROUP = 1;
+    private static final int PROFILE_GROUP = 0, SETTINGS_GROUP = 1;
 
-    private MainActivity mainActivity;
+    private final MainActivity mainActivity;
 
     private final DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -53,14 +56,28 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     {
         View headerView = navigationView.getHeaderView(0);
 
+        URL url;
+        try
+        {
+            url = new URL("http://192.168.0.104:8000" + mainActivity.getPrivatePreferences()
+                                                                    .getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+        }
+        catch (MalformedURLException e)
+        {
+            return;
+        }
+
         ImageView avatarView = headerView.findViewById(R.id.avatar_view);
+        Glide.with(navigationView)
+             .load(url)
+             .into(avatarView);
 
         TextView fullNameView = headerView.findViewById(R.id.fullname_view);
-        fullNameView.setText(mainActivity.getPreferences(Context.MODE_PRIVATE)
+        fullNameView.setText(mainActivity.getPrivatePreferences()
                                          .getString(MainActivity.USER_FULLNAME_KEY, ""));
 
         TextView addressesView = headerView.findViewById(R.id.address_view);
-        addressesView.setText(mainActivity.getPreferences(Context.MODE_PRIVATE)
+        addressesView.setText(mainActivity.getPrivatePreferences()
                                           .getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
     }
 

@@ -1,22 +1,18 @@
 package com.example.mobv2.utils;
 
-import android.content.res.Resources;
-
-import com.example.mobv2.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MarkerAddition
 {
-    private LatLng position;
-    private String title;
-    private BitmapDescriptor descriptor;
+    private final String title;
+    private final LatLng position;
+    private final BitmapDescriptor descriptor;
 
-    public MarkerAddition(double latitude,
+    public MarkerAddition(String title,
+                          double latitude,
                           double longitude,
-                          String title,
                           BitmapDescriptor descriptor)
     {
         this.position = new LatLng(latitude, longitude);

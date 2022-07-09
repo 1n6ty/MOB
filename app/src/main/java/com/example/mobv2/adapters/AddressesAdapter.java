@@ -15,22 +15,27 @@ import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.models.Address;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.SetAddressCallback;
+import com.example.mobv2.utils.abstractions.FuncParameterless;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder>
 {
-    private final MainActivity mainActivity;
+    private final Context context;
     private final List<AddressItem> addressItems;
+    private final FuncParameterless<SharedPreferences> sharedPreferencesFuncParameterless;
 
     private AddressItem lastItem;
 
-    public AddressesAdapter(MainActivity mainActivity,
-                            List<Address> addresses)
+    public AddressesAdapter(Context context,
+                            List<Address> addresses,
+                            FuncParameterless<SharedPreferences> sharedPreferencesFuncParameterless
+    )
     {
-        this.mainActivity = mainActivity;
-        addressItems = new ArrayList<>();
+        this.context = context;
+        this.addressItems = new ArrayList<>();
+        this.sharedPreferencesFuncParameterless = sharedPreferencesFuncParameterless;
 
         for (Address address : addresses)
         {
@@ -60,6 +65,13 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
 
         holder.itemView.setBackgroundResource(R.drawable.background_item_address_selector);
 
+        if (address.getId() == sharedPreferencesFuncParameterless.execute()
+                                                                 .getInt(MainActivity.ADDRESS_ID_KEY, -1))
+        {
+            addressItem.setChecked(true);
+            lastItem = addressItem;
+        }
+
         if (addressItem.isChecked())
         {
             holder.itemView.setSelected(true);
@@ -81,19 +93,17 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         {
             addressItem.setChecked(true);
             Address address = addressItem.getAddress();
-            MainActivity.MOB_SERVER_API.setAddress(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
-            SharedPreferences.Editor editor = mainActivity.getPreferences(Context.MODE_PRIVATE)
-                                                          .edit();
+            MainActivity.MOB_SERVER_API.setAddress(new SetAddressCallback(context), address.getId(), MainActivity.token);
+            SharedPreferences.Editor editor = sharedPreferencesFuncParameterless.execute()
+                                                                                .edit();
             editor.putInt(MainActivity.ADDRESS_ID_KEY, address.getId());
             editor.putString(MainActivity.ADDRESS_FULL_KEY, address.toString());
-            /*
-            editor.putString(MainActivity.ADDRESS_COUNTRY_KEY, address.getCountry());
+/*            editor.putString(MainActivity.ADDRESS_COUNTRY_KEY, address.getCountry());
             editor.putString(MainActivity.ADDRESS_CITY_KEY, address.getCity());
             editor.putString(MainActivity.ADDRESS_STREET_KEY, address.getStreet());
-            editor.putInt(MainActivity.ADDRESS_HOUSE_KEY, address.getHouse());
+            editor.putInt(MainActivity.ADDRESS_HOUSE_KEY, address.getHouse());*/
             editor.putFloat(MainActivity.ADDRESS_X_KEY, (float) address.getX());
             editor.putFloat(MainActivity.ADDRESS_Y_KEY, (float) address.getY());
-            */
             editor.apply();
         }
         lastItem = addressItem;

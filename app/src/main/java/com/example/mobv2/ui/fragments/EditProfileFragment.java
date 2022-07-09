@@ -1,6 +1,5 @@
 package com.example.mobv2.ui.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
@@ -8,9 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
 import com.example.mobv2.ui.activities.MainActivity;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
 {
@@ -38,7 +41,21 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     protected void initToolbar()
     {
         toolbar = binding.toolbar;
-        super.initToolbar(toolbar, mainActivity.getPreferences(Context.MODE_PRIVATE)
+
+        URL url;
+        try
+        {
+            url = new URL("http://192.168.0.104:8000" + mainActivity.getPrivatePreferences()
+                                                                    .getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+        }
+        catch (MalformedURLException e)
+        {
+            return;
+        }
+
+        Glide.with(this).load(url).into(binding.avatarView);
+
+        super.initToolbar(toolbar, mainActivity.getPrivatePreferences()
                                                .getString(MainActivity.USER_FULLNAME_KEY, ""));
     }
 
@@ -47,7 +64,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         binding.settingsPhoneNumberView.setOnClickListener(view ->
         {
         });
-        binding.phoneNumberView.setText(mainActivity.getPreferences(Context.MODE_PRIVATE)
+        binding.phoneNumberView.setText(mainActivity.getPrivatePreferences()
                                                     .getString(MainActivity.USER_PHONE_NUMBER_KEY, ""));
     }
 
@@ -56,7 +73,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         binding.settingsNicknameView.setOnClickListener(view ->
         {
         });
-        binding.nicknameView.setText(mainActivity.getPreferences(Context.MODE_PRIVATE)
+        binding.nicknameView.setText(mainActivity.getPrivatePreferences()
                                                  .getString(MainActivity.USER_NICKNAME_KEY, ""));
     }
 

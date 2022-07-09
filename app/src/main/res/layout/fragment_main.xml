@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.fragments.main.MainFragment"
-        tools:openDrawer="start">
+        tools:openDrawer="end">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -83,6 +83,7 @@
                             android:layout_marginTop="@dimen/toolbar_rest_margin_top"
                             android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
                             app:navigationIcon="@drawable/ic_close"
+                            app:menu="@menu/menu_recycler_toolbar"
                             app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
                     </com.google.android.material.appbar.AppBarLayout>
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -2,6 +2,7 @@ package com.example.mobv2.adapters;
 
 import android.content.Context;
 import android.os.Build;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -16,20 +17,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ItemReactionBinding;
 import com.example.mobv2.models.Reaction;
+import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.callbacks.PostChangeReactCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ReactionViewHolder>
+public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.ReactionViewHolder>
 {
-    private final Context context;
+    private final MainActivity mainActivity;
     private final List<ReactionItem> reactionItems;
 
-    public ReactionAdapter(Context context,
-                           List<Reaction> reactions)
+    private final int postId;
+
+    public ReactionsAdapter(MainActivity mainActivity,
+                            List<Reaction> reactions,
+                            int postId)
     {
-        this.context = context;
-        reactionItems = new ArrayList<>();
+        this.mainActivity = mainActivity;
+        this.reactionItems = new ArrayList<>();
+
+        this.postId = postId;
 
         for (Reaction reaction : reactions)
         {
@@ -44,9 +52,8 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
     public ReactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                  int viewType)
     {
-        View reactionItem = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.item_reaction, parent, false);
+        View reactionItem = LayoutInflater.from(parent.getContext())
+                                          .inflate(R.layout.item_reaction, parent, false);
         return new ReactionViewHolder(reactionItem);
     }
 
@@ -56,6 +63,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
     {
         ReactionItem reactionItem = reactionItems.get(holder.getAdapterPosition());
         Reaction reaction = reactionItem.getReaction();
+        List<Integer> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
+        int userId = mainActivity.getPrivatePreferences()
+                                 .getInt(MainActivity.USER_ID_KEY, -1);
 
         final boolean isAddButton = reaction.isAdd();
 
@@ -65,7 +75,13 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
         holder.count.setVisibility(isAddButton ? View.GONE : View.VISIBLE);
 
         holder.itemView.setOnClickListener(view -> onReactionItemClicked(view, isAddButton, holder.getAdapterPosition()));
-        holder.itemView.setBackgroundResource(R.drawable.background_item_reaction_selector);
+        holder.itemView.setBackgroundResource(0);
+
+        if (userIdsWhoLiked != null && userIdsWhoLiked.contains(userId))
+        {
+            reactionItem.setChecked(true);
+        }
+
 
         if (reactionItem.isChecked())
         {
@@ -81,8 +97,8 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
         if (isAddButton)
         {
             Context contextThemeWrapper =
-                    new ContextThemeWrapper(context, R.style.MyPopupOtherStyle);
-            PopupMenu popupMenu = new PopupMenu(contextThemeWrapper, view);
+                    new ContextThemeWrapper(mainActivity, R.style.MyPopupOtherStyle);
+            PopupMenu popupMenu = new PopupMenu(contextThemeWrapper, view, Gravity.NO_GRAVITY);
             popupMenu.inflate(R.menu.menu_reactions);
 
             initMenuAdd(popupMenu);
@@ -108,7 +124,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
         }
     }
 
-    private boolean addReaction(String emoji)
+    public boolean addReaction(String emoji)
     {
         for (int i = 0; i < reactionItems.size(); i++)
         {
@@ -122,7 +138,13 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
             }
         }
 
-        reactionItems.add(reactionItems.size() - 1, new ReactionItem(new Reaction(emoji, 1), true));
+        List<Integer> usersWhoLiked = new ArrayList<>();
+        int userId = mainActivity.getPrivatePreferences()
+                                 .getInt(MainActivity.USER_ID_KEY, -1);
+        usersWhoLiked.add(userId);
+
+        reactionItems.add(reactionItems.size() - 1, new ReactionItem(new Reaction(emoji, usersWhoLiked), true));
+        MainActivity.MOB_SERVER_API.postReact(new PostChangeReactCallback(), postId, emoji, MainActivity.token);
         notifyItemInserted(reactionItems.size() - 2);
         return true;
     }
@@ -134,15 +156,20 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
         ReactionItem reactionItem = reactionItems.get(position);
         Reaction reaction = reactionItem.getReaction();
 
+        int userId = mainActivity.getPrivatePreferences()
+                                 .getInt(MainActivity.USER_ID_KEY, -1);
+        List<Integer> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
         if (reactionItem.isChecked())
         {
             reactionItem.setChecked(false);
-            reaction.setCount(reaction.getCount() - 1);
+            userIdsWhoLiked.remove((Object) userId);
+            MainActivity.MOB_SERVER_API.postUnreact(new PostChangeReactCallback(), postId, reaction.getEmoji(), MainActivity.token);
         }
         else
         {
             reactionItem.setChecked(true);
-            reaction.setCount(reaction.getCount() + 1);
+            userIdsWhoLiked.add(userId);
+            MainActivity.MOB_SERVER_API.postReact(new PostChangeReactCallback(), postId, reaction.getEmoji(), MainActivity.token);
         }
 
         if (reaction.getCount() == 0)
@@ -151,9 +178,6 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
             notifyItemRemoved(position);
         }
 
-        else
-            notifyItemChanged(position);
-
         sortReactionItems();
     }
 
@@ -161,13 +185,12 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.Reacti
     {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
         {
-            reactionItems.sort((o1, o2) -> Integer.compare(o2.getReaction()
-                                                             .getCount(), o1.getReaction()
-                                                                            .getCount()));
+            reactionItems.sort((item1, item2) -> Integer.compare(item2.getReaction()
+                                                                      .getCount(), item1.getReaction()
+                                                                                        .getCount()));
             notifyItemRangeChanged(0, reactionItems.size() - 1);
         }
     }
-
 
     @Override
     public int getItemCount()

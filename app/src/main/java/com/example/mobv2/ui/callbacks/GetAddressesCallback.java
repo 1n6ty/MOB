@@ -16,9 +16,9 @@ import java.util.List;
 
 public class GetAddressesCallback implements MOBServerAPI.MOBAPICallback
 {
-    private MainActivity mainActivity;
-    private RecyclerView recyclerView;
-    private View noAddressesView;
+    private final MainActivity mainActivity;
+    private final RecyclerView recyclerView;
+    private final View noAddressesView;
 
     public GetAddressesCallback(MainActivity mainActivity,
                                 RecyclerView recyclerView,
@@ -45,7 +45,7 @@ public class GetAddressesCallback implements MOBServerAPI.MOBAPICallback
             addresses.add(address);
         }
 
-        recyclerView.setAdapter(new AddressesAdapter(mainActivity, addresses));
+        recyclerView.setAdapter(new AddressesAdapter(mainActivity, addresses, mainActivity::getPrivatePreferences));
         noAddressesView.setVisibility(addresses.size() < 1
                 ? View.VISIBLE
                 : View.INVISIBLE);

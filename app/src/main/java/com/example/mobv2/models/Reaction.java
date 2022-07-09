@@ -1,33 +1,35 @@
 package com.example.mobv2.models;
 
+import java.util.List;
+
 public class Reaction
 {
     public static String EMOJI_LIKE = "\uD83D\uDC4D";
     public static String EMOJI_DISLIKE = "\uD83D\uDC4E";
     public static String EMOJI_LOVE = "❤";
 
-    private String emoji;
-    private int count;
-    private boolean add;
+    private final String emoji;
+    private List<Integer> userIdsWhoLiked;
+    private final boolean add;
 
     public Reaction(String emoji,
-                    int count)
+                    List<Integer> userIdsWhoLiked)
     {
-        this(emoji, count, false);
+        this(emoji, userIdsWhoLiked, false);
     }
 
     protected Reaction(String emoji,
-                       int count,
+                       List<Integer> userIdsWhoLiked,
                        boolean add)
     {
         this.emoji = emoji;
-        this.count = count;
+        this.userIdsWhoLiked = userIdsWhoLiked;
         this.add = add;
     }
 
     public static Reaction createAdd()
     {
-        return new Reaction("+", -1, true);
+        return new Reaction("+", null, true);
     }
 
     public String getEmoji()
@@ -35,18 +37,23 @@ public class Reaction
         return emoji;
     }
 
-    public int getCount()
+    public List<Integer> getUserIdsWhoLiked()
     {
-        return count;
+        return userIdsWhoLiked;
     }
 
-    public void setCount(int count)
+    public void setUserIdsWhoLiked(List<Integer> userIdsWhoLiked)
     {
-        this.count = count;
+        this.userIdsWhoLiked = userIdsWhoLiked;
     }
 
     public boolean isAdd()
     {
         return add;
+    }
+
+    public int getCount()
+    {
+        return userIdsWhoLiked == null ? -1 : userIdsWhoLiked.size();
     }
 }

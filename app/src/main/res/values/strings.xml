@@ -9,7 +9,7 @@
     <string name="action_settings">Settings</string>
 
     <!--  nav drawer header  -->
-    <string name="sample_fullName">Lary Davise</string>
+    <string name="sample_fullname">Lary Davise</string>
     <string name="sample_phone_number">+78005553535</string>
     <string name="sample_avatar_desc">User\'s avatar</string>
     <string name="sample_nickname">\@user</string>
@@ -59,4 +59,5 @@
     <!--  change addresses fragment  -->
     <string name="address_primary">Russia, Kursk</string>
     <string name="address_secondary">Centralniy okrug, Verhnyaya Lugovaya ulica, 59</string>
+    <string name="sample_comment">Pastry dragée danish jujubes icing tootsie roll. Marshmallow jelly beans toffee shortbread cupcake.</string>
 </resources>

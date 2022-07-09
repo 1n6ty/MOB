@@ -1,29 +1,30 @@
 package com.example.mobv2.ui.callbacks;
 
-import android.content.Context;
 import android.util.Log;
 
+import com.example.mobv2.adapters.CommentsAdapter;
+import com.example.mobv2.models.Comment;
 import com.example.mobv2.serverapi.MOBServerAPI;
-import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
 
-public class SetAddressCallback implements MOBServerAPI.MOBAPICallback
+public class GetCommentCallback implements MOBServerAPI.MOBAPICallback
 {
-    private final Context context;
+    private final CommentsAdapter commentsAdapter;
 
-    public SetAddressCallback(Context context)
+    public GetCommentCallback(CommentsAdapter commentsAdapter)
     {
-        this.context = context;
+        this.commentsAdapter = commentsAdapter;
     }
 
     @Override
     public void funcOk(LinkedTreeMap<String, Object> obj)
     {
         Log.v("DEBUG", obj.toString());
-        LinkedTreeMap<String, String> response =
-                (LinkedTreeMap<String, String>) obj.get("response");
 
-        MainActivity.token = response.get("token");
+        var response = (LinkedTreeMap<String, Object>) obj.get("response");
+
+        Comment comment = Comment.parseFromMap(response);
+        commentsAdapter.addComment(comment);
     }
 
     @Override

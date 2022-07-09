@@ -34,18 +34,17 @@ public class Address
 
     public static Address parseFromMap(LinkedTreeMap<String, Object> map)
     {
-        // id
+        if (map == null)
+            return null;
+
         int id = ((Double) map.get("id")).intValue();
 
-        // address
-        String country = (String) map.get("country");
-        String city = (String) map.get("city");
-        String street = (String) map.get("street");
-        int house = ((Double) map.get("house")).intValue();
-
-        // coordinates
-        double x = (double) map.get("x");
-        double y = (double) map.get("y");
+        var country = (String) map.get("country");
+        var city = (String) map.get("city");
+        var street = (String) map.get("street");
+        var house = ((Double) map.get("house")).intValue();
+        var x = (double) map.get("x");
+        var y = (double) map.get("y");
 
         return new Address(id, country, city, street, house, x, y);
     }

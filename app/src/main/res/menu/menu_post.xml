@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/menu_copy_post"
         android:title="@string/menu_copy_post"
@@ -21,4 +22,20 @@
         android:title="@string/menu_delete_post"
         android:visible="false"
         app:showAsAction="never" />
+
+    <item android:title="Reactions">
+        <menu>
+            <group>
+                <item
+                    android:id="@+id/menu_reaction_like"
+                    android:title="@string/menu_reaction_like" />
+                <item
+                    android:id="@+id/menu_reaction_dislike"
+                    android:title="@string/menu_reaction_dislike" />
+                <item
+                    android:id="@+id/menu_reaction_love"
+                    android:title="@string/menu_reaction_love" />
+            </group>
+        </menu>
+    </item>
 </menu>

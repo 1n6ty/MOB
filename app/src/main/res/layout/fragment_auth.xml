@@ -10,83 +10,68 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/vertical_margin"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/vertical_margin"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_small_margin"
                 android:orientation="vertical">
 
-                <!--            <TextView-->
-                <!--                android:layout_width="match_parent"-->
-                <!--                android:layout_height="wrap_content"-->
-                <!--                android:layout_marginHorizontal="@dimen/horizontal_margin"-->
-                <!--                android:text="@string/auth_desc"-->
-                <!--                android:textAppearance="@style/navSubheaderStyle" />-->
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/vertical_small_margin"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/error_phone_view"
-                        style="@style/wrongInputTextStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/field_is_necessary"
-                        android:visibility="invisible" />
-
-                    <EditText
-                        android:id="@+id/phone_number_view"
-                        style="@style/authPasswordTextStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/horizontal_margin"
-                        android:autofillHints="phone"
-                        android:backgroundTint="@color/white"
-                        android:hint="@string/auth_phone_hint"
-                        android:inputType="phone" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/vertical_small_margin"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/error_password_view"
-                        style="@style/wrongInputTextStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/field_is_necessary"
-                        android:visibility="invisible" />
-
-                    <EditText
-                        android:id="@+id/password_view"
-                        style="@style/authPasswordTextStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/horizontal_margin"
-                        android:autofillHints="password"
-                        android:backgroundTint="@color/white"
-                        android:hint="@string/auth_password_hint"
-                        android:inputType="textPassword" />
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/next_button"
-                    style="@style/Widget.MaterialComponents.FloatingActionButton"
+                <TextView
+                    android:id="@+id/error_phone_number_view"
+                    style="@style/incorrectInputTextStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:backgroundTint="@color/blue_100"
-                    android:text="@string/auth_button"
-                    android:textAppearance="@style/nextButtonTextStyle"
-                    android:textStyle="bold" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/field_is_necessary"
+                    android:visibility="invisible" />
+
+                <EditText
+                    android:id="@+id/phone_number_view"
+                    style="@style/authPasswordTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/horizontal_margin"
+                    android:autofillHints="phone"
+                    android:hint="@string/auth_phone_hint"
+                    android:inputType="phone" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_small_margin"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/error_password_view"
+                    style="@style/incorrectInputTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/field_is_necessary"
+                    android:visibility="invisible" />
+
+                <EditText
+                    android:id="@+id/password_view"
+                    style="@style/authPasswordTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/horizontal_margin"
+                    android:autofillHints="password"
+                    android:hint="@string/auth_password_hint"
+                    android:inputType="textPassword" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/next_button"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/blue_100"
+                android:text="@string/auth_button"
+                android:textAppearance="@style/nextButtonTextStyle" />
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

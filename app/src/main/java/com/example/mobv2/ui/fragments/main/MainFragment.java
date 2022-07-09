@@ -1,10 +1,13 @@
 package com.example.mobv2.ui.fragments.main;
 
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -12,13 +15,18 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.PostAdapter;
+import com.example.mobv2.adapters.PostsAdapter;
 import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.models.Post;
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.callbacks.GetMarksCallback;
+import com.example.mobv2.ui.callbacks.GetPostCallback;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
+import com.example.mobv2.ui.callbacks.SetAddressCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.utils.MarkerAddition;
@@ -29,8 +37,9 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.gson.internal.LinkedTreeMap;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
@@ -40,7 +49,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private MainFragmentViewModel viewModel;
 
     private Toolbar toolbar;
-
     private NavDrawer navDrawer;
     private BottomSheetBehavior<View> sheetBehavior;
     private Toolbar postsToolbar;
@@ -58,10 +66,10 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
         initViewModel();
 
         initToolbar();
+
         initMap();
         if (viewModel.isMapReady())
         {
@@ -69,6 +77,11 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         }
 
         initBottomSheet();
+
+        // get address on launch
+        MainActivity.MOB_SERVER_API.setAddress(new SetAddressCallback(getContext()),
+                mainActivity.getPrivatePreferences()
+                            .getInt(MainActivity.ADDRESS_ID_KEY, -1), MainActivity.token);
     }
 
     @Override
@@ -78,7 +91,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         refreshMarker();
         googleMap.clear();
-        viewModel.getPostIds()
+        viewModel.getPostsWithMarks()
                  .clear();
     }
 
@@ -91,10 +104,40 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         toolbar = binding.toolbar;
         navDrawer = new NavDrawer(mainActivity);
+        URL url;
+        try
+        {
+            url = new URL("http://192.168.0.104:8000" + mainActivity.getPrivatePreferences()
+                                                                    .getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+        }
+        catch (MalformedURLException e)
+        {
+            return;
+        }
 
-        super.initToolbar(toolbar, R.drawable.sample_avatar_rounded, v -> navDrawer.open());
+        Glide.with(this)
+             .asBitmap()
+             .load(url)
+             .into(new CustomTarget<Bitmap>()
+             {
+                 @Override
+                 public void onResourceReady(@NonNull Bitmap resource,
+                                             @Nullable Transition<? super Bitmap> transition)
+                 {
+                     resource.reconfigure(36, 36, Bitmap.Config.ARGB_8888);
+                     Drawable drawable = new BitmapDrawable(getResources(), resource);
+                     toolbar.setNavigationIcon(drawable);
+                 }
+
+                 @Override
+                 public void onLoadCleared(@Nullable Drawable placeholder)
+                 {
+
+                 }
+             });
+
+        super.initToolbar(toolbar, "", v -> navDrawer.open());
     }
-
 
     private void initMap()
     {
@@ -114,64 +157,32 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         sheetBehavior.setSaveFlags(BottomSheetBehavior.SAVE_NONE);
 
-        sheetBehavior.addBottomSheetCallback(
-                new PostsSheetCallback(binding.postsAppBarContainer,
-                        this::initPostsRecycler,
-                        () ->
-                        {
-                            // fix will be better
-                            refreshMarker();
-                        }));
+        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(binding.postsAppBarContainer));
 
         sheetBehavior.setPeekHeight(200);
-        sheetBehavior.setHalfExpandedRatio(0.6f);
+        sheetBehavior.setHalfExpandedRatio(0.5f);
 
-        postsToolbar.setNavigationOnClickListener(
-                v -> sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN));
-        postsToolbar.setOnMenuItemClickListener(item -> false);
-    }
-
-    private void initPostsRecycler()
-    {
-        postsRecycler = binding.postsRecycler;
-
-        postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        PostAdapter adapter = new PostAdapter(getContext(), new ArrayList<>());
-        postsRecycler.setAdapter(adapter);
-
-        for (int id : viewModel.getPostIds())
+        postsToolbar.setNavigationOnClickListener(view ->
         {
-            MainActivity.MOB_SERVER_API.getPost(new MOBServerAPI.MOBAPICallback()
-            {
-                @Override
-                public void funcOk(LinkedTreeMap<String, Object> obj)
-                {
-                    Log.v("DEBUG", obj.toString());
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            refreshMarker();
+        });
+        postsToolbar.setOnMenuItemClickListener(item ->
+        {
+            refreshPosts();
+            return true;
+        });
 
-                    LinkedTreeMap<String, Object> response =
-                            (LinkedTreeMap<String, Object>) obj.get("response");
-
-                    Post post = Post.parseFromMap(response);
-                    adapter.addPost(post);
-                }
-
-                @Override
-                public void funcBad(LinkedTreeMap<String, Object> obj)
-                {
-                    Log.v("DEBUG", obj.toString());
-//                    Toast.makeText(getContext(), "Post is not available", Toast.LENGTH_LONG)
-//                         .show();
-                }
-
-                @Override
-                public void fail(Throwable obj)
-                {
-                    Log.v("DEBUG", obj.toString());
-//                    Toast.makeText(getContext(), R.string.check_internet_connection, Toast.LENGTH_LONG)
-//                         .show();
-                }
-            }, id, MainActivity.token);
-        }
+        viewModel.getTitleMarker()
+                 .observe(mainActivity, title ->
+                 {
+                     if (title != null)
+                     {
+                         if (viewModel.getMarker() != null) viewModel.getMarker()
+                                                                     .setTitle(title);
+                         postsToolbar.setTitle(title);
+                     }
+                 });
     }
 
     private void onMapReady(GoogleMap googleMap)
@@ -188,86 +199,35 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void setMapMarkers()
     {
-        BitmapDescriptor descriptor = getBitmapDescriptor(R.drawable.ic_marker_24dp);
+        BitmapDescriptor addressDescriptor =
+                getBitmapDescriptor(R.drawable.ic_marker_address_24dp);
+        BitmapDescriptor markDescriptor = getBitmapDescriptor(R.drawable.ic_marker_24dp);
 
-        /*MarkerAddition[] markerAdditions =
-                new MarkerAddition[]{
-                        new MarkerAddition(-34, 151, "Sydney", descriptor),
-                        new MarkerAddition(55, 37, "Moscow", descriptor),
-                        new MarkerAddition(51.5406, 46.0086, "Saratov", descriptor)
-                };
+        SharedPreferences preferences = mainActivity.getPrivatePreferences();
+        String title = preferences.getString(MainActivity.ADDRESS_FULL_KEY, "");
+        double x = preferences.getFloat(MainActivity.ADDRESS_X_KEY, -1);
+        double y = preferences.getFloat(MainActivity.ADDRESS_Y_KEY, -1);
+        googleMap.addMarker(new MarkerAddition(title, x, y, addressDescriptor).create())
+                 .setTag(true);
 
-        for (MarkerAddition markerAddition : markerAdditions)
-        {
-            googleMap.addMarker(markerAddition.create());
-        }*/
-
-        MainActivity.MOB_SERVER_API.getMarks(new MOBServerAPI.MOBAPICallback()
-        {
-            @Override
-            public void funcOk(LinkedTreeMap<String, Object> obj)
-            {
-                LinkedTreeMap<String, LinkedTreeMap<String, Double>> response =
-                        (LinkedTreeMap<String, LinkedTreeMap<String, Double>>) obj.get("response");
-
-                for (String postId : response.keySet())
-                {
-                    viewModel.addPostId(Integer.parseInt(postId));
-                    LinkedTreeMap<String, Double> coordinates = response.get(postId);
-                    double x = coordinates.get("x");
-                    double y = coordinates.get("y");
-                    googleMap.addMarker(new MarkerAddition(x, y, "The mark", descriptor).create());
-
-                }
-            }
-
-            @Override
-            public void funcBad(LinkedTreeMap<String, Object> obj)
-            {
-                Toast.makeText(getContext(), "There are not markers, yet", Toast.LENGTH_LONG)
-                     .show();
-            }
-
-            @Override
-            public void fail(Throwable obj)
-            {
-
-            }
-        }, MainActivity.token);
+        MainActivity.MOB_SERVER_API.getMarks(new GetMarksCallback(getContext(), markDescriptor, viewModel, googleMap), MainActivity.token);
     }
 
     private boolean onMarkerClick(@NonNull Marker marker)
     {
+        refreshMarker();
         viewModel.setMarker(marker);
+        viewModel.setAddressMarker((Boolean) marker.getTag());
+        refreshPosts();
 
-        viewModel.getMarker()
-                 .setIcon(getBitmapDescriptor(R.drawable.ic_marker_36dp));
+        setMarkerIcon(R.drawable.ic_marker_address_36dp, R.drawable.ic_marker_36dp);
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getMarker()
                                                                            .getPosition(), ZOOM));
-// переход по адресу
-/*        try
-        {
-            Geocoder geocoder = new Geocoder(getContext());
-            List<Address> addresses =
-                    geocoder.getFromLocationName("Россия Новосибирск Ватутина 19", 1);
-            double latitude = addresses.get(0)
-                                       .getLatitude();
-            double longitude = addresses.get(0)
-                                        .getLongitude();
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), ZOOM));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }*/
-
 
         sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
         postsToolbar.setTitle(viewModel.getMarker()
                                        .getTitle());
-
-//        MainActivity.MOB_SERVER_API.getPost();
 
         return true;
     }
@@ -282,9 +242,36 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         if (viewModel.getMarker() != null)
         {
-            viewModel.getMarker()
-                     .setIcon(getBitmapDescriptor(R.drawable.ic_marker_24dp));
+            setMarkerIcon(R.drawable.ic_marker_address_24dp, R.drawable.ic_marker_24dp);
             viewModel.setMarker(null);
         }
+    }
+
+    private void refreshPosts()
+    {
+        postsRecycler = binding.postsRecycler;
+        postsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        var posts = new ArrayList<Post>();
+        var postsAdapter = new PostsAdapter(mainActivity, posts, viewModel::setTitleMarker);
+        postsRecycler.setAdapter(postsAdapter);
+
+        for (var postWithMark : viewModel.getPostsWithMarks())
+        {
+            LatLng position = postWithMark.getPosition();
+            if (position.equals(viewModel.getMarker()
+                                         .getPosition()) || viewModel.isAddressMarker())
+            {
+                MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(postsAdapter, viewModel), postWithMark.getPostId(), MainActivity.token);
+            }
+        }
+    }
+
+    private void setMarkerIcon(@DrawableRes int addressMarker,
+                               @DrawableRes int marker)
+    {
+        viewModel.getMarker()
+                 .setIcon(viewModel.isAddressMarker()
+                         ? getBitmapDescriptor(addressMarker)
+                         : getBitmapDescriptor(marker));
     }
 }
