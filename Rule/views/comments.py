@@ -55,15 +55,15 @@ def getComment(req):
         
         appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', e.appreciatedUsers.split(' '))))
         unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', e.unappreciatedUsers.split(' '))))
-        app = -1
+        app = "-1"
         try:
             appUsers.index(user.id)
-            app = True
+            app = "True"
         except:
             pass
         try:
             unappUsers.index(user.id)
-            app = False
+            app = "False"
         except:
             pass
 

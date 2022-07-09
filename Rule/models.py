@@ -48,6 +48,3 @@ class Comment(models.Model):
     unappreciatedUsers = models.TextField(blank=True)
     date = models.DateField(default=time.now())
     reacted = models.JSONField(default={}, blank=True)
-
-    class Meta:
-        ordering = ['-appreciations', '-date']
