@@ -70,7 +70,7 @@ def getComment(req):
         return JsonResponse({
             'response': {
                 'user': {
-                    'nickName': e.user.nickName,
+                    'nick_name': e.user.nickName,
                     'name': e.user.name,
                     'email': e.user.email,
                     'phone_number': e.user.phone_number,
