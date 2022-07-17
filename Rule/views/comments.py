@@ -79,6 +79,7 @@ def getComment(req):
                     'profile_img_url': e.user.profile_img.url
                 },
                 'id': e.id,
+                'post_id': post_id,
                 'text': e.text,
                 'date': str(e.date),
                 'reactions': e.reacted,
