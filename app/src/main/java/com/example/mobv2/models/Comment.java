@@ -14,6 +14,7 @@ import java.util.Objects;
 public class Comment
 {
     private final int id;
+    private final int postId;
 
     private final User user;
     private final Date date;
@@ -21,12 +22,14 @@ public class Comment
     private final List<Reaction> reactions;
 
     public Comment(int id,
+                   int postId,
                    User user,
                    Date date,
                    String text,
                    List<Reaction> reactions)
     {
         this.id = id;
+        this.postId = postId;
         this.user = user;
         this.date = date;
         this.text = text;
@@ -52,6 +55,8 @@ public class Comment
 
         int id = ((Double) map.get("id")).intValue();
 
+        int postId = ((Double) map.get("post_id")).intValue();
+
         var userMap = (LinkedTreeMap<String, Object>) map.get("user");
         var user = User.parseFromMap(userMap);
         var text = (String) map.get("text");
@@ -71,12 +76,17 @@ public class Comment
 
         //
 
-        return new Comment(id, user, date, text, reactions);
+        return new Comment(id, postId, user, date, text, reactions);
     }
 
     public int getId()
     {
         return id;
+    }
+
+    public int getPostId()
+    {
+        return postId;
     }
 
     public User getUser()

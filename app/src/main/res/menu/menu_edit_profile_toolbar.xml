@@ -5,7 +5,8 @@
     <item
         android:icon="@drawable/ic_show_more"
         android:title=""
-        app:showAsAction="ifRoom">
+        app:showAsAction="ifRoom"
+        android:iconTint="?colorToolbarIcon">
         <menu>
             <item
                 android:icon="@drawable/ic_add_photo"

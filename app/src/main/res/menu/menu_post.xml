@@ -23,19 +23,17 @@
         android:visible="false"
         app:showAsAction="never" />
 
-    <item android:title="Reactions">
-        <menu>
-            <group>
-                <item
-                    android:id="@+id/menu_reaction_like"
-                    android:title="@string/menu_reaction_like" />
-                <item
-                    android:id="@+id/menu_reaction_dislike"
-                    android:title="@string/menu_reaction_dislike" />
-                <item
-                    android:id="@+id/menu_reaction_love"
-                    android:title="@string/menu_reaction_love" />
-            </group>
-        </menu>
-    </item>
+    <!--  Reactions  -->
+    <item
+        android:id="@+id/menu_reaction_like"
+        android:title="@string/menu_reaction_like"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_reaction_dislike"
+        android:title="@string/menu_reaction_dislike"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_reaction_love"
+        android:title="@string/menu_reaction_love"
+        app:showAsAction="ifRoom" />
 </menu>

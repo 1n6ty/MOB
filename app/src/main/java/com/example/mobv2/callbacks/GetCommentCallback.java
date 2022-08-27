@@ -1,19 +1,26 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import android.util.Log;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.adapters.CommentsAdapter;
 import com.example.mobv2.models.Comment;
 import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
 
 public class GetCommentCallback implements MOBServerAPI.MOBAPICallback
 {
-    private final CommentsAdapter commentsAdapter;
+    protected final MainActivity mainActivity;
+    protected final RecyclerView commentsRecycler;
+    private final boolean withSort;
 
-    public GetCommentCallback(CommentsAdapter commentsAdapter)
+    public GetCommentCallback(MainActivity mainActivity, RecyclerView commentsRecycler, boolean withSort)
     {
-        this.commentsAdapter = commentsAdapter;
+        this.mainActivity = mainActivity;
+        this.commentsRecycler = commentsRecycler;
+        this.withSort = withSort;
     }
 
     @Override
@@ -24,7 +31,9 @@ public class GetCommentCallback implements MOBServerAPI.MOBAPICallback
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
         Comment comment = Comment.parseFromMap(response);
-        commentsAdapter.addComment(comment);
+        var commentsAdapter = (CommentsAdapter) commentsRecycler.getAdapter();
+        commentsAdapter.addComment(comment, withSort);
+        commentsRecycler.scrollToPosition(0);
     }
 
     @Override

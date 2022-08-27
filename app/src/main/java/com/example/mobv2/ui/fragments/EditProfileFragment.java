@@ -79,6 +79,6 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
 
     private void initSettingsAddressesView()
     {
-        binding.settingsAddressesView.setOnClickListener(view -> mainActivity.transactionToFragment(new ChangeAddressesFragment()));
+        binding.settingsAddressesView.setOnClickListener(view -> mainActivity.goToFragment(new ChangeAddressesFragment()));
     }
 }

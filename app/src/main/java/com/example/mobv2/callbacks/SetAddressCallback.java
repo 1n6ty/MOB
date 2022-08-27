@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import android.content.Context;
 import android.util.Log;

@@ -9,27 +9,13 @@ public class Reaction
     public static String EMOJI_LOVE = "❤";
 
     private final String emoji;
-    private List<Integer> userIdsWhoLiked;
-    private final boolean add;
+    private final List<Integer> userIdsWhoLiked;
 
     public Reaction(String emoji,
                     List<Integer> userIdsWhoLiked)
     {
-        this(emoji, userIdsWhoLiked, false);
-    }
-
-    protected Reaction(String emoji,
-                       List<Integer> userIdsWhoLiked,
-                       boolean add)
-    {
         this.emoji = emoji;
         this.userIdsWhoLiked = userIdsWhoLiked;
-        this.add = add;
-    }
-
-    public static Reaction createAdd()
-    {
-        return new Reaction("+", null, true);
     }
 
     public String getEmoji()
@@ -40,16 +26,6 @@ public class Reaction
     public List<Integer> getUserIdsWhoLiked()
     {
         return userIdsWhoLiked;
-    }
-
-    public void setUserIdsWhoLiked(List<Integer> userIdsWhoLiked)
-    {
-        this.userIdsWhoLiked = userIdsWhoLiked;
-    }
-
-    public boolean isAdd()
-    {
-        return add;
     }
 
     public int getCount()

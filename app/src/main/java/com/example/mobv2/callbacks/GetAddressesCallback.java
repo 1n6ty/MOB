@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import android.util.Log;
 import android.view.View;
@@ -45,7 +45,7 @@ public class GetAddressesCallback implements MOBServerAPI.MOBAPICallback
             addresses.add(address);
         }
 
-        recyclerView.setAdapter(new AddressesAdapter(mainActivity, addresses, mainActivity::getPrivatePreferences));
+        recyclerView.setAdapter(new AddressesAdapter(mainActivity, addresses));
         noAddressesView.setVisibility(addresses.size() < 1
                 ? View.VISIBLE
                 : View.INVISIBLE);

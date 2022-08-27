@@ -49,15 +49,28 @@
     <string name="menu_edit_post">Edit</string>
     <string name="menu_delete_post">Delete</string>
 
-    <!--  menu reactions  -->
+    <!--  menu item sorts  -->
+    <string name="menu_sort_by_appreciations">Sort by appreciations</string>
+    <string name="menu_sort_by_date">Sort by date</string>
+    <string name="menu_sort_by_comments">Sort by comments</string>
+
+    <!--  menu item reactions  -->
     <string name="menu_reaction_count">200</string>
     <string name="menu_reaction_like">👍</string>
     <string name="menu_reaction_dislike">👎</string>
     <string name="menu_reaction_love">❤</string>
-    <string name="menu_reaction_plus">+</string>
 
     <!--  change addresses fragment  -->
     <string name="address_primary">Russia, Kursk</string>
-    <string name="address_secondary">Centralniy okrug, Verhnyaya Lugovaya ulica, 59</string>
+    <string name="address_secondary">Centralniy okrug, Verhnyaya Lugovaya, 59</string>
+
+    <!--  comments fragment  -->
     <string name="sample_comment">Pastry dragée danish jujubes icing tootsie roll. Marshmallow jelly beans toffee shortbread cupcake.</string>
+    <string name="comments_message">Messages:</string>
+
+
+    <string name="bs_long_map_coordinates">Coordinates:</string>
+    <string name="bs_long_map_address">Address:</string>
+    <string name="bs_long_map_add_marker">Add marker</string>
+
 </resources>

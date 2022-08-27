@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="bindingContext"
+            type="com.example.mobv2.ui.fragments.main.MainFragmentViewModel" />
+    </data>
+
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
@@ -17,7 +24,12 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appBarLayout2"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="0dp"
+                app:elevation="0dp"
+                app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.coordinatorlayout.widget.CoordinatorLayout
                     android:layout_width="match_parent"
@@ -37,64 +49,137 @@
                         android:layout_marginTop="@dimen/toolbar_main_margin_top"
                         android:background="@drawable/background_toolbar_main"
                         android:elevation="2dp"
-                        android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
                         app:navigationIcon="@drawable/ic_menu_drawer"
                         app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
+
+
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>
             </com.google.android.material.appbar.AppBarLayout>
+
+
+            <LinearLayout
+                android:id="@+id/coordinatorLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/backgroundSecondaryWindow"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/horizontal_margin"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:layout_width="106dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/background_item_reaction_selector"
+                    android:drawableTop="@drawable/ic_marker_address_36dp"
+                    android:drawableTint="@color/gray_300"
+                    android:outlineProvider="none"
+                    android:paddingVertical="@dimen/vertical_small_margin"
+                    android:text="My address"
+                    android:textAllCaps="false"
+                    android:textColor="?colorNavigationItemIcon"
+                    app:iconTint="?colorNavigationItemIcon" />
+
+                <!--                <com.google.android.material.button.MaterialButton-->
+                <!--                    style="?attr/buttonBarButtonStyle"-->
+                <!--                    android:layout_width="106dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginTop="0dp"-->
+                <!--                    android:text="News"-->
+                <!--                    android:textAllCaps="false"-->
+                <!--                    app:backgroundTint="?backgroundSecondaryWindow"-->
+                <!--                    app:icon="@drawable/ic_marker_address_36dp"-->
+                <!--                    app:iconGravity="top"-->
+                <!--                    app:iconTint="?colorNavigationItemIcon" />-->
+
+                <!--                <com.google.android.material.button.MaterialButton-->
+                <!--                    style="?attr/buttonBarButtonStyle"-->
+                <!--                    android:layout_width="106dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginTop="0dp"-->
+                <!--                    android:text="News"-->
+                <!--                    android:textAllCaps="false"-->
+                <!--                    app:backgroundTint="?backgroundSecondaryWindow"-->
+                <!--                    app:icon="@drawable/ic_marker_address_36dp"-->
+                <!--                    app:iconGravity="top"-->
+                <!--                    app:iconTint="?colorNavigationItemIcon" />-->
+
+                <!--                <com.google.android.material.button.MaterialButton-->
+                <!--                    style="?attr/buttonBarButtonStyle"-->
+                <!--                    android:layout_width="106dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginTop="0dp"-->
+                <!--                    android:text="News"-->
+                <!--                    android:textAllCaps="false"-->
+                <!--                    app:backgroundTint="?backgroundSecondaryWindow"-->
+                <!--                    app:icon="@drawable/ic_marker_address_36dp"-->
+                <!--                    app:iconGravity="top"-->
+                <!--                    app:iconTint="?colorNavigationItemIcon" />-->
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="visible">
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/frame_posts"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/background_sheet_post"
-                android:elevation="20dp"
-                android:orientation="vertical"
                 app:behavior_hideable="true"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="10dp"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-                <androidx.coordinatorlayout.widget.CoordinatorLayout
-                    android:id="@+id/posts_app_bar_container"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent"
+                    android:background="@drawable/background_sheet_post"
+                    android:orientation="vertical">
 
-                    <View
-                        android:id="@+id/dragger"
-                        android:layout_width="64dp"
-                        android:layout_height="2dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/background_dragger" />
-
-                    <com.google.android.material.appbar.AppBarLayout
-                        android:id="@+id/posts_app_bar"
+                    <androidx.coordinatorlayout.widget.CoordinatorLayout
+                        android:id="@+id/posts_app_bar_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.Toolbar
-                            android:id="@+id/posts_toolbar"
-                            android:layout_width="match_parent"
-                            android:layout_height="?attr/actionBarSize"
-                            android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-                            android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
-                            app:navigationIcon="@drawable/ic_close"
-                            app:menu="@menu/menu_recycler_toolbar"
-                            app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
-                    </com.google.android.material.appbar.AppBarLayout>
-                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                        <View
+                            android:id="@+id/dragger"
+                            android:layout_width="64dp"
+                            android:layout_height="2dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/background_dragger" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/posts_recycler"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#f4f4f4"
-                    tools:listitem="@layout/item_post" />
-            </LinearLayout>
+                        <com.google.android.material.appbar.AppBarLayout
+                            android:id="@+id/posts_app_bar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.appbar.MaterialToolbar
+                                android:id="@+id/posts_toolbar"
+                                style="@style/toolbarStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="?attr/actionBarSize"
+                                android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                                app:menu="@menu/menu_recycler_toolbar"
+                                app:navigationIcon="@drawable/ic_close"
+                                app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
+                                app:title="@{bindingContext.postTitle}" />
+                        </com.google.android.material.appbar.AppBarLayout>
+                    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/posts_recycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?backgroundPrimaryWindow"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_post" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
@@ -103,13 +188,11 @@
             android:layout_width="@dimen/nav_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-
             android:theme="@style/Theme.MOBv2.NavigationView"
             app:headerLayout="@layout/nav_header_main"
-            app:itemIconTint="@color/gray_300"
+            app:itemIconTint="?colorNavigationItemIcon"
             app:itemTextAppearance="@style/navItemTextStyle"
-            app:itemTextColor="@color/gray_700"
-            app:subheaderTextAppearance="@style/navSubheaderStyle" />
+            app:itemTextColor="?colorNavigationItemText"
+            app:subheaderTextAppearance="@style/navItemHeaderStyle" />
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

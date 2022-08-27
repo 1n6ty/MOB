@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="backgroundToolbar" format="color" />
+    <attr name="colorToolbarTitle" format="color" />
+    <attr name="colorToolbarSubtitle" format="color" />
+    <attr name="colorToolbarIcon" format="color" />
+    <attr name="backgroundMainToolbar" format="color" />
+    <attr name="colorMainToolbarTitle" format="color" />
+    <attr name="backgroundPopupMenu" format="color" />
+    <attr name="colorPopupMenuIcon" format="color" />
+    <attr name="colorPopupMenuText" format="color" />
+    <attr name="backgroundPrimaryWindow" format="color" />
+    <attr name="backgroundSecondaryWindow" format="color" />
+    <attr name="backgroundPrimaryFab" format="color" />
+    <attr name="colorPrimaryFabIcon" format="color" />
+    <attr name="backgroundSecondaryFab" format="color" />
+    <attr name="colorSecondaryFabIcon" format="color" />
+    <attr name="backgroundClickedFab" format="color" />
+    <attr name="colorPrimaryText" format="color"/>
+    <attr name="colorSecondaryText" format="color"/>
+    <attr name="colorTertiaryText" format="color"/>
+    <attr name="colorWrongText" format="color"/>
+    <attr name="backgroundSelectedAddress" format="color" />
+    <attr name="colorNavigationHeader" format="color" />
+    <attr name="colorNavigationSubheader" format="color" />
+    <attr name="colorNavigationItemHeader" format="color" />
+    <attr name="colorNavigationItemText" format="color" />
+    <attr name="colorNavigationItemIcon" format="color" />
+    <attr name="backgroundHelpButton" format="color" />
+    <attr name="colorHelpButtonIcon" format="color" />
+</resources>

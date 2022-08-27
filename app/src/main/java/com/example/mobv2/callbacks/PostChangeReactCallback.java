@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.google.gson.internal.LinkedTreeMap;

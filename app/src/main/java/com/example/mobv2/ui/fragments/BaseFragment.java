@@ -1,10 +1,13 @@
 package com.example.mobv2.ui.fragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -17,10 +20,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.utils.BitmapConverter;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 
-public class BaseFragment<T extends ViewDataBinding> extends Fragment
+public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
 {
     protected MainActivity mainActivity;
     protected T binding;
@@ -38,24 +39,37 @@ public class BaseFragment<T extends ViewDataBinding> extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-
         mainActivity = (MainActivity) getActivity();
-        mainActivity.getWindow()
-                    .getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-
+        updateWindow();
 
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false);
-
-        binding.getRoot()
-               .setBackgroundResource(R.color.white);
         return binding.getRoot();
     }
 
-    protected void initToolbar()
+    public void update()
     {
-
+        updateWindow();
     }
+
+    protected void updateWindow()
+    {
+        updateWindow(View.SYSTEM_UI_FLAG_VISIBLE, getResources().getColor(mainActivity.getAttribute(R.attr.backgroundPrimaryWindow)));
+    }
+
+    protected void updateWindow(int visibility,
+                                @ColorInt int color)
+    {
+        Window window = mainActivity.getWindow();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            window.getDecorView()
+                  .setSystemUiVisibility(visibility);
+        }
+        window.setNavigationBarColor(color);
+    }
+
+    protected abstract void initToolbar();
 
     protected void initToolbar(Toolbar toolbar,
                                String title)
@@ -85,11 +99,6 @@ public class BaseFragment<T extends ViewDataBinding> extends Fragment
     {
         toolbar.setNavigationIcon(resId);
         toolbar.setNavigationOnClickListener(onClickListener);
-    }
-
-    protected BitmapDescriptor getBitmapDescriptor(@DrawableRes int resId)
-    {
-        return BitmapConverter.drawableToBitmapDescriptor(getResources(), resId);
     }
 
     private void defaultOnClick(View v)

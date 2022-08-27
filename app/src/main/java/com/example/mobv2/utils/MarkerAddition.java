@@ -15,16 +15,16 @@ public class MarkerAddition
                           double longitude,
                           BitmapDescriptor descriptor)
     {
-        this.position = new LatLng(latitude, longitude);
         this.title = title;
+        this.position = new LatLng(latitude, longitude);
         this.descriptor = descriptor;
     }
 
     public MarkerOptions create()
     {
         return new MarkerOptions()
-                .position(position)
                 .title(title)
+                .position(position)
                 .icon(descriptor);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.mobv2.models;
 
+import androidx.databinding.ObservableInt;
+
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.text.ParseException;
@@ -23,7 +25,9 @@ public class Post
     private final String text;
     private final List<String> images;
     private final List<Reaction> reactions;
-    private final int commentsCount;
+    private final ObservableInt commentsCount;
+    private final ObservableInt appreciationsCount;
+    private int appreciated;
 
     private final int type;
 
@@ -34,7 +38,9 @@ public class Post
                 String text,
                 List<String> images,
                 List<Reaction> reactions,
-                int commentsCount)
+                int commentsCount,
+                int appreciationsCount,
+                int appreciated)
     {
         this.id = id;
         this.title = title;
@@ -42,14 +48,16 @@ public class Post
         this.date = date;
         this.text = text;
         this.images = images;
-        this.reactions = reactions;
         if (images == null || images.isEmpty())
             type = POST_ONLY_TEXT;
         else if (text == null || text.isEmpty())
             type = POST_ONLY_IMAGES;
         else
             type = POST_FULL;
-        this.commentsCount = commentsCount;
+        this.reactions = reactions;
+        this.commentsCount = new ObservableInt(commentsCount);
+        this.appreciationsCount = new ObservableInt(appreciationsCount);
+        this.appreciated = appreciated;
     }
 
     public static Post parseFromMap(Map<String, Object> map)
@@ -90,12 +98,12 @@ public class Post
         }
 
         // appreciations
-
-        //
+        var appreciationsCount = ((Double) map.get("appreciations")).intValue();
+        var appreciatedByUser = ((Double) map.get("appreciated")).intValue();
 
         var commentsCount = ((Double) map.get("comments_count")).intValue();
 
-        return new Post(id, title, user, date, text, imageUrls, reactions, commentsCount);
+        return new Post(id, title, user, date, text, imageUrls, reactions, commentsCount, appreciationsCount, appreciatedByUser);
     }
 
     public int getId()
@@ -133,9 +141,24 @@ public class Post
         return images;
     }
 
-    public int getCommentsCount()
+    public ObservableInt getCommentsCount()
     {
         return commentsCount;
+    }
+
+    public ObservableInt getAppreciationsCount()
+    {
+        return appreciationsCount;
+    }
+
+    public int getAppreciated()
+    {
+        return appreciated;
+    }
+
+    public void setAppreciated(int appreciated)
+    {
+        this.appreciated = appreciated;
     }
 
     public int getType()

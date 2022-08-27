@@ -1,24 +1,22 @@
 package com.example.mobv2.adapters;
 
-import android.content.Context;
 import android.os.Build;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.ContextThemeWrapper;
-import androidx.appcompat.widget.PopupMenu;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.callbacks.CommentChangeReactCallback;
+import com.example.mobv2.callbacks.PostChangeReactCallback;
 import com.example.mobv2.databinding.ItemReactionBinding;
 import com.example.mobv2.models.Reaction;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.callbacks.PostChangeReactCallback;
+import com.example.mobv2.utils.MyObservableArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,25 +24,80 @@ import java.util.List;
 public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.ReactionViewHolder>
 {
     private final MainActivity mainActivity;
-    private final List<ReactionItem> reactionItems;
+    private final MyObservableArrayList<ReactionItem> reactionItems;
 
     private final int postId;
+    private final int commentId;
+    private final boolean ownerIsPost;
 
     public ReactionsAdapter(MainActivity mainActivity,
                             List<Reaction> reactions,
                             int postId)
     {
+        this(mainActivity, reactions, postId, -1, true);
+    }
+
+    public ReactionsAdapter(MainActivity mainActivity,
+                            List<Reaction> reactions,
+                            int postId,
+                            int commentId)
+    {
+        this(mainActivity, reactions, postId, commentId, false);
+    }
+
+    private ReactionsAdapter(MainActivity mainActivity,
+                             List<Reaction> reactions,
+                             int postId,
+                             int commentId,
+                             boolean ownerIsPost)
+    {
         this.mainActivity = mainActivity;
-        this.reactionItems = new ArrayList<>();
+        this.reactionItems = new MyObservableArrayList<>();
+
 
         this.postId = postId;
+        this.commentId = commentId;
+        this.ownerIsPost = ownerIsPost;
 
         for (Reaction reaction : reactions)
         {
             reactionItems.add(new ReactionItem(reaction));
         }
 
-        reactionItems.add(new ReactionItem(Reaction.createAdd()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        {
+            reactionItems.sort((item1, item2) -> Integer.compare(item2.getReaction()
+                                                                      .getCount(), item1.getReaction()
+                                                                                        .getCount()));
+        }
+
+        this.reactionItems.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
+        {
+            @Override
+            public void onAdded(ReactionItem reactionItem)
+            {
+                reactions.add(reactionItem.getReaction());
+            }
+
+            @Override
+            public void onAdded(int index,
+                                ReactionItem element)
+            {
+                reactions.add(index, element.getReaction());
+            }
+
+            @Override
+            public void onRemoved(int index)
+            {
+                reactions.remove(index);
+            }
+
+            @Override
+            public void onRemoved(@Nullable Object o)
+            {
+                reactions.remove(o);
+            }
+        });
     }
 
     @NonNull
@@ -67,14 +120,11 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
         int userId = mainActivity.getPrivatePreferences()
                                  .getInt(MainActivity.USER_ID_KEY, -1);
 
-        final boolean isAddButton = reaction.isAdd();
-
         holder.reaction.setText(reaction.getEmoji());
 
         holder.count.setText(String.valueOf(reaction.getCount()));
-        holder.count.setVisibility(isAddButton ? View.GONE : View.VISIBLE);
 
-        holder.itemView.setOnClickListener(view -> onReactionItemClicked(view, isAddButton, holder.getAdapterPosition()));
+        holder.itemView.setOnClickListener(view -> toggleChecked(holder.getAdapterPosition()));
         holder.itemView.setBackgroundResource(0);
 
         if (userIdsWhoLiked != null && userIdsWhoLiked.contains(userId))
@@ -87,40 +137,6 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
         {
             holder.itemView.setSelected(true);
             holder.itemView.setBackgroundResource(R.drawable.background_item_reaction_selected);
-        }
-    }
-
-    private void onReactionItemClicked(View view,
-                                       boolean isAddButton,
-                                       int position)
-    {
-        if (isAddButton)
-        {
-            Context contextThemeWrapper =
-                    new ContextThemeWrapper(mainActivity, R.style.MyPopupOtherStyle);
-            PopupMenu popupMenu = new PopupMenu(contextThemeWrapper, view, Gravity.NO_GRAVITY);
-            popupMenu.inflate(R.menu.menu_reactions);
-
-            initMenuAdd(popupMenu);
-            // inflate menu
-            popupMenu.show();
-        }
-        else
-            toggleChecked(position);
-    }
-
-    private void initMenuAdd(@NonNull PopupMenu popupMenu)
-    {
-        Menu menu = popupMenu.getMenu();
-
-        int[] menuIds =
-                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
-
-        for (int id : menuIds)
-        {
-            menu.findItem(id)
-                .setOnMenuItemClickListener(item -> addReaction(item.getTitle()
-                                                                    .toString()));
         }
     }
 
@@ -143,9 +159,13 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
                                  .getInt(MainActivity.USER_ID_KEY, -1);
         usersWhoLiked.add(userId);
 
-        reactionItems.add(reactionItems.size() - 1, new ReactionItem(new Reaction(emoji, usersWhoLiked), true));
-        MainActivity.MOB_SERVER_API.postReact(new PostChangeReactCallback(), postId, emoji, MainActivity.token);
-        notifyItemInserted(reactionItems.size() - 2);
+        //TODO change
+        reactionItems.add(new ReactionItem(new Reaction(emoji, usersWhoLiked), true));
+        if (ownerIsPost)
+            MainActivity.MOB_SERVER_API.postReact(new PostChangeReactCallback(), postId, emoji, MainActivity.token);
+        else
+            MainActivity.MOB_SERVER_API.commentReact(new CommentChangeReactCallback(), postId, commentId, emoji, MainActivity.token);
+        notifyItemInserted(reactionItems.size() - 1);
         return true;
     }
 
@@ -159,36 +179,49 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
         int userId = mainActivity.getPrivatePreferences()
                                  .getInt(MainActivity.USER_ID_KEY, -1);
         List<Integer> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
+        String emoji = reaction.getEmoji();
         if (reactionItem.isChecked())
         {
+            //TODO change
             reactionItem.setChecked(false);
             userIdsWhoLiked.remove((Object) userId);
-            MainActivity.MOB_SERVER_API.postUnreact(new PostChangeReactCallback(), postId, reaction.getEmoji(), MainActivity.token);
+            if (ownerIsPost)
+                MainActivity.MOB_SERVER_API.postUnreact(new PostChangeReactCallback(), postId, emoji, MainActivity.token);
+            else
+                MainActivity.MOB_SERVER_API.commentUnreact(new CommentChangeReactCallback(), postId, commentId, emoji, MainActivity.token);
         }
         else
         {
+            //TODO change
             reactionItem.setChecked(true);
             userIdsWhoLiked.add(userId);
-            MainActivity.MOB_SERVER_API.postReact(new PostChangeReactCallback(), postId, reaction.getEmoji(), MainActivity.token);
+            if (ownerIsPost)
+                MainActivity.MOB_SERVER_API.postReact(new PostChangeReactCallback(), postId, emoji, MainActivity.token);
+            else
+                MainActivity.MOB_SERVER_API.commentReact(new CommentChangeReactCallback(), postId, commentId, emoji, MainActivity.token);
         }
 
+        //TODO will be remade
         if (reaction.getCount() == 0)
         {
             reactionItems.remove(position);
             notifyItemRemoved(position);
         }
-
-        sortReactionItems();
-    }
-
-    private void sortReactionItems()
-    {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        else
         {
-            reactionItems.sort((item1, item2) -> Integer.compare(item2.getReaction()
-                                                                      .getCount(), item1.getReaction()
-                                                                                        .getCount()));
-            notifyItemRangeChanged(0, reactionItems.size() - 1);
+            for (int i = 0; i < reactionItems.size(); i++)
+            {
+                Reaction currentReaction = reactionItems.get(i)
+                                                        .getReaction();
+                if (reaction.getCount() >= currentReaction.getCount())
+                {
+                    reactionItems.remove(position);
+                    notifyItemRemoved(position);
+                    reactionItems.add(i, new ReactionItem(reaction));
+                    notifyItemInserted(i);
+                    break;
+                }
+            }
         }
     }
 
@@ -208,6 +241,7 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
             super(itemView);
 
             ItemReactionBinding binding = ItemReactionBinding.bind(itemView);
+
             reaction = binding.reaction;
             count = binding.count;
         }

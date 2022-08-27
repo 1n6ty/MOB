@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="bindingContext"
+            type="com.example.mobv2.ui.fragments.main.MainFragmentViewModel" />
+    </data>
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,6 +39,7 @@
                 android:id="@+id/fullname_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="@{bindingContext.fullname}"
                 android:textAppearance="@style/navHeaderTitleStyle"
                 tools:text="@string/sample_fullname" />
 
@@ -40,9 +47,9 @@
                 android:id="@+id/address_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/horizontal_margin"
                 android:ellipsize="end"
                 android:singleLine="true"
+                android:text="@{bindingContext.address}"
                 android:textAppearance="@style/navSubheaderTitleStyle"
                 tools:text="@string/sample_address" />
         </LinearLayout>

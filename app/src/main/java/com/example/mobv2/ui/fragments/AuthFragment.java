@@ -1,6 +1,5 @@
 package com.example.mobv2.ui.fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -14,7 +13,8 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.callbacks.AuthCallback;
+import com.example.mobv2.callbacks.AuthCallback;
+import com.example.mobv2.ui.fragments.main.MainFragment;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding>
 {
@@ -33,21 +33,16 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        changeStatusBar();
 
         initPhoneView();
         initPasswordView();
         initNextButton();
     }
 
-    private void changeStatusBar()
+    @Override
+    protected void updateWindow()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            mainActivity.getWindow()
-                        .getDecorView()
-                        .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
+        super.updateWindow(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR, getResources().getColor(mainActivity.getAttribute(R.attr.backgroundSecondaryWindow)));
     }
 
     private void initPhoneView()
@@ -105,8 +100,12 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
         });
 
         // unnecessary
-        binding.skipAuthButton.setOnClickListener(v -> mainActivity.transactionToMainFragment());
+        binding.skipAuthButton.setOnClickListener(v -> mainActivity.replaceFragment(new MainFragment()));
     }
 
-
+    @Override
+    protected void initToolbar()
+    {
+        // there is no toolbar
+    }
 }

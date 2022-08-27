@@ -6,19 +6,44 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="toolbarStyle">
+        <item name="android:background">?backgroundToolbar</item>
+        <item name="navigationIconTint">?colorToolbarIcon</item>
+        <item name="titleTextColor">?colorToolbarTitle</item>
+        <item name="subtitleTextColor">?colorToolbarSubtitle</item>
+        <item name="subtitleTextAppearance">@style/toolbarSubtitleTextStyle</item>
+    </style>
+
+    <style name="toolbarSubtitleTextStyle">
+        <item name="android:textSize">@dimen/pre_medium_text_size</item>
+    </style>
+
+    <style name="collapsingToolbarStyle">
+        <item name="navigationIconTint">?colorToolbarIcon</item>
+        <item name="titleTextColor">?colorToolbarTitle</item>
+        <item name="subtitleTextColor">?colorToolbarSubtitle</item>
+    </style>
+
+    <style name="imageViewerToolbarStyle">
+        <item name="navigationIconTint">?colorToolbarIcon</item>
+        <item name="titleTextColor">?colorToolbarTitle</item>
+        <item name="subtitleTextColor">?colorToolbarSubtitle</item>
+        <item name="subtitleTextAppearance">@style/toolbarSubtitleTextStyle</item>
+    </style>
+
     <style name="navHeaderTitleStyle">
+        <item name="android:textColor">?colorNavigationHeader</item>
         <item name="android:textSize">@dimen/title_text_size</item>
-        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="navSubheaderTitleStyle">
+        <item name="android:textColor">?colorNavigationSubheader</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
-        <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="navSubheaderStyle">
+    <style name="navItemHeaderStyle">
+        <item name="android:textColor">?colorNavigationItemHeader</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
-        <item name="android:textColor">@color/blue_500</item>
     </style>
 
     <style name="navItemTextStyle">
@@ -39,68 +64,90 @@
 
     <style name="settingsItemHeaderTextStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:textColor">@color/gray_700</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?colorPrimaryText</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
     </style>
 
     <style name="settingsItemSubheaderTextStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">@dimen/vertical_very_small_margin</item>
-        <item name="android:textColor">@color/gray_300</item>
+        <item name="android:textColor">?colorSecondaryText</item>
         <item name="android:textSize">@dimen/small_text_size</item>
     </style>
 
     <style name="authPasswordTextStyle">
-        <item name="android:backgroundTint">@color/blue_100</item>
-        <item name="android:textColor">@color/gray_700</item>
-        <item name="android:textColorHint">@color/gray_200</item>
+        <item name="android:backgroundTint">?colorAccent</item>
+        <item name="android:textColor">?colorPrimaryText</item>
+        <item name="android:textColorHint">?colorTertiaryText</item>
         <item name="android:textColorHighlight">@color/blue_100_alpha_40</item>
         <item name="android:textCursorDrawable">@drawable/background_cursor</item>
     </style>
 
     <style name="incorrectInputTextStyle">
-        <item name="android:textColor">@color/gray_500</item>
+        <item name="android:textColor">?colorWrongText</item>
     </style>
 
     <style name="nextButtonTextStyle">
         <item name="android:textSize">@dimen/medium_text_size</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?colorToolbarTitle</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="ButtonStyle">
+    <style name="postButtonStyle">
         <item name="android:background">@drawable/background_item_reaction_selector</item>
         <item name="android:paddingHorizontal">@dimen/vertical_small_margin</item>
         <item name="android:paddingVertical">2dp</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
+        <item name="tint">?colorHelpButtonIcon</item>
+    </style>
+
+    <style name="commentButtonStyle">
+        <item name="android:background">@drawable/background_comment_selector</item>
+        <item name="android:paddingHorizontal">@dimen/vertical_small_margin</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="tint">?colorHelpButtonIcon</item>
     </style>
 
     <style name="postItemHeaderTextStyle">
-        <item name="android:textColor">@color/gray_700</item>
+        <item name="android:textColor">?colorPrimaryText</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
     </style>
 
-    <style name="postItemSubheaderTextStyle">
-        <item name="android:textColor">@color/gray_200</item>
+    <style name="itemContentTextStyle">
+        <item name="android:textColor">?colorSecondaryText</item>
+        <item name="android:textSize">@dimen/pre_medium_text_size</item>
+    </style>
+
+    <style name="itemDateTextStyle">
+        <item name="android:textColor">?colorTertiaryText</item>
         <item name="android:textSize">@dimen/pre_medium_text_size</item>
     </style>
 
     <style name="appreciationsTextStyle">
-        <item name="android:textColor">@color/gray_200</item>
+        <item name="android:textColor">?colorTertiaryText</item>
         <item name="android:textSize">@dimen/pre_medium_text_size</item>
         <item name="android:gravity">center</item>
     </style>
 
     <style name="addressItemHeaderTextStyle">
-        <item name="android:textColor">@color/gray_700</item>
+        <item name="android:textColor">?colorPrimaryText</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
     </style>
 
     <style name="addressItemSubheaderTextStyle">
-        <item name="android:textColor">@color/gray_300</item>
+        <item name="android:layout_marginTop">@dimen/vertical_very_small_margin</item>
+        <item name="android:textColor">?colorSecondaryText</item>
         <item name="android:textSize">@dimen/small_text_size</item>
+    </style>
+
+    <style name="addMarkerButtonTextStyle">
+        <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:textColor">?colorNavigationItemIcon</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

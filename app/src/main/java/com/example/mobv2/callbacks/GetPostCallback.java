@@ -1,23 +1,21 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import android.util.Log;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.adapters.PostsAdapter;
 import com.example.mobv2.models.Post;
 import com.example.mobv2.serverapi.MOBServerAPI;
-import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
 import com.google.gson.internal.LinkedTreeMap;
 
 public class GetPostCallback implements MOBServerAPI.MOBAPICallback
 {
-    private final PostsAdapter postsAdapter;
-    private final MainFragmentViewModel viewModel;
+    private final RecyclerView postsRecycler;
 
-    public GetPostCallback(PostsAdapter postsAdapter,
-                           MainFragmentViewModel viewModel)
+    public GetPostCallback(RecyclerView postsRecycler)
     {
-        this.postsAdapter = postsAdapter;
-        this.viewModel = viewModel;
+        this.postsRecycler = postsRecycler;
     }
 
     @Override
@@ -28,9 +26,9 @@ public class GetPostCallback implements MOBServerAPI.MOBAPICallback
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
         Post post = Post.parseFromMap(response);
+        var postsAdapter = (PostsAdapter) postsRecycler.getAdapter();
         postsAdapter.addPost(post);
-
-        viewModel.setTitleMarker(post.getTitle()); // not work as i wish
+        postsRecycler.scrollToPosition(0);
     }
 
     @Override

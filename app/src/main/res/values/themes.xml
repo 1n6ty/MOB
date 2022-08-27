@@ -1,23 +1,47 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="Theme.MOBv2.DayNight" parent="Theme.MOBv2" />
 
     <!-- Base application theme. -->
     <style name="Theme.MOBv2" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:colorControlActivated">@color/blue_100</item>
 
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_500</item>
-        <item name="colorPrimaryVariant">@color/blue_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorOnSecondary">@color/blue_500</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" >@color/blue_100_alpha_5</item>
 
+        <item name="colorPrimary">?backgroundToolbar</item>
+        <item name="colorOnSecondary">?backgroundClickedFab</item>
+
+
+        <item name="android:statusBarColor">@color/blue_100_alpha_5</item>
+        <item name="android:navigationBarColor">?backgroundPrimaryWindow</item>
+        <item name="colorAccent">@color/blue_300</item>
+        <item name="backgroundToolbar">@color/blue_500</item>
+        <item name="colorToolbarTitle">@color/white</item>
+        <item name="colorToolbarSubtitle">@color/white</item>
+        <item name="colorToolbarIcon">@color/white</item>
+        <item name="backgroundMainToolbar">@color/white</item>
+        <item name="colorMainToolbarTitle">@color/gray_500</item>
+        <item name="backgroundPopupMenu">@color/white</item>
+        <item name="colorPopupMenuIcon">@color/gray_300</item>
+        <item name="colorPopupMenuText">@color/gray_700</item>
+        <item name="backgroundPrimaryWindow">@color/gray_100</item>
+        <item name="backgroundSecondaryWindow">@color/white</item>
+        <item name="backgroundPrimaryFab">@color/white</item>
+        <item name="colorPrimaryFabIcon">@color/gray_300</item>
+        <item name="backgroundSecondaryFab">@color/blue_500</item>
+        <item name="colorSecondaryFabIcon">@color/white</item>
+        <item name="backgroundClickedFab">@color/gray_200</item>
+        <item name="colorPrimaryText">@color/gray_700</item>
+        <item name="colorSecondaryText">@color/gray_500</item>
+        <item name="colorTertiaryText">@color/gray_300</item>
+        <item name="colorWrongText">@color/gray_500</item>
+        <item name="backgroundSelectedAddress">@color/blue_100_alpha_40</item>
+        <item name="colorNavigationHeader">@color/white</item>
+        <item name="colorNavigationSubheader">@color/white</item>
+        <item name="colorNavigationItemHeader">@color/blue_300</item>
+        <item name="colorNavigationItemText">@color/gray_700</item>
+        <item name="colorNavigationItemIcon">@color/gray_300</item>
+        <item name="backgroundHelpButton">@color/white</item>
+        <item name="colorHelpButtonIcon">@color/gray_200</item>
     </style>
-
-    <style name="Theme.MOBv2.AppBarOverlayLight" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.MOBv2.AppBarOverlayDark" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
 

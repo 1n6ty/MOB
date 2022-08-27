@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -8,6 +8,7 @@ import com.example.mobv2.R;
 import com.example.mobv2.models.User;
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.fragments.main.MainFragment;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.Map;
@@ -42,7 +43,7 @@ public class AuthCallback implements MOBServerAPI.MOBAPICallback
         editor.putString(MainActivity.USER_PHONE_NUMBER_KEY, user.getPhoneNumber());
         editor.apply();
 
-        mainActivity.transactionToMainFragment();
+        mainActivity.replaceFragment(new MainFragment());
     }
 
     @Override

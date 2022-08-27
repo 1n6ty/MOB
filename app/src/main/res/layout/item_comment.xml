@@ -6,6 +6,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?backgroundSecondaryWindow"
         android:elevation="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,20 +50,21 @@
                     android:id="@+id/comment_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textAppearance="@style/itemContentTextStyle"
                     tools:text="@string/sample_comment" />
 
                 <TextView
                     android:id="@+id/comment_date_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAppearance="@style/postItemSubheaderTextStyle"
+                    android:textAppearance="@style/itemDateTextStyle"
                     tools:text="@string/sample_date" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/linearLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/vertical_margin"
+                    android:layout_marginTop="@dimen/vertical_small_margin"
                     android:layout_marginBottom="@dimen/vertical_small_margin"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toTopOf="@+id/reactions_view"
@@ -80,15 +82,14 @@
 
                         <ImageView
                             android:id="@+id/appreciation_up_view"
-                            style="@style/ButtonStyle"
+                            style="@style/postButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginRight="@dimen/vertical_small_margin"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_add"
-                            app:tint="@color/gray_200" />
+                            app:srcCompat="@drawable/ic_add" />
 
                         <TextView
                             android:id="@+id/appreciations_count_view"
@@ -100,27 +101,25 @@
 
                         <ImageView
                             android:id="@+id/appreciation_down_view"
-                            style="@style/ButtonStyle"
+                            style="@style/postButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_remove"
-                            app:tint="@color/gray_200" />
+                            app:srcCompat="@drawable/ic_remove" />
                     </LinearLayout>
 
                     <ImageView
                         android:id="@+id/show_reactions_view"
-                        style="@style/ButtonStyle"
+                        style="@style/postButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_arrow_down"
-                        app:tint="@color/gray_200" />
+                        app:srcCompat="@drawable/ic_arrow_down" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.recyclerview.widget.RecyclerView

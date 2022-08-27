@@ -5,18 +5,24 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
+import androidx.annotation.AnimatorRes;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.fragments.AuthFragment;
+import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.fragments.main.MainFragment;
 
-public class MainActivity extends AppCompatActivity
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class MainActivity extends ThemedActivity
 {
     //WARNING UNSAFE
     public static final MOBServerAPI MOB_SERVER_API =
@@ -46,7 +52,6 @@ public class MainActivity extends AppCompatActivity
 
     private ActivityMainBinding binding;
 
-    private MainFragment mainFragment;
     private FrameLayout navContentFrame;
 
     @Override
@@ -57,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         initViewBinding();
 
         initNavContentFrame();
-        initMainFragment();
+        initAuthFragment();
     }
 
     private void initViewBinding()
@@ -75,28 +80,56 @@ public class MainActivity extends AppCompatActivity
         navContentFrame = binding.navContentFrame;
     }
 
-    private void initMainFragment()
+    private void initAuthFragment()
     {
-        mainFragment = new MainFragment();
-        transactionToFragment(new AuthFragment());
+        replaceFragment(new AuthFragment());
     }
 
-    public void transactionToMainFragment()
+    public void goToFragment(@NonNull Fragment fragment)
     {
-        transactionToFragment(mainFragment);
+        goToFragment(fragment, R.animator.slide_in_left);
     }
 
-    public void transactionToFragment(@NonNull Fragment fragment)
+    public void goToFragment(@NonNull Fragment fragment,
+                             @AnimatorRes int enter)
     {
         String fragmentName = fragment.getClass()
                                       .getSimpleName();
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .setReorderingAllowed(true)
-                .setCustomAnimations(R.animator.slide_in_left, 0, 0, R.animator.slide_in_right)
-                .replace(navContentFrame.getId(), fragment, fragmentName)
-                .addToBackStack(fragmentName)
+                .setCustomAnimations(enter, android.R.animator.fade_out)
+                .add(navContentFrame.getId(), fragment, fragmentName)
                 .commit();
+    }
+
+    public void replaceFragment(@NonNull Fragment fragment)
+    {
+        replaceFragment(fragment, R.animator.slide_in_left);
+    }
+
+    public void replaceFragment(@NonNull Fragment fragment,
+                                @AnimatorRes int enter)
+    {
+        String fragmentName = fragment.getClass()
+                                      .getSimpleName();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(enter, android.R.animator.fade_out)
+                .replace(navContentFrame.getId(), fragment, fragmentName)
+                .commit();
+    }
+
+    public void toPreviousFragment()
+    {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.animator.slide_in_right, R.animator.slide_in_right)
+                .remove(getFragmentAtFrame())
+                .commitNow();
+
+        ((BaseFragment) getFragmentAtFrame()).update();
     }
 
     @Override
@@ -108,8 +141,9 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        super.onBackPressed();
+        toPreviousFragment();
     }
+
 
     public Fragment getFragmentAtFrame()
     {
@@ -119,5 +153,25 @@ public class MainActivity extends AppCompatActivity
     public SharedPreferences getPrivatePreferences()
     {
         return getPreferences(Context.MODE_PRIVATE);
+    }
+
+    public static void loadImageInView(String path,
+                                       View withView,
+                                       ImageView intoView)
+    {
+        URL url;
+        try
+        {
+            url = new URL("http://192.168.0.104:8000" + path);
+        }
+        catch (MalformedURLException e)
+        {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        Glide.with(withView)
+             .load(url)
+             .into(intoView);
     }
 }

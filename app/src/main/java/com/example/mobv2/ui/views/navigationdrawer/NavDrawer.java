@@ -4,7 +4,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -14,12 +13,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
+import com.example.mobv2.databinding.NavHeaderMainBinding;
 import com.example.mobv2.models.MenuItemMetadatum;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.EditProfileFragment;
 import com.example.mobv2.ui.fragments.LanguageFragment;
 import com.example.mobv2.ui.fragments.MapFeaturesFragment;
 import com.example.mobv2.ui.fragments.NotificationAndSoundFragment;
+import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
 import com.google.android.material.navigation.NavigationView;
 
 import java.net.MalformedURLException;
@@ -33,6 +34,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
     private final DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private View headerView;
 
 
     public NavDrawer(MainActivity mainActivity)
@@ -42,7 +44,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         drawerLayout = mainActivity.findViewById(R.id.drawer_layout);
 
         initNavigationView();
-        initHeaderView();
+        updateHeaderView();
         initNavigationMenu();
     }
 
@@ -50,12 +52,17 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     {
         navigationView = mainActivity.findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+
+        headerView = navigationView.getHeaderView(0);
+
+        var binding = NavHeaderMainBinding.bind(navigationView.getHeaderView(0));
+        var mainFragmentViewModel =
+                new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
+        binding.setBindingContext(mainFragmentViewModel);
     }
 
-    private void initHeaderView()
+    public void updateHeaderView()
     {
-        View headerView = navigationView.getHeaderView(0);
-
         URL url;
         try
         {
@@ -68,20 +75,12 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         }
 
         ImageView avatarView = headerView.findViewById(R.id.avatar_view);
-        Glide.with(navigationView)
+        Glide.with(mainActivity)
              .load(url)
              .into(avatarView);
-
-        TextView fullNameView = headerView.findViewById(R.id.fullname_view);
-        fullNameView.setText(mainActivity.getPrivatePreferences()
-                                         .getString(MainActivity.USER_FULLNAME_KEY, ""));
-
-        TextView addressesView = headerView.findViewById(R.id.address_view);
-        addressesView.setText(mainActivity.getPrivatePreferences()
-                                          .getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
     }
 
-    public void initNavigationMenu()
+    private void initNavigationMenu()
     {
         Menu menu = navigationView.getMenu();
         menu.clear();
@@ -95,7 +94,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            mainActivity.transactionToFragment(new EditProfileFragment());
+                            mainActivity.goToFragment(new EditProfileFragment());
                         }),
                 R.drawable.ic_menu_profile
         );
@@ -111,7 +110,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            mainActivity.transactionToFragment(new NotificationAndSoundFragment());
+                            mainActivity.goToFragment(new NotificationAndSoundFragment());
                         }),
                 R.drawable.ic_menu_notification
         );
@@ -123,7 +122,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            mainActivity.transactionToFragment(new MapFeaturesFragment());
+                            mainActivity.goToFragment(new MapFeaturesFragment());
                         }),
                 R.drawable.ic_menu_map
         );
@@ -135,7 +134,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
                         () ->
                         {
-                            mainActivity.transactionToFragment(new LanguageFragment());
+                            mainActivity.goToFragment(new LanguageFragment());
                         }),
                 R.drawable.ic_menu_international
         );

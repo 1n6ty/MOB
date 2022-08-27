@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -61,7 +62,7 @@ public class MOBServerAPI
                     try
                     {
                         LinkedTreeMap<String, Object> msg = new Gson().fromJson(response.errorBody()
-                                .string(), new TypeToken<LinkedTreeMap<String, Object>>()
+                                                                                        .string(), new TypeToken<LinkedTreeMap<String, Object>>()
                         {
                         }.getType());
                         body.put("msg", msg.get("msg"));
@@ -281,16 +282,16 @@ public class MOBServerAPI
 
     public void post(MOBAPICallback obj,
                      String text,
-                     float markX,
-                     float markY,
-                     String[] imgPaths,
+                     double markX,
+                     double markY,
+                     List<String> imgPaths,
                      String token)
     {
 
-        MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.length];
-        for (int i = 0; i < imgPaths.length; i++)
+        MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.size()];
+        for (int i = 0; i < imgPaths.size(); i++)
         {
-            File file = new File(imgPaths[i]);
+            File file = new File(imgPaths.get(i));
             imgs[i] =
                     MultipartBody.Part.createFormData("imgs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
         }

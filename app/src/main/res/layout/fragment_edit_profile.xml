@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:focusable="true">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="?backgroundPrimaryWindow">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -30,12 +33,12 @@
                         android:scaleType="centerCrop"
                         app:srcCompat="@drawable/sample_avatar" />
 
-                    <androidx.appcompat.widget.Toolbar
+                    <com.google.android.material.appbar.MaterialToolbar
                         android:id="@+id/toolbar"
+                        style="@style/collapsingToolbarStyle"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-                        android:theme="@style/Theme.MOBv2.AppBarOverlayLight"
                         app:menu="@menu/menu_edit_profile_toolbar"
                         app:navigationIcon="@drawable/ic_arrow"
                         app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
@@ -46,8 +49,9 @@
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vertical_margin"
+                android:background="?backgroundSecondaryWindow"
                 android:orientation="vertical"
+                android:paddingTop="@dimen/vertical_medium_margin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
@@ -119,13 +123,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/vertical_margin"
-            android:background="@drawable/ripple_effect"
             android:scaleType="centerCrop"
-            app:backgroundTint="@color/white"
+            app:backgroundTint="?backgroundPrimaryFab"
             app:elevation="2dp"
             app:layout_anchor="@id/appBarLayout"
             app:layout_anchorGravity="bottom|end"
             app:srcCompat="@drawable/ic_add_photo"
-            app:tint="@color/gray_300" />
+            app:tint="?colorPrimaryFabIcon" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

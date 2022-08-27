@@ -1,31 +1,32 @@
-package com.example.mobv2.ui.callbacks;
+package com.example.mobv2.callbacks;
 
 import android.content.Context;
-import android.widget.Toast;
 
+import com.example.mobv2.models.MarkerInfo;
 import com.example.mobv2.models.PostWithMark;
 import com.example.mobv2.serverapi.MOBServerAPI;
-import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
 import com.example.mobv2.utils.MarkerAddition;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.List;
+
 public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
 {
     private final Context context;
     private final BitmapDescriptor markDescriptor;
-    private final MainFragmentViewModel viewModel;
+    private final List<PostWithMark> postsWithMarks;
     private final GoogleMap googleMap;
 
     public GetMarksCallback(Context context,
                             BitmapDescriptor markDescriptor,
-                            MainFragmentViewModel viewModel,
+                            List<PostWithMark> postsWithMarks,
                             GoogleMap googleMap)
     {
         this.context = context;
         this.markDescriptor = markDescriptor;
-        this.viewModel = viewModel;
+        this.postsWithMarks = postsWithMarks;
         this.googleMap = googleMap;
     }
 
@@ -41,17 +42,15 @@ public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
             double x = coordinates.get("x");
             double y = coordinates.get("y");
             PostWithMark postWithMark = new PostWithMark(x, y, Integer.parseInt(postId));
-            viewModel.addPostWithMark(postWithMark);
+            postsWithMarks.add(postWithMark);
             googleMap.addMarker(new MarkerAddition("The mark", x, y, markDescriptor).create())
-                     .setTag(false);
+                     .setTag(MarkerInfo.COMMON_MARKER);
         }
     }
 
     @Override
     public void funcBad(LinkedTreeMap<String, Object> obj)
     {
-        Toast.makeText(context, "There are not markers, yet", Toast.LENGTH_LONG)
-             .show();
     }
 
     @Override

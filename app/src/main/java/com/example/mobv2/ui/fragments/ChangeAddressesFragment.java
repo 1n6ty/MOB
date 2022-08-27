@@ -7,15 +7,13 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.callbacks.GetAddressesCallback;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.callbacks.ChangeAddressTouchCallback;
-import com.example.mobv2.ui.callbacks.GetAddressesCallback;
 
 public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddressesBinding>
 {
@@ -34,6 +32,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         super.onViewCreated(view, savedInstanceState);
 
         initToolbar();
+
         initAddressesRecycler();
     }
 
@@ -47,12 +46,9 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
     private void initAddressesRecycler()
     {
         addressesRecycler = binding.addressesRecycler;
-        ItemTouchHelper itemTouchHelper =
-                new ItemTouchHelper(new ChangeAddressTouchCallback(getResources(), 0, ItemTouchHelper.LEFT));
         ImageView noAddressesView = binding.noAddressesView;
 
         addressesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        itemTouchHelper.attachToRecyclerView(addressesRecycler);
         noAddressesView.setVisibility(View.VISIBLE);
 
         MainActivity.MOB_SERVER_API.getAddresses(new GetAddressesCallback(mainActivity, addressesRecycler, noAddressesView), MainActivity.token);
