@@ -4,20 +4,26 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MarkerInfo
 {
-    public static final int ADDRESS_MARKER = 0, COMMON_MARKER = 1;
+    public static final int ADDRESS_MARKER = 0, SUB_ADDRESS_MARKER = 1;
+    public static final int MARKER_NOT_CLICKED = 0, MARKER_CLICKED = 1, MARKER_ADDED = 2, MARKER_REMOVED = 3;
 
     private final Marker marker;
     private final int markerType;
-    private boolean clicked;
+    private final Map<String, Object> metadata;
+    private int markerCondition;
 
     public MarkerInfo(Marker marker,
                       int markerType)
     {
         this.marker = marker;
         this.markerType = markerType;
-        this.clicked = false;
+        this.metadata = new HashMap<>();
+        this.markerCondition = MARKER_NOT_CLICKED;
     }
 
     @NonNull
@@ -31,13 +37,18 @@ public class MarkerInfo
         return markerType;
     }
 
-    public boolean isClicked()
+    public Map<String, Object> getMetadata()
     {
-        return clicked;
+        return metadata;
     }
 
-    public void setClicked(boolean clicked)
+    public int getMarkerCondition()
     {
-        this.clicked = clicked;
+        return markerCondition;
+    }
+
+    public void setMarkerCondition(int markerCondition)
+    {
+        this.markerCondition = markerCondition;
     }
 }

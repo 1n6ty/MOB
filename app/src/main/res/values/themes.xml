@@ -9,7 +9,6 @@
         <item name="colorPrimary">?backgroundToolbar</item>
         <item name="colorOnSecondary">?backgroundClickedFab</item>
 
-
         <item name="android:statusBarColor">@color/blue_100_alpha_5</item>
         <item name="android:navigationBarColor">?backgroundPrimaryWindow</item>
         <item name="colorAccent">@color/blue_300</item>

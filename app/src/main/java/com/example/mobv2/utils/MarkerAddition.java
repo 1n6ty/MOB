@@ -12,6 +12,13 @@ public class MarkerAddition
 
     public MarkerAddition(String title,
                           double latitude,
+                          double longitude)
+    {
+        this(title, latitude, longitude, null);
+    }
+
+    public MarkerAddition(String title,
+                          double latitude,
                           double longitude,
                           BitmapDescriptor descriptor)
     {

@@ -109,23 +109,23 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
         itemPost.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
 
-//        itemPost.appreciationUpView.setOnClickListener(view -> onAppreciationUpClick(view, position));
+//        itemPost.appreciationUpButton.setOnClickListener(view -> onAppreciationUpClick(view, position));
         itemPost.appreciationsCountView.setText(String.valueOf(post.getAppreciationsCount()));
-//        itemPost.appreciationDownView.setOnClickListener(this::onAppreciationDownClick);
-        itemPost.appreciationUpView.setSelected(false);
-//        itemPost.appreciationUpView.getDrawable().setTint(0);
-        itemPost.appreciationDownView.setSelected(false);
-//        itemPost.appreciationDownView.getDrawable().setTint(0);
+//        itemPost.appreciationDownButton.setOnClickListener(this::onAppreciationDownClick);
+        itemPost.appreciationUpButton.setSelected(false);
+//        itemPost.appreciationUpButton.getDrawable().setTint(0);
+        itemPost.appreciationDownButton.setSelected(false);
+//        itemPost.appreciationDownButton.getDrawable().setTint(0);
         if (post.getAppreciated() == 1)
         {
-            itemPost.appreciationUpView.setSelected(true);
-            itemPost.appreciationUpView.getDrawable()
+            itemPost.appreciationUpButton.setSelected(true);
+            itemPost.appreciationUpButton.getButtonDrawable()
                                        .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
         }
         else if (post.getAppreciated() == 0)
         {
-            itemPost.appreciationDownView.setSelected(true);
-            itemPost.appreciationDownView.getDrawable()
+            itemPost.appreciationDownButton.setSelected(true);
+            itemPost.appreciationDownButton.getButtonDrawable()
                                          .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
         }
 

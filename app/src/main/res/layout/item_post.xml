@@ -117,24 +117,24 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/post_images_view">
 
-                <LinearLayout
-                    android:id="@+id/linearLayout3"
+                <RadioGroup
+                    android:id="@+id/appreciations_group"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:elevation="4dp"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <ImageView
-                        android:id="@+id/appreciation_up_view"
-                        style="@style/postButtonStyle"
+                    <RadioButton
+                        android:id="@+id/appreciation_up_button"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginRight="@dimen/vertical_small_margin"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_add" />
+                        android:button="@drawable/ic_add"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp" />
 
                     <TextView
                         android:id="@+id/appreciations_count_view"
@@ -145,16 +145,14 @@
                         android:text="@{Integer.toString(appreciationsCount)}"
                         tools:text="@string/menu_reaction_count" />
 
-                    <ImageView
-                        android:id="@+id/appreciation_down_view"
-                        style="@style/postButtonStyle"
+                    <RadioButton
+                        android:id="@+id/appreciation_down_button"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_remove" />
-                </LinearLayout>
+                        android:button="@drawable/ic_remove"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp" />
+                </RadioGroup>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

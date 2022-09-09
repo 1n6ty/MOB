@@ -7,8 +7,8 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,12 +43,16 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 {
     private final MainActivity mainActivity;
     private final List<Post> posts;
+    private final MapAdapter mapAdapter;
 
+    // TODO destroy the mapAdapter from this side
     public PostsAdapter(MainActivity mainActivity,
-                        List<Post> posts)
+                        List<Post> posts,
+                        MapAdapter mapAdapter)
     {
         this.mainActivity = mainActivity;
         this.posts = posts;
+        this.mapAdapter = mapAdapter;
     }
 
     @NonNull
@@ -60,7 +64,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                                       .inflate(R.layout.item_post, parent, false);
         return new PostViewHolder(postItem);
     }
-
 
     @Override
     public void onViewAttachedToWindow(@NonNull PostViewHolder holder)
@@ -76,10 +79,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
             mainFragmentViewModel.setPostTitle(post.getTitle());
         }
-//        else if (position == 0)
-//        {
-//            mainFragmentViewModel.setPostTitle(post.getTitle());
-//        }
     }
 
     @Override
@@ -97,20 +96,18 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
-        holder.appreciationUpView.setOnClickListener(view -> onAppreciationClick(view, holder.appreciationDownView, holder.getAdapterPosition(), true));
-        holder.binding.setAppreciationsCount(post.getAppreciationsCount());
-        holder.appreciationDownView.setOnClickListener(view -> onAppreciationClick(holder.appreciationUpView, view, holder.getAdapterPosition(), false));
+        holder.appreciationUpView.setOnClickListener(view -> onAppreciationClick((RadioButton) view, holder.getAdapterPosition(), true));
+        holder.setAppreciationsCount(post.getAppreciationsCount());
+        holder.appreciationDownView.setOnClickListener(view -> onAppreciationClick((RadioButton) view, holder.getAdapterPosition(), false));
 //        holder.appreciationUpView.getDrawable().setTint(0);
 //        holder.appreciationDownView.getDrawable().setTint(0);
         if (post.getAppreciated() == 1)
         {
-            holder.appreciationUpView.getDrawable()
-                                     .setTint(mainActivity.getColor(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent)));
+            holder.appreciationUpView.setChecked(true);
         }
         else if (post.getAppreciated() == 0)
         {
-            holder.appreciationDownView.getDrawable()
-                                       .setTint(mainActivity.getColor(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent)));
+            holder.appreciationDownView.setChecked(true);
         }
 
         holder.showReactionsView.setOnClickListener((view) -> onShowReactionsViewClick(holder.reactionsView));
@@ -133,7 +130,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             mainActivity.goToFragment(new CommentsFragment());
         });
 
-        holder.binding.setCommentsCount(post.getCommentsCount());
+        holder.setCommentsCount(post.getCommentsCount());
     }
 
     private void onShowReactionsViewClick(View view)
@@ -143,16 +140,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                 : View.GONE);
     }
 
-    private void onAppreciationClick(View upView,
-                                     View downView,
+    private void onAppreciationClick(RadioButton appreciationButton,
                                      int position,
                                      boolean isPositive)
     {
         Post post = posts.get(position);
         ObservableInt appreciationsCount = post.getAppreciationsCount();
-
-        ImageView upImageView = (ImageView) upView;
-        ImageView downImageView = (ImageView) downView;
 
         if (post.getAppreciated() == 1)
         {
@@ -163,10 +156,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                 {
                     post.setAppreciated(-1);
                     appreciationsCount.set(appreciationsCount.get() - 1);
-                    upImageView.getDrawable()
-                               .setTint(mainActivity.getColor(mainActivity.getAttribute(R.attr.colorHelpButtonIcon)));
-                    downImageView.getDrawable()
-                                 .setTint(mainActivity.getColor(mainActivity.getAttribute(R.attr.colorHelpButtonIcon)));
+                    appreciationButton.setChecked(false);
                 }
 
                 @Override
@@ -191,10 +181,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                 {
                     post.setAppreciated(-1);
                     appreciationsCount.set(appreciationsCount.get() + 1);
-                    upImageView.getDrawable()
-                               .setTint(mainActivity.getColor(mainActivity.getAttribute(R.attr.colorHelpButtonIcon)));
-                    downImageView.getDrawable()
-                                 .setTint(mainActivity.getColor(mainActivity.getAttribute(R.attr.colorHelpButtonIcon)));
+                    appreciationButton.setChecked(false);
                 }
 
                 @Override
@@ -221,10 +208,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                     {
                         post.setAppreciated(1);
                         appreciationsCount.set(appreciationsCount.get() + 1);
-                        downImageView.getDrawable()
-                                     .setTint(mainActivity.getColor(mainActivity.getAttribute(R.attr.colorHelpButtonIcon)));
-                        upImageView.getDrawable()
-                                   .setTint(mainActivity.getColor(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent)));
+                        appreciationButton.setChecked(true);
                     }
 
                     @Override
@@ -249,10 +233,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                     {
                         post.setAppreciated(0);
                         appreciationsCount.set(appreciationsCount.get() - 1);
-                        upImageView.getDrawable()
-                                   .setTint(mainActivity.getColor(mainActivity.getAttribute(R.attr.colorHelpButtonIcon)));
-                        downImageView.getDrawable()
-                                     .setTint(mainActivity.getColor(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent)));
+                        appreciationButton.setChecked(true);
                     }
 
                     @Override
@@ -471,6 +452,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             {
                 Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
                      .show();
+                mapAdapter.removeMarkerByPostId(post.getId());
                 posts.remove(post);
                 notifyItemRemoved(position);
             }
@@ -504,9 +486,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         private final TextView fullnameView;
         private final TextView dateView;
         private final Pair<TextView, RecyclerView> content;
-        private final ImageView appreciationUpView;
+        private final RadioButton appreciationUpView;
         private final TextView appreciationsCountView;
-        private final ImageView appreciationDownView;
+        private final RadioButton appreciationDownView;
         private final View showReactionsView;
         private final RecyclerView reactionsView;
         private final LinearLayout commentView;
@@ -522,13 +504,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             fullnameView = binding.fullnameView;
             dateView = binding.dateView;
             content = new Pair<>(binding.postTextView, binding.postImagesView);
-            appreciationUpView = binding.appreciationUpView;
+            appreciationUpView = binding.appreciationUpButton;
             appreciationsCountView = binding.appreciationsCountView;
-            appreciationDownView = binding.appreciationDownView;
+            appreciationDownView = binding.appreciationDownButton;
             showReactionsView = binding.showReactionsView;
             reactionsView = binding.reactionsView;
             commentView = binding.commentView;
             commentsCountView = binding.commentsCountView;
+        }
+
+        private void setCommentsCount(ObservableInt count)
+        {
+            binding.setCommentsCount(count);
+        }
+
+        private void setAppreciationsCount(ObservableInt count)
+        {
+            binding.setAppreciationsCount(count);
         }
     }
 
@@ -537,8 +529,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         private final Post post;
         private final ReactionsAdapter reactionsAdapter;
 
-        //        private View.OnClickListener onAppreciationUpClick;
-//        private View.OnClickListener onAppreciationDownClick;
         private final View.OnClickListener onShowReactionsViewClickListener;
 
         public PostItem(Post post,

@@ -1,33 +1,24 @@
 package com.example.mobv2.callbacks;
 
-import android.content.Context;
-
+import com.example.mobv2.adapters.MapAdapter;
 import com.example.mobv2.models.MarkerInfo;
-import com.example.mobv2.models.PostWithMark;
 import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.utils.MarkerAddition;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
 {
-    private final Context context;
-    private final BitmapDescriptor markDescriptor;
-    private final List<PostWithMark> postsWithMarks;
-    private final GoogleMap googleMap;
+    private final MainActivity mainActivity;
+    private final MapAdapter mapAdapter;
 
-    public GetMarksCallback(Context context,
-                            BitmapDescriptor markDescriptor,
-                            List<PostWithMark> postsWithMarks,
-                            GoogleMap googleMap)
+    public GetMarksCallback(MainActivity mainActivity,
+                            MapAdapter mapAdapter)
     {
-        this.context = context;
-        this.markDescriptor = markDescriptor;
-        this.postsWithMarks = postsWithMarks;
-        this.googleMap = googleMap;
+        this.mainActivity = mainActivity;
+        this.mapAdapter = mapAdapter;
     }
 
     @Override
@@ -41,10 +32,9 @@ public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
             LinkedTreeMap<String, Double> coordinates = response.get(postId);
             double x = coordinates.get("x");
             double y = coordinates.get("y");
-            PostWithMark postWithMark = new PostWithMark(x, y, Integer.parseInt(postId));
-            postsWithMarks.add(postWithMark);
-            googleMap.addMarker(new MarkerAddition("The mark", x, y, markDescriptor).create())
-                     .setTag(MarkerInfo.COMMON_MARKER);
+            HashMap<String, Object> metadata = new HashMap<>();
+            metadata.put("post_id", Integer.valueOf(postId));
+            mapAdapter.addMarker(new MarkerAddition("The mark", x, y).create(), MarkerInfo.SUB_ADDRESS_MARKER, metadata);
         }
     }
 

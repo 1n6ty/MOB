@@ -35,7 +35,8 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
         switch (newState)
         {
             case BottomSheetBehavior.STATE_COLLAPSED:
-                materialCardView.setRadius(mainActivity.getResources().getDimension(R.dimen.horizontal_margin));
+                materialCardView.setRadius(mainActivity.getResources()
+                                                       .getDimension(R.dimen.horizontal_margin));
                 appBar.setVisibility(View.INVISIBLE);
                 mainActivity.getWindow()
                             .setNavigationBarColor(mainActivity.getResources()

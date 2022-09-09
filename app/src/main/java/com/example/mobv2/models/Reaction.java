@@ -11,11 +11,21 @@ public class Reaction
     private final String emoji;
     private final List<Integer> userIdsWhoLiked;
 
+    private boolean checked;
+
     public Reaction(String emoji,
                     List<Integer> userIdsWhoLiked)
     {
+        this(emoji, userIdsWhoLiked, false);
+    }
+
+    public Reaction(String emoji,
+                    List<Integer> userIdsWhoLiked,
+                    boolean checked)
+    {
         this.emoji = emoji;
         this.userIdsWhoLiked = userIdsWhoLiked;
+        this.checked = checked;
     }
 
     public String getEmoji()
@@ -31,5 +41,15 @@ public class Reaction
     public int getCount()
     {
         return userIdsWhoLiked == null ? -1 : userIdsWhoLiked.size();
+    }
+
+    public void setChecked(boolean checked)
+    {
+        this.checked = checked;
+    }
+
+    public boolean isChecked()
+    {
+        return checked;
     }
 }
