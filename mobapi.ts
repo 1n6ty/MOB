@@ -6,15 +6,15 @@
 //--------------------------------------------------
 // With every response you get {'status_code': code}
 //--------------------------------------------------
-function auth(login: string, password: string): { // login is a phone_number only!
+function auth(login: string, password: string): { // login is a phone_number or nick or email
     'response': {
         'refresh': string,
         'token': string,
         'user': {
             'id': number,
             'email': string,
-            'phone': string,
-            'name': string,
+            'phone_number': string,
+            'full_name': string,
             'nick': string,
             'profile_img_url': string 
         }
@@ -25,39 +25,46 @@ function auth(login: string, password: string): { // login is a phone_number onl
 function me(token: string): {
     'response': {
         'user': {
-            'nick_name': string,
-            'name': string,
+            'nick': string,
+            'full_name': string,
             'email': string,
             'phone_number': string,
             'id': number,
             'profile_img_url': string
         },
-        'address': {
+        'current_address': {
+            'id': number,
             'country': string,
             'city': string,
             'street': string,
-            'house': number,
-            'x': number, // float
-            'y': number // float
-        } | 'none'
+            'house': number
+        } | 'none',
+        'addresses': {
+            'id': number,
+            'country': string,
+            'city': string,
+            'street': string,
+            'house': number
+        }[] | 'none',
     }
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function getAddresses(token: string): {
+function getUserProfile(user_id: number, token: string): {
     'response': {
-            'country': string,
-            'city': string,
-            'street': string,
-            'house': number,
+        'user': {
+            'nick': string,
+            'full_name': string,
+            'email': string,
+            'phone_number': string,
             'id': number,
-            'x': number, // float
-            'y': number // float
-        }[] //status 200
+            'profile_img_url': string
+        }
+    }
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function setAddress(location_id: number, token: string): {
+function setCurrentAddress(location_id: number, token: string): {
     'response': {
         'token': string
     } //status 200
@@ -67,6 +74,7 @@ function setAddress(location_id: number, token: string): {
 function getMarks(token: string): {
     'response': {
         '*id*': { // '*id*' - integer (id of post)
+            'category': 'News' | 'Suggestions',
             'x': number // float
             'y': number // float
         },
@@ -86,15 +94,19 @@ function getPost(post_id: number, token: string): { // post_id -> real id of pos
             '*reaction*': [number] // like '😂': [10, 13, ...]
             //...
         },
-        'appreciations': number,
-        'appreciated': boolean,
+        'rate': {
+            'p': [number], // ids of users
+            'm': [number] // ids of users
+        },
         'data': {
+            'title': string,
             'img_urls': string[],
-            'text': string
+            'content': string,
+            'comment_ids': [number] | 'none' // real ids of comments
         },
         'user': {
-            'nick_name': string,
-            'name': string,
+            'nick': string,
+            'full_name': string,
             'email': string,
             'phone_number': string,
             'id': number,
@@ -109,32 +121,37 @@ function deletePost(post_id: number, token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function post(text: string, imgs_urls: string[], token: string): {
+function post(content: string, img_routes: string[], token: string): {
     'response': {
         'id': number
     } //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function getComment(post_id: number, comment_id: number, ind: boolean, token: string): { // post_id -> real id of post; comment_id -> next index of list that you don't have (ind = true)
-    'response': {                                                                        // comment_id -> real id of comment (ind = true)
+function getComment(comment_id: number, token: string): { // comment_id -> real comment_id
+    'response': {  
+        'id': number,
+        'date': string,
         'user': {
-            'nick_name': string,
-            'name': string,
+            'nick': string,
+            'full_name': string,
             'email': string,
             'phone_number': string,
             'id': number,
             'profile_img_url': string
         },
-        'id': number,
-        'text': string,
-        'date': string,
+        'data': {
+            'content': string,
+            'comment_ids': [number] | 'none' // real ids of comments
+        },
         'reactions': {
             '*reaction*': [number] // like '😂': [10, 13, ...] 'ids'
             //...
         },
-        'appreciations': number,
-        'appreciated': boolean
+        'rate': {
+            'p': [number], // ids of users
+            'm': [number] // ids of users
+        }
     } //status 200
     'msg': 'error' //status 400, 403, 404
     //------------------------------------------------------------------
@@ -143,13 +160,13 @@ function getComment(post_id: number, comment_id: number, ind: boolean, token: st
     //------------------------------------------------------------------
 }{return;}
 
-function deleteComment(post_id: number, comment_id: number, token: string): {
+function deleteComment(comment_id: number, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function editUser(nick_name: string | null, name: string | null,
-                    email: string | null, password: string | null, new_profile_img_url: string | null, token: string): {
+function editUser(new_nick: string | null, new_full_name: string | null,
+                    new_email: string | null, new_password: string | null, new_profile_img_route: string | null, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
@@ -164,12 +181,12 @@ function postDec(post_id: number, token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function commentInc(post_id: number, comment_id: number, token: string): {
+function commentInc(comment_id: number, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function commentDec(post_id: number, comment_id: number, token: string): {
+function commentDec(comment_id: number, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
@@ -184,17 +201,17 @@ function postUnreact(post_id: number, reaction: string, token: string): {
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function commentReact(post_id: number, comment_id: number, reaction: string, token: string): {
+function commentReact(comment_id: number, reaction: string, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function commentUnreact(post_id: number, comment_id: number, reaction: string, token: string): {
+function commentUnreact(comment_id: number, reaction: string, token: string): {
     'response': {} //status 200
     'msg': 'error' //status 400, 403, 404
 }{return;}
 
-function comment(post_id: number, text: string, token: string): {
+function comment(content: string, token: string): {
     'response': {
         'id': number
     } //status 200

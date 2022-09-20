@@ -1,48 +1,51 @@
+from itertools import chain
 from Rule.views.views import isCorruptedToken, getDataFromToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse, HttpResponse, QueryDict
-from Rule.models import User, Comment
-
-is_true_bool = lambda value: bool(value) and value.lower() not in ('false', '0')
+from django.http import JsonResponse, HttpResponse
+from Rule.models import User, Comment, Address
 
 def getComment(req):
     if req.method == 'GET':
-        try:
-            token = req.GET['token']
-            post_id = req.GET['post_id']
-            comment_id = req.GET['comment_id']
-            if is_true_bool(req.GET['ind']):
-                ind = True
-            else:
-                ind = False
-        except:
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        comment_id = req.GET.get('comment_id', False)
+        if not (token and comment_id):
             return JsonResponse({
-                'msg': 'bad_request'
+                'msg': "bad_request"
             }, status = 400)
         try:
             token_data = getDataFromToken(token)
-            post_id = int(post_id)
             comment_id = int(comment_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
 
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-            if ind:
-                e = post.comments.all()[comment_id]
-            else:
-                e = post.comments.get(id = comment_id)
-        except (ObjectDoesNotExist, IndexError) as e:
+        # get user and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
             return JsonResponse({
-                'msg': "not_found"
+                'msg': "user_not_found"
             }, status = 404)
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        comment = address.comments.filter(id = comment_id).all()
+        if comment.count() > 0:
+            comment = comment[0]
+        else:
+            return JsonResponse({
+                'msg': "not_allowed"
+            }, status = 403)
 
-        if sessionTimeExpired(user.sessionExpTime):
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
             return JsonResponse({
                 'msg': "session_time_expired"
             }, status = 404)
@@ -52,125 +55,57 @@ def getComment(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-
-        
-        appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', e.appreciatedUsers.split(' '))))
-        unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', e.unappreciatedUsers.split(' '))))
-        app = "-1"
-        try:
-            appUsers.index(user.id)
-            app = "True"
-        except:
-            pass
-        try:
-            unappUsers.index(user.id)
-            app = "False"
-        except:
-            pass
-
         return JsonResponse({
             'response': {
+                'id': comment.id,
+                'date': str(comment.date),
                 'user': {
-                    'nick_name': e.user.nickName,
-                    'name': e.user.name,
-                    'email': e.user.email,
-                    'phone_number': e.user.phone_number,
-                    'id': e.user.id,
-                    'profile_img_url': e.user.profile_img.url
+                    'nick': comment.user.nick,
+                    'full_name': comment.user.full_name,
+                    'email': comment.user.email,
+                    'phone_number': comment.user.phone_number,
+                    'id': comment.user.id,
+                    'profile_img_url': comment.user.profile_img.url
                 },
-                'id': e.id,
-                'post_id': post_id,
-                'text': e.text,
-                'date': str(e.date),
-                'reactions': e.reacted,
-                'appreciations': e.appreciations,
-                'appreciated': app
+                'data': {
+                    'content': comment.content,
+                    'comment_ids': [i.id for i in comment.comments.all()]
+                },
+                'reactions': comment.reactions,
+                'rate': comment.rate
             }
         }, status = 200)
     return HttpResponse(status = 405)
 
 @csrf_exempt
 def deleteComment(req):
-    if req.method == 'PUT':
-        data = QueryDict(req.body)
-        token = data.get('token')
-        post_id = data.get('post_id')
-        comment_id = data.get('comment_id')
-        if token == None or post_id == None or comment_id == None:
-            return JsonResponse({
-                'msg': 'bad_request'
-            }, status = 400)
-        try:
-            token_data = getDataFromToken(token)
-            post_id = int(data.get('post_id'))
-            comment_id = int(data.get('comment_id'))
-        except:
+    if req.method == 'POST':
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        comment_id = req.POST.get('comment_id', False)
+        if not (token and comment_id):
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
-
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-            comment = post.comments.get(id = comment_id)
-        except (ObjectDoesNotExist, IndexError) as e:
-            return JsonResponse({
-                'msg': "not_found"
-            }, status = 404)
-
-        if sessionTimeExpired(user.sessionExpTime):
-            return JsonResponse({
-                'msg': "session_time_expired"
-            }, status = 404)
-
-        if isCorruptedToken(token, user.prv_key):
-            return JsonResponse({
-                'msg': "token_corrupted"
-            }, status = 403)
-
-        if comment.user.id == token_data['id']:
-            comment.delete()
-
-            return JsonResponse({
-                'response': {}
-            }, status = 200)
-        return JsonResponse({
-            'msg': 'author_not_matched'
-        }, status = 403)
-    return HttpResponse(status = 405)
-
-@csrf_exempt
-def commentInc(req):
-    if req.method == 'PUT':
-        data = QueryDict(req.body)
-        token = data.get('token')
-        post_id = data.get('post_id')
-        comment_id = data.get('comment_id')
-        if token == None or post_id == None or comment_id == None:
-            return JsonResponse({
-                'msg': 'bad_request'
-            }, status = 400)
         try:
             token_data = getDataFromToken(token)
-            post_id = int(post_id)
             comment_id = int(comment_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
 
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-            comment = post.comments.get(id = comment_id)
-        except (ObjectDoesNotExist, IndexError) as e:
+        # get user, address and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
             return JsonResponse({
-                'msg': "not_found"
+                'msg': "user_not_found"
             }, status = 404)
 
-        if sessionTimeExpired(user.sessionExpTime):
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
             return JsonResponse({
                 'msg': "session_time_expired"
             }, status = 404)
@@ -180,21 +115,91 @@ def commentInc(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', comment.appreciatedUsers.split(' '))))
-        unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', comment.unappreciatedUsers.split(' '))))
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        comment = address.comments.filter(id = comment_id).all()
+        if comment.count() > 0:
+            comment = comment[0]
+            comments2delete = list(comment.comments.all())
+            ind = 0
+            while ind < len(comments2delete):
+                if comments2delete[ind].comments.all().count() == 0:
+                    ind += 1
+                    continue
+                comments2delete = list(chain(comments2delete, comments2delete[ind].comments.all()))
+                ind += 1
+            for i in comments2delete:
+                i.delete()
+        else:
+            return JsonResponse({
+                'msg': "no_such_comment"
+            }, status = 404)
+
+        return JsonResponse({
+            'msg': 'not_allowed'
+        }, status = 403)
+    return HttpResponse(status = 405)
+
+@csrf_exempt
+def commentInc(req):
+    if req.method == 'POST':
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        comment_id = req.POST.get('comment_id', False)
+        if not (token and comment_id):
+            return JsonResponse({
+                'msg': "bad_request"
+            }, status = 400)
         try:
-            ind = appUsers.index(user.id)
+            token_data = getDataFromToken(token)
+            comment_id = int(comment_id)
         except:
-            try:
-                ind = unappUsers.index(user.id)
-                comment.unappreciatedUsers = ' '.join(list(map(str, filter(lambda x: x != user.id, unappUsers))))
-                comment.appreciatedUsers += ' ' + str(user.id)
-                comment.appreciations += 2
-                comment.save()
-            except:
-                comment.appreciatedUsers += ' ' + str(user.id)
-                comment.appreciations += 1
-                comment.save()
+            return JsonResponse({
+                'msg': "bad_request"
+            }, status = 400)
+
+        # get user, address and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
+            return JsonResponse({
+                'msg': "user_not_found"
+            }, status = 404)
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        comment = address.comments.filter(id = comment_id).all()
+        if comment.count() > 0:
+            comment = comment[0]
+        else:
+            return JsonResponse({
+                'msg': "not_allowed"
+            }, status = 403)
+
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
+            return JsonResponse({
+                'msg': "session_time_expired"
+            }, status = 404)
+
+        if isCorruptedToken(token, user.prv_key):
+            return JsonResponse({
+                'msg': "token_corrupted"
+            }, status = 403)
+
+        comment.rate['p'] = list(chain(filter(lambda e: e != user.id, comment.rate['p']), [user.id]))
+        comment.rate['m'] = list(filter(lambda e: e != user.id, comment.rate['m']))
+        comment.save()
 
         return JsonResponse({
             'response': {}
@@ -203,35 +208,47 @@ def commentInc(req):
 
 @csrf_exempt
 def commentDec(req):
-    if req.method == 'PUT':
-        data = QueryDict(req.body)
-        token = data.get('token')
-        post_id = data.get('post_id')
-        comment_id = data.get('comment_id')
-        if token == None or post_id == None or comment_id == None:
+    if req.method == 'POST':
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        comment_id = req.POST.get('comment_id', False)
+        if not (token and comment_id):
             return JsonResponse({
-                'msg': 'bad_request'
+                'msg': "bad_request"
             }, status = 400)
         try:
             token_data = getDataFromToken(token)
-            post_id = int(post_id)
             comment_id = int(comment_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
 
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-            comment = post.comments.get(id = comment_id)
-        except (ObjectDoesNotExist, IndexError) as e:
+        # get user, address and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
             return JsonResponse({
-                'msg': "not_found"
+                'msg': "user_not_found"
             }, status = 404)
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        comment = address.comments.filter(id = comment_id).all()
+        if comment.count() > 0:
+            comment = comment[0]
+        else:
+            return JsonResponse({
+                'msg': "not_allowed"
+            }, status = 403)
 
-        if sessionTimeExpired(user.sessionExpTime):
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
             return JsonResponse({
                 'msg': "session_time_expired"
             }, status = 404)
@@ -240,25 +257,10 @@ def commentDec(req):
             return JsonResponse({
                 'msg': "token_corrupted"
             }, status = 403)
-
-        if isCorruptedToken(token, user.prv_key) or sessionTimeExpired(user.sessionExpTime):
-            return HttpResponse(status = 403)
-
-        appUsers = list(map(int, filter(lambda x: x != '' and x != ' ', comment.appreciatedUsers.split(' '))))
-        unappUsers = list(map(int, filter(lambda x: x != '' and x != ' ', comment.unappreciatedUsers.split(' '))))
-        try:
-            ind = unappUsers.index(user.id)
-        except:
-            try:
-                ind = appUsers.index(user.id)
-                comment.appreciatedUsers = ' '.join(list(map(str, filter(lambda x: x != user.id, appUsers))))
-                comment.unappreciatedUsers += ' ' + str(user.id)
-                comment.appreciations -= 2
-                comment.save()
-            except:
-                comment.unappreciatedUsers += ' ' + str(user.id)
-                comment.appreciations -= 1
-                comment.save()
+        
+        comment.rate['m'] = list(chain(filter(lambda e: e != user.id, comment.rate['m']), [user.id]))
+        comment.rate['p'] = list(filter(lambda e: e != user.id, comment.rate['p']))
+        comment.save()
         
         return JsonResponse({
             'response': {}
@@ -268,32 +270,48 @@ def commentDec(req):
 @csrf_exempt
 def comment(req):
     if req.method == 'POST':
-        try:
-            token = req.POST['token']
-            post_id = req.POST['post_id']
-            text = req.POST['text']
-        except:
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        parent_id = req.POST.get('parent_id', False)
+        parent_litera = req.POST.get('l', False)
+        content = req.POST.get('content', False)
+        if not (token and parent_id and content and parent_litera) and (parent_litera == 'c' or parent_litera == 'p'):
             return JsonResponse({
-                'msg': 'bad_request'
+                'msg': "bad_request"
             }, status = 400)
         try:
             token_data = getDataFromToken(token)
-            post_id = int(post_id)
+            parent_id = int(parent_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
 
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-        except (ObjectDoesNotExist, IndexError) as e:
+        # get user, address and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
             return JsonResponse({
-                'msg': "not_found"
+                'msg': "user_not_found"
             }, status = 404)
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        parent = address.comments.filter(id = parent_id).all() if parent_litera == 'c' else address.posts.filter(id = parent_id).all()
+        if parent.count() > 0:
+            parent = parent[0]
+        else:
+            return JsonResponse({
+                'msg': "not_allowed"
+            }, status = 403)
 
-        if sessionTimeExpired(user.sessionExpTime):
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
             return JsonResponse({
                 'msg': "session_time_expired"
             }, status = 404)
@@ -303,10 +321,12 @@ def comment(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        new_c = Comment(user=user, text=text)
+        new_c = Comment(user=user, content=content)
         new_c.save()
-        post.comments.add(new_c)
-        post.save()
+        parent.comments.add(new_c)
+        parent.save()
+        address.comments.add(new_c)
+        address.save()
 
         return JsonResponse({
             'response': {}
@@ -315,36 +335,48 @@ def comment(req):
 
 @csrf_exempt
 def reactComment(req):
-    if req.method == 'PUT':
-        data = QueryDict(req.body)
-        token = data.get('token')
-        post_id = data.get('post_id')
-        comment_id = data.get('comment_id')
-        reaction = data.get('reaction')
-        if token == None or post_id == None or comment_id == None or reaction == None:
+    if req.method == 'POST':
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        comment_id = req.POST.get('comment_id', False)
+        reaction = req.POST.get('reaction', False)
+        if not (token and comment_id and reaction):
             return JsonResponse({
-                'msg': 'bad_request'
+                'msg': "bad_request"
             }, status = 400)
         try:
             token_data = getDataFromToken(token)
-            post_id = int(post_id)
             comment_id = int(comment_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
 
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-            comment = post.comments.get(id = comment_id)
-        except (ObjectDoesNotExist, IndexError) as e:
+        # get user, address and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
             return JsonResponse({
-                'msg': "not_found"
+                'msg': "user_not_found"
             }, status = 404)
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        comment = address.comments.filter(id = comment_id).all()
+        if comment.count() > 0:
+            comment = comment[0]
+        else:
+            return JsonResponse({
+                'msg': "not_allowed"
+            }, status = 403)
 
-        if sessionTimeExpired(user.sessionExpTime):
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
             return JsonResponse({
                 'msg': "session_time_expired"
             }, status = 404)
@@ -355,10 +387,10 @@ def reactComment(req):
             }, status = 403)
 
         try:
-            if len(list(filter(lambda x: x == user.id, comment.reacted[reaction]))) == 0:
-                comment.reacted[reaction].append(user.id)
-        except:
-            comment.reacted[reaction] = [user.id, ]
+            if len(list(filter(lambda x: x == user.id, comment.reactions[reaction]))) == 0:
+                comment.reactions[reaction].append(user.id)
+        except KeyError:
+            comment.reactions[reaction] = [user.id]
         comment.save()
 
         return JsonResponse({
@@ -368,36 +400,48 @@ def reactComment(req):
 
 @csrf_exempt
 def unreactComment(req):
-    if req.method == 'PUT':
-        data = QueryDict(req.body)
-        token = data.get('token')
-        post_id = data.get('post_id')
-        comment_id = data.get('comment_id')
-        reaction = data.get('reaction')
-        if token == None or post_id == None or comment_id == None or reaction == None:
+    if req.method == 'POST':
+        # get request parameters
+        token = req.META.get('HTTP_AUTHORIZATION', False)
+        comment_id = req.POST.get('comment_id', False)
+        reaction = req.POST.get('reaction', False)
+        if not (token and comment_id and reaction):
             return JsonResponse({
-                'msg': 'bad_request'
+                'msg': "bad_request"
             }, status = 400)
         try:
             token_data = getDataFromToken(token)
-            post_id = int(post_id)
             comment_id = int(comment_id)
         except:
             return JsonResponse({
                 'msg': "bad_request"
             }, status = 400)
 
-        try:
-            user = User.objects.get(id = token_data['id'])
-            address = user.addresses.get(id = token_data['location_id'])
-            post = address.posts.get(id = post_id)
-            comment = post.comments.get(id = comment_id)
-        except (ObjectDoesNotExist, IndexError) as e:
+        # get user, address and comment objects 
+        user = User.objects.filter(id = token_data['id']).all()
+        if user.count() > 0:
+            user = user[0]
+        else:
             return JsonResponse({
-                'msg': "not_found"
+                'msg': "user_not_found"
             }, status = 404)
+        address = Address.objects.filter(id = token_data["location_id"]).all()
+        if address.count() > 0:
+            address = address[0]
+        else:
+            return JsonResponse({
+                'msg': "no_such_address"
+            }, status = 404)
+        comment = address.comments.filter(id = comment_id).all()
+        if comment.count() > 0:
+            comment = comment[0]
+        else:
+            return JsonResponse({
+                'msg': "not_allowed"
+            }, status = 403)
 
-        if sessionTimeExpired(user.sessionExpTime):
+        # check token
+        if sessionTimeExpired(token_data['expire_time']):
             return JsonResponse({
                 'msg': "session_time_expired"
             }, status = 404)
@@ -407,13 +451,18 @@ def unreactComment(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        if len(list(filter(lambda x: x == user.id, comment.reacted[reaction]))) != 0:
-            cur = list(filter(lambda x: x != user.id, comment.reacted[reaction]))
-            if len(cur) == 0:
-                comment.reacted.pop(reaction, None)
-            else:
-                comment.reacted[reaction] = cur
-        comment.save()
+        try:
+            if len(list(filter(lambda x: x == user.id, comment.reactions[reaction]))) != 0:
+                cur = list(filter(lambda x: x != user.id, comment.reactions[reaction]))
+                if len(cur) == 0:
+                    comment.reactions.pop(reaction, None)
+                else:
+                    comment.reactions[reaction] = cur
+            comment.save()
+        except KeyError:
+            return JsonResponse({
+                'msg': "no_such_reaction"
+            }, status = 404)
 
         return JsonResponse({
             'response': {}

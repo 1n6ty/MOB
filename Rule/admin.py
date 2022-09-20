@@ -1,9 +1,5 @@
 from django.contrib import admin
-from .models import RuleCompany, Address, User, PostWithMark, Comment
-
-class RuleCompanyAdmin(admin.ModelAdmin):
-    exclude = ()
-    filter_horizontal = ('addresses', )
+from .models import Address, User, PostWithMark, Comment
 
 class AddressAdmin(admin.ModelAdmin):
     filter_horizontal = ('posts', )
@@ -11,7 +7,6 @@ class AddressAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     filter_horizontal = ('addresses', )
 
-admin.site.register(RuleCompany, RuleCompanyAdmin)
 admin.site.register(Address, AddressAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(PostWithMark)
