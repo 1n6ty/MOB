@@ -330,7 +330,7 @@ def comment(req):
 
         return JsonResponse({
             'response': {
-                "id": new_c.id
+                "comment_id": new_c.id
             }
             }, status=200)
     return HttpResponse(status=405)
