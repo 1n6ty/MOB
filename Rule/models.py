@@ -8,7 +8,8 @@ class Address(models.Model):
     house = models.PositiveIntegerField(blank=False)
     posts = models.ManyToManyField('PostWithMark', blank = True)
     comments = models.ManyToManyField('Comment', blank=True)
-    users = models.ManyToManyField('User', blank=True)
+    users = models.ManyToManyField('User', blank=True, related_name="users")
+    owner = models.ForeignKey('User', on_delete=models.CASCADE, related_name="owner")
 
 class User(models.Model):
     nick = models.CharField(max_length = 255, blank=False)

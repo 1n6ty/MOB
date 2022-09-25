@@ -329,7 +329,9 @@ def comment(req):
         address.save()
 
         return JsonResponse({
-            'response': {}
+            'response': {
+                "id": new_c.id
+            }
             }, status=200)
     return HttpResponse(status=405)
 
