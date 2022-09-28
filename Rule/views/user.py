@@ -141,9 +141,7 @@ def getMe(req):
         if current_address.count() > 0:
             current_address = current_address[0]
         else:
-            return JsonResponse({
-                'msg': "no_such_address"
-            }, status = 404)
+            current_address = 'none'
 
         addresses = user.addresses.all()
         if addresses.count() == 0:
@@ -174,13 +172,15 @@ def getMe(req):
                     'country': current_address.country,
                     'city': current_address.city,
                     'street': current_address.street,
-                    'house': current_address.house
+                    'house': current_address.house,
+                    'id': current_address.id
                 },
                 'addresses': addresses if addresses == 'none' else [{
                     'country': i.country,
                     'city': i.city,
                     'street': i.street,
-                    'house': i.house
+                    'house': i.house,
+                    'id': i.id
                 } for i in addresses]
             }
         }, status = 200)
