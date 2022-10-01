@@ -14,7 +14,7 @@ urlpatterns = [
     path('user/me/', getMe),
 
     path('address/set/', setLocation),
-    path('address/marks/get', getMarks),
+    path('address/marks/get/', getMarks),
 
     path('post/create/', createPost),
     path('post/get/', getPost),

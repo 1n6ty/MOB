@@ -141,8 +141,8 @@ def deleteComment(req):
             }, status = 404)
 
         return JsonResponse({
-            'msg': 'not_allowed'
-        }, status = 403)
+            'response': {}
+        }, status = 200)
     return HttpResponse(status = 405)
 
 @csrf_exempt
