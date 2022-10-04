@@ -25,7 +25,7 @@ public class GetPostCallback implements MOBServerAPI.MOBAPICallback
 
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-        Post post = Post.parseFromMap(response);
+        Post post = new Post.PostBuilder().parseFromMap(response);
         var postsAdapter = (PostsAdapter) postsRecycler.getAdapter();
         postsAdapter.addPost(post);
         postsRecycler.scrollToPosition(0);
@@ -35,15 +35,11 @@ public class GetPostCallback implements MOBServerAPI.MOBAPICallback
     public void funcBad(LinkedTreeMap<String, Object> obj)
     {
         Log.v("DEBUG", obj.toString());
-//                    Toast.makeText(getContext(), "Post is not available", Toast.LENGTH_LONG)
-//                         .show();
     }
 
     @Override
     public void fail(Throwable obj)
     {
         Log.v("DEBUG", obj.toString());
-//                    Toast.makeText(getContext(), R.string.check_internet_connection, Toast.LENGTH_LONG)
-//                         .show();
     }
 }

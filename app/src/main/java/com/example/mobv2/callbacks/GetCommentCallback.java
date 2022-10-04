@@ -14,13 +14,11 @@ public class GetCommentCallback implements MOBServerAPI.MOBAPICallback
 {
     protected final MainActivity mainActivity;
     protected final RecyclerView commentsRecycler;
-    private final boolean withSort;
 
-    public GetCommentCallback(MainActivity mainActivity, RecyclerView commentsRecycler, boolean withSort)
+    public GetCommentCallback(MainActivity mainActivity, RecyclerView commentsRecycler)
     {
         this.mainActivity = mainActivity;
         this.commentsRecycler = commentsRecycler;
-        this.withSort = withSort;
     }
 
     @Override
@@ -30,9 +28,9 @@ public class GetCommentCallback implements MOBServerAPI.MOBAPICallback
 
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-        Comment comment = Comment.parseFromMap(response);
+        Comment comment = new Comment.CommentBuilder().parseFromMap(response);
         var commentsAdapter = (CommentsAdapter) commentsRecycler.getAdapter();
-        commentsAdapter.addComment(comment, withSort);
+        commentsAdapter.addComment(comment);
         commentsRecycler.scrollToPosition(0);
     }
 

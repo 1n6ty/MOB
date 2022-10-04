@@ -31,6 +31,12 @@
         <item name="subtitleTextAppearance">@style/toolbarSubtitleTextStyle</item>
     </style>
 
+    <style name="markerCreatorToolbarStyle">
+        <item name="titleTextColor">?colorMarkerCreatorToolbarTitle</item>
+        <item name="subtitleTextColor">?colorMarkerCreatorToolbarSubtitle</item>
+        <item name="subtitleTextAppearance">@style/toolbarSubtitleTextStyle</item>
+    </style>
+
     <style name="navHeaderTitleStyle">
         <item name="android:textColor">?colorNavigationHeader</item>
         <item name="android:textSize">@dimen/title_text_size</item>
@@ -93,6 +99,12 @@
         <item name="android:textSize">@dimen/medium_text_size</item>
         <item name="android:textColor">?colorToolbarTitle</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="createMarkerTextStyle">
+        <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:textColor">?colorToolbarTitle</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <style name="postButtonStyle">

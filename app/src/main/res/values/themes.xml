@@ -18,6 +18,9 @@
         <item name="colorToolbarIcon">@color/white</item>
         <item name="backgroundMainToolbar">@color/white</item>
         <item name="colorMainToolbarTitle">@color/gray_500</item>
+        <item name="colorMarkerCreatorToolbarTitle">@color/gray_700</item>
+        <item name="colorMarkerCreatorToolbarSubtitle">@color/gray_700</item>
+        <item name="colorMarkerCreatorToolbarIcon">@color/gray_700</item>
         <item name="backgroundPopupMenu">@color/white</item>
         <item name="colorPopupMenuIcon">@color/gray_300</item>
         <item name="colorPopupMenuText">@color/gray_700</item>

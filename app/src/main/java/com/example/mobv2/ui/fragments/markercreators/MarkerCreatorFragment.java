@@ -1,0 +1,131 @@
+package com.example.mobv2.ui.fragments.markercreators;
+
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import com.example.mobv2.R;
+import com.example.mobv2.adapters.ImagesAdapter;
+import com.example.mobv2.databinding.FragmentMarkerCreatorBinding;
+import com.example.mobv2.models.Image;
+import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.fragments.BaseFragment;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBinding>
+        implements HasToolbar, ActivityResultCallback<List<Uri>>
+{
+    private final ActivityResultLauncher<String> launcher =
+            registerForActivityResult(new ActivityResultContracts.GetMultipleContents(), this);
+
+    private final List<String> imagePaths;
+
+    private MarkerCreatorViewModel viewModel;
+
+    private Toolbar toolbar;
+    private EditText markerTitleView;
+    private EditText markerTextView;
+    private RecyclerView imagesView;
+    private ImageView addImageButton;
+
+    public MarkerCreatorFragment()
+    {
+        super(R.layout.fragment_marker_creator);
+
+        imagePaths = new ArrayList<>();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        initViewModel();
+
+        initToolbar();
+
+        initTextInfo();
+        initImagesInfo();
+        initConfirmAddingMarkerButton();
+    }
+
+    private void initViewModel()
+    {
+        viewModel = new ViewModelProvider(mainActivity).get(MarkerCreatorViewModel.class);
+    }
+
+    @Override
+    public void initToolbar()
+    {
+        toolbar = binding.toolbar;
+        super.initToolbar(toolbar, "Create marker");
+    }
+
+    private void initTextInfo()
+    {
+        markerTitleView = binding.markerTitleView;
+        markerTextView = binding.markerTextView;
+    }
+
+    private void initImagesInfo()
+    {
+        addImageButton = binding.addImageButton;
+        imagesView = binding.imagesView;
+
+        addImageButton.setOnClickListener(view ->
+        {
+            launcher.launch("image/*");
+        });
+    }
+
+    private void initConfirmAddingMarkerButton()
+    {
+        binding.confirmAddingMarkerButton.setOnClickListener(this::onConfirmAddingMarkerButtonClick);
+    }
+
+    public void onActivityResult(List<Uri> result)
+    {
+        if (result.size() == 0)
+            return;
+
+        List<Image> images = new ArrayList<>();
+        for (Uri uri : result)
+        {
+            images.add(new Image(uri.getPath(), uri, Image.IMAGE_OFFLINE));
+//                        imagePaths.add(UriUtils.getPath(getContext(), uri));
+        }
+
+        ImagesAdapter adapter = new ImagesAdapter((MainActivity) getActivity(), images);
+        imagesView.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
+        imagesView.setAdapter(adapter);
+    }
+
+    private void onConfirmAddingMarkerButtonClick(View view)
+    {
+        LatLng latLng = viewModel.getLatLng();
+        MOBServerAPI.MOBAPICallback callback = viewModel.getCallback();
+
+        String text = markerTextView.getText()
+                                    .toString();
+        String title = markerTitleView.getText()
+                                      .toString();
+        MainActivity.MOB_SERVER_API.post(callback, text, title, latLng.latitude, latLng.longitude, imagePaths, MainActivity.token);
+    }
+}

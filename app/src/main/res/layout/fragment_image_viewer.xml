@@ -9,12 +9,17 @@
         android:layout_height="match_parent"
         android:background="@color/black">
 
-        <ImageView
-            android:id="@+id/image_view"
+        <!--        <ImageView-->
+        <!--            android:id="@+id/image_view"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:scaleType="fitCenter"-->
+        <!--            app:srcCompat="@drawable/sample_avatar" />-->
+
+        <ImageSwitcher
+            android:id="@+id/image_switcher"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/sample_avatar" />
+            android:layout_height="match_parent" />
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"

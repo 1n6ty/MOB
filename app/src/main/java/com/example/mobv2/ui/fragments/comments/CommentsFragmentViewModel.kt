@@ -7,13 +7,4 @@ import com.example.mobv2.adapters.PostsAdapter.PostItem
 
 class CommentsFragmentViewModel : ObservableViewModel() {
     var postItem: PostItem? = null
-
-    @Bindable
-    var commentsCount = 0
-    set(value)
-    {
-        field = value
-
-        notifyPropertyChanged(BR.commentsCount)
-    }
 }

@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.callbacks.GetAddressesCallback;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
+import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 
 public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddressesBinding>
+        implements HasToolbar
 {
     private Toolbar toolbar;
     private RecyclerView addressesRecycler;
@@ -36,8 +38,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         initAddressesRecycler();
     }
 
-    @Override
-    protected void initToolbar()
+    public void initToolbar()
     {
         toolbar = binding.toolbar;
         super.initToolbar(toolbar, "Addresses");
@@ -51,6 +52,6 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         addressesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         noAddressesView.setVisibility(View.VISIBLE);
 
-        MainActivity.MOB_SERVER_API.getAddresses(new GetAddressesCallback(mainActivity, addressesRecycler, noAddressesView), MainActivity.token);
+        MainActivity.MOB_SERVER_API.me(new GetAddressesCallback(mainActivity, addressesRecycler, noAddressesView), MainActivity.token);
     }
 }

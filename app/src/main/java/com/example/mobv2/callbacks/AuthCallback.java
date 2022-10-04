@@ -31,11 +31,11 @@ public class AuthCallback implements MOBServerAPI.MOBAPICallback
 
         MainActivity.token = (String) response.get("token");
 
-        User user = User.parseFromMap((Map<String, Object>) response.get("user"));
+        User user = new User.UserBuilder().parseFromMap((Map<String, Object>) response.get("user"));
 
         SharedPreferences.Editor editor = mainActivity.getPrivatePreferences()
                                                       .edit();
-        editor.putInt(MainActivity.USER_ID_KEY, user.getId());
+        editor.putString(MainActivity.USER_ID_KEY, user.getId());
         editor.putString(MainActivity.USER_AVATAR_URL_KEY, user.getAvatarUrl());
         editor.putString(MainActivity.USER_NICKNAME_KEY, user.getNickName());
         editor.putString(MainActivity.USER_FULLNAME_KEY, user.getFullname());

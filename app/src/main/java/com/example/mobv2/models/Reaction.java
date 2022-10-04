@@ -4,23 +4,19 @@ import java.util.List;
 
 public class Reaction
 {
-    public static String EMOJI_LIKE = "\uD83D\uDC4D";
-    public static String EMOJI_DISLIKE = "\uD83D\uDC4E";
-    public static String EMOJI_LOVE = "❤";
-
     private final String emoji;
-    private final List<Integer> userIdsWhoLiked;
+    private final List<String> userIdsWhoLiked;
 
     private boolean checked;
 
     public Reaction(String emoji,
-                    List<Integer> userIdsWhoLiked)
+                    List<String> userIdsWhoLiked)
     {
         this(emoji, userIdsWhoLiked, false);
     }
 
     public Reaction(String emoji,
-                    List<Integer> userIdsWhoLiked,
+                    List<String> userIdsWhoLiked,
                     boolean checked)
     {
         this.emoji = emoji;
@@ -33,7 +29,7 @@ public class Reaction
         return emoji;
     }
 
-    public List<Integer> getUserIdsWhoLiked()
+    public List<String> getUserIdsWhoLiked()
     {
         return userIdsWhoLiked;
     }

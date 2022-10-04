@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -15,23 +16,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
+import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.Image;
 import com.example.mobv2.models.Post;
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.comments.CommentsFragment;
 import com.example.mobv2.ui.fragments.comments.CommentsFragmentViewModel;
 import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.gson.internal.LinkedTreeMap;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,17 +41,17 @@ import java.util.List;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
 {
     private final MainActivity mainActivity;
-    private final List<Post> posts;
     private final MapAdapter mapAdapter;
+
+    private final List<Post> posts;
 
     // TODO destroy the mapAdapter from this side
     public PostsAdapter(MainActivity mainActivity,
-                        List<Post> posts,
                         MapAdapter mapAdapter)
     {
         this.mainActivity = mainActivity;
-        this.posts = posts;
         this.mapAdapter = mapAdapter;
+        this.posts = new ArrayList<>();
     }
 
     @NonNull
@@ -88,6 +87,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         var post = posts.get(position);
         var user = post.getUser();
 
+        holder.binding.setCommentsCount(post.getCommentsCount());
+        holder.binding.setAppreciationsCount(post.getAppreciationsCount());
+
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
 
         holder.fullnameView.setText(user.getFullname());
@@ -96,41 +98,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
-        holder.appreciationUpView.setOnClickListener(view -> onAppreciationClick((RadioButton) view, holder.getAdapterPosition(), true));
-        holder.setAppreciationsCount(post.getAppreciationsCount());
-        holder.appreciationDownView.setOnClickListener(view -> onAppreciationClick((RadioButton) view, holder.getAdapterPosition(), false));
-//        holder.appreciationUpView.getDrawable().setTint(0);
-//        holder.appreciationDownView.getDrawable().setTint(0);
-        if (post.getAppreciated() == 1)
-        {
-            holder.appreciationUpView.setChecked(true);
-        }
-        else if (post.getAppreciated() == 0)
-        {
-            holder.appreciationDownView.setChecked(true);
-        }
-
-        holder.showReactionsView.setOnClickListener((view) -> onShowReactionsViewClick(holder.reactionsView));
+        holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsView));
 
         initContent(holder.content, position);
 
         var reactionsAdapter =
-                new ReactionsAdapter(mainActivity, post.getReactions(), post.getId());
+                new ReactionsPostAdapter(mainActivity, post.getReactions(), post.getId());
         holder.reactionsView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         holder.reactionsView.setAdapter(reactionsAdapter);
 
         holder.commentView.setOnClickListener(view ->
         {
-            var postItem = new PostItem(post, reactionsAdapter, this::onShowReactionsViewClick);
+            var postItem = new PostItem(post, reactionsAdapter);
             var viewModel =
                     new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
             viewModel.setPostItem(postItem);
-            viewModel.setCommentsCount(post.getCommentsCount()
-                                           .get());
             mainActivity.goToFragment(new CommentsFragment());
         });
-
-        holder.setCommentsCount(post.getCommentsCount());
     }
 
     private void onShowReactionsViewClick(View view)
@@ -138,118 +122,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         view.setVisibility(view.getVisibility() == View.GONE
                 ? View.VISIBLE
                 : View.GONE);
-    }
-
-    private void onAppreciationClick(RadioButton appreciationButton,
-                                     int position,
-                                     boolean isPositive)
-    {
-        Post post = posts.get(position);
-        ObservableInt appreciationsCount = post.getAppreciationsCount();
-
-        if (post.getAppreciated() == 1)
-        {
-            MainActivity.MOB_SERVER_API.postInc(new MOBServerAPI.MOBAPICallback()
-            {
-                @Override
-                public void funcOk(LinkedTreeMap<String, Object> obj)
-                {
-                    post.setAppreciated(-1);
-                    appreciationsCount.set(appreciationsCount.get() - 1);
-                    appreciationButton.setChecked(false);
-                }
-
-                @Override
-                public void funcBad(LinkedTreeMap<String, Object> obj)
-                {
-
-                }
-
-                @Override
-                public void fail(Throwable obj)
-                {
-
-                }
-            }, post.getId(), MainActivity.token);
-        }
-        else if (post.getAppreciated() == 0)
-        {
-            MainActivity.MOB_SERVER_API.postDec(new MOBServerAPI.MOBAPICallback()
-            {
-                @Override
-                public void funcOk(LinkedTreeMap<String, Object> obj)
-                {
-                    post.setAppreciated(-1);
-                    appreciationsCount.set(appreciationsCount.get() + 1);
-                    appreciationButton.setChecked(false);
-                }
-
-                @Override
-                public void funcBad(LinkedTreeMap<String, Object> obj)
-                {
-
-                }
-
-                @Override
-                public void fail(Throwable obj)
-                {
-
-                }
-            }, post.getId(), MainActivity.token);
-        }
-        else
-        {
-            if (isPositive)
-            {
-                MainActivity.MOB_SERVER_API.postInc(new MOBServerAPI.MOBAPICallback()
-                {
-                    @Override
-                    public void funcOk(LinkedTreeMap<String, Object> obj)
-                    {
-                        post.setAppreciated(1);
-                        appreciationsCount.set(appreciationsCount.get() + 1);
-                        appreciationButton.setChecked(true);
-                    }
-
-                    @Override
-                    public void funcBad(LinkedTreeMap<String, Object> obj)
-                    {
-
-                    }
-
-                    @Override
-                    public void fail(Throwable obj)
-                    {
-
-                    }
-                }, post.getId(), MainActivity.token);
-            }
-            else
-            {
-                MainActivity.MOB_SERVER_API.postDec(new MOBServerAPI.MOBAPICallback()
-                {
-                    @Override
-                    public void funcOk(LinkedTreeMap<String, Object> obj)
-                    {
-                        post.setAppreciated(0);
-                        appreciationsCount.set(appreciationsCount.get() - 1);
-                        appreciationButton.setChecked(true);
-                    }
-
-                    @Override
-                    public void funcBad(LinkedTreeMap<String, Object> obj)
-                    {
-
-                    }
-
-                    @Override
-                    public void fail(Throwable obj)
-                    {
-
-                    }
-                }, post.getId(), MainActivity.token);
-            }
-        }
     }
 
     public void addPost(Post post)
@@ -280,36 +152,37 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public boolean reverse()
     {
         Collections.reverse(posts);
-
         notifyItemRangeChanged(0, posts.size());
         return true;
     }
 
     public boolean sortByAppreciations()
     {
-        Collections.sort(posts, (o1, o2) -> Integer.compare(o2.getAppreciationsCount()
-                                                              .get(), o1.getAppreciationsCount()
-                                                                        .get()));
-
+        Collections.sort(posts, (post, nextPost) ->
+        {
+            int postPositiveRatesSize = post.getPositiveRates()
+                                            .size();
+            int nextPostPositiveRatesSize = nextPost.getPositiveRates()
+                                                    .size();
+            return Integer.compare(nextPostPositiveRatesSize, postPositiveRatesSize);
+        });
         notifyItemRangeChanged(0, posts.size());
         return true;
     }
 
     public boolean sortByDate()
     {
-        Collections.sort(posts, (o1, o2) -> (o2.getDate()
-                                               .compareTo(o1.getDate())));
-
+        Collections.sort(posts, (post, nextPost) -> (nextPost.getDate()
+                                                             .compareTo(post.getDate())));
         notifyItemRangeChanged(0, posts.size());
         return true;
     }
 
     public boolean sortByComments()
     {
-        Collections.sort(posts, (o1, o2) -> Integer.compare(o2.getCommentsCount()
-                                                              .get(), o1.getCommentsCount()
-                                                                        .get()));
-
+        Collections.sort(posts, (post, nextPost) -> Integer.compare(nextPost.getCommentsIds()
+                                                                            .size(), post.getCommentsIds()
+                                                                                         .size()));
         notifyItemRangeChanged(0, posts.size());
         return true;
     }
@@ -333,16 +206,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         var post = posts.get(position);
         var user = post.getUser();
         var userId = mainActivity.getPrivatePreferences()
-                                 .getInt(MainActivity.USER_ID_KEY, -1);
+                                 .getString(MainActivity.USER_ID_KEY, "");
         var menu = popupMenu.getMenu();
 
-        if (user.getId() == userId) // if the user is a post's creator
-        {
-            menu.findItem(R.id.menu_edit_post)
-                .setVisible(true);
-            menu.findItem(R.id.menu_delete_post)
-                .setVisible(true);
-        }
+        boolean isCreator = user.getId()
+                                .equals(userId);// if the user is a post's creator
+        menu.findItem(R.id.menu_edit_post)
+            .setVisible(isCreator);
+        menu.findItem(R.id.menu_delete_post)
+            .setVisible(isCreator);
 
         switch (post.getType())
         {
@@ -357,28 +229,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                 break;
         }
 
-        popupMenu.setOnMenuItemClickListener(item ->
-        {
-            switch (item.getItemId())
-            {
-                case R.id.menu_copy_post:
-                    return copyPost(position);
-                case R.id.menu_forward_post:
-                    return forwardPost(position);
-                case R.id.menu_edit_post:
-                    return editPost(position);
-                case R.id.menu_delete_post:
-                    return deletePost(position);
-            }
-
-            return false;
-        });
+        popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
 
         int[] menuIds =
                 {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
 
         var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_view);
-        var reactionsAdapter = (ReactionsAdapter) reactionsView.getAdapter();
+        var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
         for (int id : menuIds)
         {
             menu.findItem(id)
@@ -387,10 +244,28 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         }
     }
 
+    private boolean onMenuItemClick(MenuItem item,
+                                    int position)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_copy_post:
+                return copyPost(position);
+            case R.id.menu_forward_post:
+                return forwardPost(position);
+            case R.id.menu_edit_post:
+                return editPost(position);
+            case R.id.menu_delete_post:
+                return deletePost(position);
+        }
+
+        return false;
+    }
+
     private void initContent(@NonNull Pair<TextView, RecyclerView> content,
                              int position)
     {
-        Post post = posts.get(position);
+        var post = posts.get(position);
 
         content.first.setText(post.getText());
 
@@ -416,7 +291,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     private boolean copyPost(int position)
     {
-        Post post = posts.get(position);
+        var post = posts.get(position);
 
         var clipboard = (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
         var clip = ClipData.newPlainText("simple text", post.getText());
@@ -445,30 +320,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     {
         Post post = posts.get(position);
 
-        MainActivity.MOB_SERVER_API.postDelete(new MOBServerAPI.MOBAPICallback()
-        {
-            @Override
-            public void funcOk(LinkedTreeMap<String, Object> obj)
-            {
-                Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
-                     .show();
-                mapAdapter.removeMarkerByPostId(post.getId());
-                posts.remove(post);
-                notifyItemRemoved(position);
-            }
+        mapAdapter.removeMarkerByPostId(post.getId());
+        posts.remove(post);
+        notifyItemRemoved(position);
 
-            @Override
-            public void funcBad(LinkedTreeMap<String, Object> obj)
-            {
+        MainActivity.MOB_SERVER_API.postDelete(new MOBAPICallbackImpl(), String.valueOf(post.getId()), MainActivity.token);
 
-            }
+        Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
+             .show();
 
-            @Override
-            public void fail(Throwable obj)
-            {
-
-            }
-        }, post.getId(), MainActivity.token);
         return true;
     }
 
@@ -513,31 +373,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             commentsCountView = binding.commentsCountView;
         }
 
-        private void setCommentsCount(ObservableInt count)
-        {
-            binding.setCommentsCount(count);
-        }
-
-        private void setAppreciationsCount(ObservableInt count)
-        {
-            binding.setAppreciationsCount(count);
-        }
+//        private void setCommentsCount(ObservableInt count)
+//        {
+//            binding.setCommentsCount(count);
+//        }
+//
+//        private void setAppreciationsCount(ObservableInt count)
+//        {
+//            binding.setAppreciationsCount(count);
+//        }
     }
 
     public static class PostItem
     {
         private final Post post;
-        private final ReactionsAdapter reactionsAdapter;
-
-        private final View.OnClickListener onShowReactionsViewClickListener;
+        private final ReactionsPostAdapter reactionsPostAdapter;
 
         public PostItem(Post post,
-                        ReactionsAdapter reactionsAdapter,
-                        View.OnClickListener onShowReactionsViewClickListener)
+                        ReactionsPostAdapter reactionsPostAdapter)
         {
             this.post = post;
-            this.reactionsAdapter = reactionsAdapter;
-            this.onShowReactionsViewClickListener = onShowReactionsViewClickListener;
+            this.reactionsPostAdapter = reactionsPostAdapter;
         }
 
         public Post getPost()
@@ -545,14 +401,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             return post;
         }
 
-        public ReactionsAdapter getReactionsAdapter()
+        public ReactionsPostAdapter getReactionsAdapter()
         {
-            return reactionsAdapter;
-        }
-
-        public void onShowReactionsViewClick(View view)
-        {
-            onShowReactionsViewClickListener.onClick(view);
+            return reactionsPostAdapter;
         }
     }
 }

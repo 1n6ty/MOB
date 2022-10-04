@@ -46,7 +46,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         Image image = images.get(position);
 
         holder.itemView.setOnClickListener(view ->
-                mainActivity.goToFragment(new ImageViewerFragment(image), android.R.animator.fade_in));
+                mainActivity.goToFragment(new ImageViewerFragment(images), android.R.animator.fade_in));
 
         if (image.getType() == Image.IMAGE_ONLINE)
         {

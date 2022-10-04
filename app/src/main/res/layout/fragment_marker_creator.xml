@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?backgroundPrimaryWindow">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?backgroundSecondaryWindow"
+                app:elevation="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    style="@style/markerCreatorToolbarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                    app:navigationIcon="@drawable/ic_arrow"
+                    app:navigationIconTint="?colorMarkerCreatorToolbarIcon"
+                    app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?backgroundSecondaryWindow"
+                android:orientation="vertical"
+                android:paddingVertical="@dimen/vertical_medium_margin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appBarLayout2">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/horizontal_margin"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/marker_title_view"
+                        style="@style/authPasswordTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Marker's title"
+                        android:importantForAutofill="no"
+                        android:inputType="text" />
+
+                    <EditText
+                        android:id="@+id/marker_text_view"
+                        style="@style/authPasswordTextStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top|start"
+                        android:hint="Marker's text"
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine"
+                        android:minLines="1"
+                        android:scrollbars="vertical"
+                        android:scrollHorizontally="false" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/horizontal_very_small_margin"
+                    android:layout_marginVertical="@dimen/vertical_margin"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/add_image_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ripple_effect"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:srcCompat="@drawable/ic_add"
+                        app:tint="?colorPrimaryFabIcon" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/images_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:itemCount="1"
+                        tools:listitem="@layout/item_image" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/confirm_adding_marker_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/horizontal_margin"
+            android:scaleType="centerCrop"
+            app:backgroundTint="?backgroundSecondaryFab"
+            app:elevation="2dp"
+            app:layout_anchor="@id/linear_layout"
+            app:layout_anchorGravity="bottom|center"
+            app:srcCompat="@drawable/ic_check"
+            app:tint="?colorSecondaryFabIcon" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

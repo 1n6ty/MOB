@@ -9,8 +9,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentMapFeaturesBinding;
+import com.example.mobv2.ui.abstractions.HasToolbar;
 
 public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding>
+        implements HasToolbar
 {
     private Toolbar toolbar;
 
@@ -28,8 +30,7 @@ public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding
         initToolbar();
     }
 
-    @Override
-    protected void initToolbar()
+    public void initToolbar()
     {
         toolbar = binding.toolbar;
         super.initToolbar(toolbar, R.string.menu_map_features);

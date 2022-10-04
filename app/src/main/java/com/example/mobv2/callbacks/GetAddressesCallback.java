@@ -34,14 +34,17 @@ public class GetAddressesCallback implements MOBServerAPI.MOBAPICallback
     {
         Log.v("DEBUG", obj.toString());
 
+        LinkedTreeMap<String, Object> response =
+                (LinkedTreeMap<String, Object>) obj.get("response");
+        List<LinkedTreeMap<String, Object>> addressesMapList =
+                (List<LinkedTreeMap<String, Object>>) response.get("addresses");
+
         ArrayList<Address> addresses = new ArrayList<>();
 
-        List<LinkedTreeMap<String, Object>> response =
-                (List<LinkedTreeMap<String, Object>>) obj.get("response");
 
-        for (LinkedTreeMap<String, Object> item : response)
+        for (LinkedTreeMap<String, Object> item : addressesMapList)
         {
-            Address address = Address.parseFromMap(item);
+            Address address = new Address.AddressBuilder().parseFromMap(item);
             addresses.add(address);
         }
 

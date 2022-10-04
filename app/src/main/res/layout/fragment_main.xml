@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:elevation="0dp"
-                app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+                app:layout_constraintBottom_toTopOf="@+id/bottom_appbar_layout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -56,9 +56,69 @@
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/frame_posts"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:behavior_hideable="true"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="10dp"
+                    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/background_sheet_post"
+                        android:orientation="vertical">
+
+                        <androidx.coordinatorlayout.widget.CoordinatorLayout
+                            android:id="@+id/posts_app_bar_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <View
+                                android:id="@+id/dragger"
+                                android:layout_width="64dp"
+                                android:layout_height="2dp"
+                                android:layout_gravity="center"
+                                android:background="@drawable/background_dragger" />
+
+                            <com.google.android.material.appbar.AppBarLayout
+                                android:id="@+id/posts_app_bar"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <com.google.android.material.appbar.MaterialToolbar
+                                    android:id="@+id/posts_toolbar"
+                                    style="@style/toolbarStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="?android:attr/actionBarSize"
+                                    android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                                    app:menu="@menu/menu_recycler_toolbar"
+                                    app:navigationIcon="@drawable/ic_close"
+                                    app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
+                                    app:title="@{bindingContext.postTitle}" />
+                            </com.google.android.material.appbar.AppBarLayout>
+                        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/posts_recycler"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?backgroundPrimaryWindow"
+                            tools:itemCount="1"
+                            tools:listitem="@layout/item_post" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
             <LinearLayout
-                android:id="@+id/coordinatorLayout"
+                android:id="@+id/bottom_appbar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/backgroundSecondaryWindow"
@@ -119,69 +179,6 @@
                 <!--                    app:iconTint="?colorNavigationItemIcon" />-->
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/frame_posts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:behavior_hideable="true"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="10dp"
-                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/background_sheet_post"
-                    android:orientation="vertical">
-
-                    <androidx.coordinatorlayout.widget.CoordinatorLayout
-                        android:id="@+id/posts_app_bar_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <View
-                            android:id="@+id/dragger"
-                            android:layout_width="64dp"
-                            android:layout_height="2dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/background_dragger" />
-
-                        <com.google.android.material.appbar.AppBarLayout
-                            android:id="@+id/posts_app_bar"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <com.google.android.material.appbar.MaterialToolbar
-                                android:id="@+id/posts_toolbar"
-                                style="@style/toolbarStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="?attr/actionBarSize"
-                                android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-                                app:menu="@menu/menu_recycler_toolbar"
-                                app:navigationIcon="@drawable/ic_close"
-                                app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
-                                app:title="@{bindingContext.postTitle}" />
-                        </com.google.android.material.appbar.AppBarLayout>
-                    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/posts_recycler"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?backgroundPrimaryWindow"
-                        tools:itemCount="1"
-                        tools:listitem="@layout/item_post" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navigation_view"

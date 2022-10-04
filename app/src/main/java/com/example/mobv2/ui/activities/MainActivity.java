@@ -26,7 +26,7 @@ public class MainActivity extends ThemedActivity
 {
     //WARNING UNSAFE
     public static final MOBServerAPI MOB_SERVER_API =
-            new MOBServerAPI("http://192.168.0.104:8000/rules/");
+            new MOBServerAPI("http://192.168.0.104:8000/");
     public static String token = "";
 
     // USER
@@ -46,9 +46,8 @@ public class MainActivity extends ThemedActivity
     public static final String ADDRESS_STREET_KEY = "ADDRESS_CITY_KEY";
     public static final String ADDRESS_HOUSE_KEY = "ADDRESS_HOUSE_KEY";
      */
-    public static final String ADDRESS_X_KEY = "ADDRESS_X_KEY";
-    public static final String ADDRESS_Y_KEY = "ADDRESS_Y_KEY";
 
+    public static MOBServerAPI.MOBAPICallback[] callbacks;
 
     private ActivityMainBinding binding;
 

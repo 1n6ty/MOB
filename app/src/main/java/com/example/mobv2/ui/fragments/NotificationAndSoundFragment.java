@@ -9,8 +9,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentNotificationAndSoundBinding;
+import com.example.mobv2.ui.abstractions.HasToolbar;
 
 public class NotificationAndSoundFragment extends BaseFragment<FragmentNotificationAndSoundBinding>
+        implements HasToolbar
 {
     private Toolbar toolbar;
 
@@ -28,8 +30,7 @@ public class NotificationAndSoundFragment extends BaseFragment<FragmentNotificat
         initToolbar();
     }
 
-    @Override
-    protected void initToolbar()
+    public void initToolbar()
     {
         toolbar = binding.toolbar;
         super.initToolbar(toolbar, R.string.menu_notification_and_sound);

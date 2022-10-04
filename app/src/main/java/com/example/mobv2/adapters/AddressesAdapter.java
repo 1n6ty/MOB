@@ -63,8 +63,9 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
 
         holder.itemView.setBackgroundResource(R.drawable.background_item_address_selector);
 
-        if (address.getId() == mainActivity.getPrivatePreferences()
-                                           .getInt(MainActivity.ADDRESS_ID_KEY, -1))
+        if (address.getId()
+                   .equals(mainActivity.getPrivatePreferences()
+                                       .getString(MainActivity.ADDRESS_ID_KEY, "")))
         {
             addressItem.setChecked(true);
             lastItem = addressItem;
@@ -90,17 +91,11 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
 
         addressItem.setChecked(true);
         Address address = addressItem.getAddress();
-        MainActivity.MOB_SERVER_API.setAddress(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
+        MainActivity.MOB_SERVER_API.setLocation(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
         SharedPreferences.Editor editor = mainActivity.getPrivatePreferences()
                                                       .edit();
-        editor.putInt(MainActivity.ADDRESS_ID_KEY, address.getId());
+        editor.putString(MainActivity.ADDRESS_ID_KEY, address.getId());
         editor.putString(MainActivity.ADDRESS_FULL_KEY, address.toString());
-/*            editor.putString(MainActivity.ADDRESS_COUNTRY_KEY, address.getCountry());
-            editor.putString(MainActivity.ADDRESS_CITY_KEY, address.getCity());
-            editor.putString(MainActivity.ADDRESS_STREET_KEY, address.getStreet());
-            editor.putInt(MainActivity.ADDRESS_HOUSE_KEY, address.getHouse());*/
-        editor.putFloat(MainActivity.ADDRESS_X_KEY, (float) address.getX());
-        editor.putFloat(MainActivity.ADDRESS_Y_KEY, (float) address.getY());
         editor.apply();
 
         var mainFragmentViewModel =

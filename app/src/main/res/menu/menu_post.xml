@@ -11,7 +11,7 @@
         android:title="@string/menu_forward_post"
         app:showAsAction="never" />
 
-    <!--  For marker's owner  -->
+    <!--  For post's creator  -->
     <item
         android:id="@+id/menu_edit_post"
         android:title="@string/menu_edit_post"

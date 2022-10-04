@@ -21,9 +21,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
 
@@ -43,7 +43,7 @@ public class MOBServerAPI
 
     private Callback<LinkedTreeMap<String, Object>> createResponseCallback(MOBAPICallback obj)
     {
-        return new Callback<LinkedTreeMap<String, Object>>()
+        return new Callback<>()
         {
             @Override
             public void onResponse(@NonNull Call<LinkedTreeMap<String, Object>> call,
@@ -94,135 +94,144 @@ public class MOBServerAPI
 
     public interface MOBInterface
     {
-        @GET("auth/")
+        @GET("urbaAPI/user/auth/")
         Call<LinkedTreeMap<String, Object>> auth(@Query("l") String login,
-                                                 @Query("p") String passwordHashed);
+                                                 @Query("p") String password);
 
-        @GET("getLocations/")
-        Call<LinkedTreeMap<String, Object>> getLocations(@Query("token") String token);
+        @GET("urbaAPI/user/get/")
+        Call<LinkedTreeMap<String, Object>> getUserProfile(@Query("user_id") String user_id,
+                                                           @Header("Authorization") String token);
 
-        @GET("getMarks/")
-        Call<LinkedTreeMap<String, Object>> getMarks(@Query("token") String token);
+        @GET("urbaAPI/user/me/")
+        Call<LinkedTreeMap<String, Object>> getMe(@Header("Authorization") String token);
 
-        @GET("getPost/")
-        Call<LinkedTreeMap<String, Object>> getPost(@Query("post_id") int post_id,
-                                                    @Query("token") String token);
+        @GET("urbaAPI/address/marks/get/")
+        Call<LinkedTreeMap<String, Object>> getMarks(@Header("Authorization") String token);
 
-        @GET("getComment/")
-        Call<LinkedTreeMap<String, Object>> getComment(@Query("post_id") int post_id,
-                                                       @Query("comment_id") int comment_id,
-                                                       @Query("ind") boolean ind,
-                                                       @Query("token") String token);
+        @GET("urbaAPI/post/get/")
+        Call<LinkedTreeMap<String, Object>> getPost(@Query("post_id") String post_id,
+                                                    @Header("Authorization") String token);
 
-        @GET
-        Call<LinkedTreeMap<String, Object>> refresh(@Query("token") String token,
-                                                    @Query("token") String refresh);
+        @GET("urbaAPI/comment/get/")
+        Call<LinkedTreeMap<String, Object>> getComment(@Query("comment_id") String comment_id,
+                                                       @Header("Authorization") String token);
 
-        @GET
-        Call<LinkedTreeMap<String, Object>> me(@Query("token") String token);
+        @GET("urbaAPI/user/refresh/")
+        Call<LinkedTreeMap<String, Object>> refresh(@Query("refresh") String refresh,
+                                                    @Header("Authorization") String token);
+
+        @FormUrlEncoded
+        @POST("urbaAPI/post/create/")
+        Call<LinkedTreeMap<String, Object>> createPostWithoutImage(@Field("title") String title,
+                                                                   @Field("content") String text,
+                                                                   @Field("markx") double markx,
+                                                                   @Field("marky") double marky,
+                                                                   @Header("Authorization") String token);
 
         @Multipart
-        @POST("createPost/")
-        Call<LinkedTreeMap<String, Object>> createPost(@Part("text") String text,
-                                                       @Part("markx") double markx,
-                                                       @Part("marky") double marky,
-                                                       @Part("token") String token,
-                                                       @Part MultipartBody.Part[] imgs);
+        @POST("urbaAPI/post/create/")
+        Call<LinkedTreeMap<String, Object>> createPostWithImage(@Part("title") String title,
+                                                                @Part("content") String text,
+                                                                @Part("markx") double markx,
+                                                                @Part("marky") double marky,
+                                                                @Part MultipartBody.Part[] images,
+                                                                @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @POST("comment/")
-        Call<LinkedTreeMap<String, Object>> comment(@Field("post_id") int post_id,
-                                                    @Field("text") String text,
-                                                    @Field("token") String token);
+        @POST("urbaAPI/comment/create/")
+        Call<LinkedTreeMap<String, Object>> comment(@Field("parent_id") String post_id,
+                                                    @Field("content") String content,
+                                                    @Field("parent") String litera,
+                                                    @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("setLocation/")
-        Call<LinkedTreeMap<String, Object>> setLocation(@Field("location_id") int location_id,
-                                                        @Field("token") String token);
+        @POST("urbaAPI/address/set/")
+        Call<LinkedTreeMap<String, Object>> setLocation(@Field("location_id") String location_id,
+                                                        @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("editUser/")
-        Call<LinkedTreeMap<String, Object>> editUserNickName(@Field("nickName") String nickName,
-                                                             @Field("token") String token);
+        @POST("urbaAPI/user/edit/")
+        Call<LinkedTreeMap<String, Object>> editUserNickName(@Field("nick") String nickName,
+                                                             @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("editUser/")
-        Call<LinkedTreeMap<String, Object>> editUserName(@Field("name") String name,
-                                                         @Field("token") String token);
+        @POST("urbaAPI/user/edit/")
+        Call<LinkedTreeMap<String, Object>> editUserName(@Field("full_name") String name,
+                                                         @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("editUser/")
+        @POST("urbaAPI/user/edit/")
         Call<LinkedTreeMap<String, Object>> editUserPassword(@Field("password") String password,
-                                                             @Field("token") String token);
+                                                             @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("editUser/")
+        @POST("urbaAPI/user/edit/")
         Call<LinkedTreeMap<String, Object>> editUserEmail(@Field("email") String email,
-                                                          @Field("token") String token);
+                                                          @Header("Authorization") String token);
+
+        @FormUrlEncoded
+        @POST("urbaAPI/user/edit/")
+        Call<LinkedTreeMap<String, Object>> editUserPhone(@Field("phone_number") String phone_number,
+                                                          @Header("Authorization") String token);
 
         @Multipart
-        @PUT("editUser/")
-        Call<LinkedTreeMap<String, Object>> editUserProfileImg(@Part MultipartBody.Part[] img,
-                                                               @Part("token") String token);
+        @POST("urbaAPI/user/edit/")
+        Call<LinkedTreeMap<String, Object>> editUserProfileImg(@Part MultipartBody.Part img,
+                                                               @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("postInc/")
-        Call<LinkedTreeMap<String, Object>> postInc(@Field("post_id") int post_id,
-                                                    @Field("token") String token);
+        @POST("urbaAPI/post/rate/increment/")
+        Call<LinkedTreeMap<String, Object>> postInc(@Field("post_id") String post_id,
+                                                    @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("postDec/")
-        Call<LinkedTreeMap<String, Object>> postDec(@Field("post_id") int post_id,
-                                                    @Field("token") String token);
+        @POST("urbaAPI/post/rate/decrement/")
+        Call<LinkedTreeMap<String, Object>> postDec(@Field("post_id") String post_id,
+                                                    @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("commentInc/")
-        Call<LinkedTreeMap<String, Object>> commentInc(@Field("post_id") int post_id,
-                                                       @Field("comment_id") int comment_id,
-                                                       @Field("token") String token);
+        @POST("urbaAPI/comment/rate/increment/")
+        Call<LinkedTreeMap<String, Object>> commentInc(@Field("comment_id") String comment_id,
+                                                       @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("commentDec/")
-        Call<LinkedTreeMap<String, Object>> commentDec(@Field("post_id") int post_id,
-                                                       @Field("comment_id") int comment_id,
-                                                       @Field("token") String token);
+        @POST("urbaAPI/comment/rate/decrement/")
+        Call<LinkedTreeMap<String, Object>> commentDec(@Field("comment_id") String comment_id,
+                                                       @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("postReact/")
-        Call<LinkedTreeMap<String, Object>> postReact(@Field("post_id") int post_id,
+        @POST("urbaAPI/post/reactions/add/")
+        Call<LinkedTreeMap<String, Object>> postReact(@Field("post_id") String post_id,
                                                       @Field("reaction") String reaction,
-                                                      @Field("token") String token);
+                                                      @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("postUnreact/")
-        Call<LinkedTreeMap<String, Object>> postUnreact(@Field("post_id") int post_id,
+        @POST("urbaAPI/post/reactions/remove/")
+        Call<LinkedTreeMap<String, Object>> postUnreact(@Field("post_id") String post_id,
                                                         @Field("reaction") String reaction,
-                                                        @Field("token") String token);
+                                                        @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("commentReact/")
-        Call<LinkedTreeMap<String, Object>> commentReact(@Field("post_id") int post_id,
-                                                         @Field("comment_id") int comment_id,
+        @POST("urbaAPI/comment/reactions/add/")
+        Call<LinkedTreeMap<String, Object>> commentReact(@Field("comment_id") String comment_id,
                                                          @Field("reaction") String reaction,
-                                                         @Field("token") String token);
+                                                         @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("commentUnreact/")
-        Call<LinkedTreeMap<String, Object>> commentUnreact(@Field("post_id") int post_id,
-                                                           @Field("comment_id") int comment_id,
+        @POST("urbaAPI/comment/reactions/remove/")
+        Call<LinkedTreeMap<String, Object>> commentUnreact(@Field("comment_id") String comment_id,
                                                            @Field("reaction") String reaction,
-                                                           @Field("token") String token);
+                                                           @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("deleteComment/")
-        Call<LinkedTreeMap<String, Object>> deleteComment(@Field("post_id") int post_id,
-                                                          @Field("comment_id") int comment_id,
-                                                          @Field("token") String token);
+        @POST("urbaAPI/comment/delete/")
+        Call<LinkedTreeMap<String, Object>> deleteComment(@Field("comment_id") String comment_id,
+                                                          @Header("Authorization") String token);
 
         @FormUrlEncoded
-        @PUT("deletePost/")
-        Call<LinkedTreeMap<String, Object>> deletePost(@Field("post_id") int post_id,
-                                                       @Field("token") String token);
+        @POST("urbaAPI/post/delete/")
+        Call<LinkedTreeMap<String, Object>> deletePost(@Field("post_id") String post_id,
+                                                       @Header("Authorization") String token);
     }
 
     public void refreshToken(MOBAPICallback obj,
@@ -241,17 +250,18 @@ public class MOBServerAPI
         authCall.enqueue(createResponseCallback(obj));
     }
 
+    public void getUserProfile(MOBAPICallback obj,
+                               String token,
+                               String user_id)
+    {
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getUserProfile(user_id, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+
     public void me(MOBAPICallback obj,
                    String token)
     {
-        Call<LinkedTreeMap<String, Object>> meCall = MOBAPI.me(token);
-        meCall.enqueue(createResponseCallback(obj));
-    }
-
-    public void getAddresses(MOBAPICallback obj,
-                             String token)
-    {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getLocations(token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getMe(token);
         call.enqueue(createResponseCallback(obj));
     }
 
@@ -263,7 +273,7 @@ public class MOBServerAPI
     }
 
     public void getPost(MOBAPICallback obj,
-                        int postId,
+                        String postId,
                         String token)
     {
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.getPost(postId, token);
@@ -271,50 +281,73 @@ public class MOBServerAPI
     }
 
     public void getComment(MOBAPICallback obj,
-                           int postId,
-                           int commentId,
-                           boolean ind,
+                           String commentId,
                            String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(postId, commentId, ind, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.getComment(commentId, token);
         call.enqueue(createResponseCallback(obj));
     }
 
     public void post(MOBAPICallback obj,
-                     String text,
+                     String content,
+                     String title,
                      double markX,
                      double markY,
                      List<String> imgPaths,
                      String token)
     {
-
-        MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.size()];
-        for (int i = 0; i < imgPaths.size(); i++)
+        if (imgPaths != null)
         {
-            File file = new File(imgPaths.get(i));
-            imgs[i] =
-                    MultipartBody.Part.createFormData("imgs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+            MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.size()];
+            for (int i = 0; i < imgPaths.size(); i++)
+            {
+                File file = new File(imgPaths.get(i));
+                imgs[i] =
+                        MultipartBody.Part.createFormData("images", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+            }
+            Call<LinkedTreeMap<String, Object>> call =
+                    MOBAPI.createPostWithImage(title, content, markX, markY, imgs, token);
+            call.enqueue(createResponseCallback(obj));
         }
+        else
+        {
+            Call<LinkedTreeMap<String, Object>> call =
+                    MOBAPI.createPostWithoutImage(title, content, markX, markY, token);
+            call.enqueue(createResponseCallback(obj));
+        }
+    }
 
-        Call<LinkedTreeMap<String, Object>> call =
-                MOBAPI.createPost(text, markX, markY, token, imgs);
+    private void comment(MOBAPICallback obj,
+                         String text,
+                         String parentId,
+                         String parent,
+                         String token)
+    {
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.comment(parentId, text, parent, token);
         call.enqueue(createResponseCallback(obj));
     }
 
-    public void comment(MOBAPICallback obj,
-                        String text,
-                        int postId,
-                        String token)
+    public void commentThePost(MOBAPICallback obj,
+                               String text,
+                               String parentId,
+                               String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.comment(postId, text, token);
-        call.enqueue(createResponseCallback(obj));
+        comment(obj, text, parentId, "p", token);
     }
 
-    public void setAddress(MOBAPICallback obj,
-                           int AddressId,
-                           String token)
+    public void commentTheComment(MOBAPICallback obj,
+                                  String text,
+                                  String parentId,
+                                  String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(AddressId, token);
+        comment(obj, text, parentId, "c", token);
+    }
+
+    public void setLocation(MOBAPICallback obj,
+                            String locationId,
+                            String token)
+    {
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.setLocation(locationId, token);
         call.enqueue(createResponseCallback(obj));
     }
 
@@ -323,6 +356,7 @@ public class MOBServerAPI
                          String nick_name,
                          String password,
                          String email,
+                         String phone_number,
                          String new_profile_img_url,
                          String token)
     {
@@ -346,19 +380,23 @@ public class MOBServerAPI
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserEmail(email, token);
             call.enqueue(createResponseCallback(obj));
         }
+        if (phone_number != null)
+        {
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserPhone(phone_number, token);
+            call.enqueue(createResponseCallback(obj));
+        }
         if (new_profile_img_url != null)
         {
-            MultipartBody.Part[] img = new MultipartBody.Part[1];
             File file = new File(new_profile_img_url);
-            img[0] =
-                    MultipartBody.Part.createFormData("imgs", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+            MultipartBody.Part img =
+                    MultipartBody.Part.createFormData("new_profile_img", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserProfileImg(img, token);
             call.enqueue(createResponseCallback(obj));
         }
     }
 
     public void postInc(MOBAPICallback obj,
-                        int postId,
+                        String postId,
                         String token)
     {
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.postInc(postId, token);
@@ -366,7 +404,7 @@ public class MOBServerAPI
     }
 
     public void postDec(MOBAPICallback obj,
-                        int postId,
+                        String postId,
                         String token)
     {
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.postDec(postId, token);
@@ -374,25 +412,23 @@ public class MOBServerAPI
     }
 
     public void commentInc(MOBAPICallback obj,
-                           int postId,
-                           int commentId,
+                           String commentId,
                            String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentInc(postId, commentId, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentInc(commentId, token);
         call.enqueue(createResponseCallback(obj));
     }
 
     public void commentDec(MOBAPICallback obj,
-                           int postId,
-                           int commentId,
+                           String commentId,
                            String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentDec(postId, commentId, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentDec(commentId, token);
         call.enqueue(createResponseCallback(obj));
     }
 
     public void postReact(MOBAPICallback obj,
-                          int postId,
+                          String postId,
                           String reaction,
                           String token)
     {
@@ -401,7 +437,7 @@ public class MOBServerAPI
     }
 
     public void postUnreact(MOBAPICallback obj,
-                            int postId,
+                            String postId,
                             String reaction,
                             String token)
     {
@@ -410,29 +446,26 @@ public class MOBServerAPI
     }
 
     public void commentReact(MOBAPICallback obj,
-                             int postId,
-                             int commentId,
+                             String commentId,
                              String reaction,
                              String token)
     {
-        Call<LinkedTreeMap<String, Object>> call =
-                MOBAPI.commentReact(postId, commentId, reaction, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentReact(commentId, reaction, token);
         call.enqueue(createResponseCallback(obj));
     }
 
     public void commentUnreact(MOBAPICallback obj,
-                               int postId,
-                               int commentId,
+                               String commentId,
                                String reaction,
                                String token)
     {
         Call<LinkedTreeMap<String, Object>> call =
-                MOBAPI.commentUnreact(postId, commentId, reaction, token);
+                MOBAPI.commentUnreact(commentId, reaction, token);
         call.enqueue(createResponseCallback(obj));
     }
 
     public void postDelete(MOBAPICallback obj,
-                           int postId,
+                           String postId,
                            String token)
     {
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.deletePost(postId, token);
@@ -440,11 +473,10 @@ public class MOBServerAPI
     }
 
     public void commentDelete(MOBAPICallback obj,
-                              int postId,
-                              int commentId,
+                              String commentId,
                               String token)
     {
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.deleteComment(postId, commentId, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.deleteComment(commentId, token);
         call.enqueue(createResponseCallback(obj));
     }
 }

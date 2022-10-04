@@ -1,7 +1,6 @@
 package com.example.mobv2.ui.fragments.main;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -21,31 +20,25 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.MapAdapter;
 import com.example.mobv2.adapters.PostsAdapter;
-import com.example.mobv2.callbacks.GetMarksCallback;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.FragmentMainBinding;
-import com.example.mobv2.models.MarkerInfo;
+import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.utils.MapView;
-import com.example.mobv2.utils.MarkerAddition;
 import com.example.mobv2.utils.SimpleTarget;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
+        implements HasToolbar
 {
-    public static final int ZOOM = 16;
-
     private MainFragmentViewModel viewModel;
 
     private Toolbar toolbar;
@@ -114,9 +107,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void setAddress()
     {
-        MainActivity.MOB_SERVER_API.setAddress(new SetAddressCallback(getContext()),
+        MainActivity.MOB_SERVER_API.setLocation(new SetAddressCallback(getContext()),
                 mainActivity.getPrivatePreferences()
-                            .getInt(MainActivity.ADDRESS_ID_KEY, -1), MainActivity.token);
+                            .getString(MainActivity.ADDRESS_ID_KEY, ""), MainActivity.token);
     }
 
     private void initViewModel()
@@ -124,7 +117,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         viewModel = new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
     }
 
-    protected void initToolbar()
+    public void initToolbar()
     {
         toolbar = binding.toolbar;
         super.initToolbar(toolbar, "", v -> navDrawer.open());
@@ -183,9 +176,11 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(mainActivity, binding.framePosts));
+        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(mainActivity, binding.framePosts, binding.bottomAppbarLayout));
 
-        sheetBehavior.setPeekHeight(200);
+        sheetBehavior.setPeekHeight(mainActivity.getWindow()
+                                                .getDecorView()
+                                                .getHeight() / 6);
         sheetBehavior.setHalfExpandedRatio(0.5f);
 
         postsToolbar.setOnMenuItemClickListener(item ->
@@ -211,33 +206,8 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private void onMapReady(@NonNull GoogleMap googleMap)
     {
         mapView = new MapView(googleMap);
-
-        Float[] addressCoordinates = new Float[2];
-        boolean possible = getAddressCoordinates(addressCoordinates);
-        if (possible)
-        {
-            mapAdapter =
-                    new MapAdapter(mainActivity, new ArrayList<>(), new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecycler));
-            mapView.setAdapter(mapAdapter);
-
-            // add address marker
-            String addressTitle = mainActivity.getPrivatePreferences()
-                                              .getString(MainActivity.ADDRESS_FULL_KEY, "");
-            mapAdapter.addMarker(new MarkerAddition(addressTitle, addressCoordinates[0], addressCoordinates[1]).create(), MarkerInfo.ADDRESS_MARKER);
-
-            // add other markers
-            MainActivity.MOB_SERVER_API.getMarks(new GetMarksCallback(mainActivity, mapAdapter), MainActivity.token);
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(addressCoordinates[0], addressCoordinates[1]), ZOOM));
-        }
-    }
-
-    @NonNull
-    private Boolean getAddressCoordinates(@NonNull Float[] coordinates)
-    {
-        SharedPreferences preferences = mainActivity.getPrivatePreferences();
-        coordinates[0] = preferences.getFloat(MainActivity.ADDRESS_X_KEY, -1);
-        coordinates[1] = preferences.getFloat(MainActivity.ADDRESS_Y_KEY, -1);
-
-        return coordinates[0] > 0 && coordinates[1] > 0;
+        mapAdapter =
+                new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecycler));
+        mapView.setAdapter(mapAdapter);
     }
 }

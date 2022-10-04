@@ -1,6 +1,7 @@
 package com.example.mobv2.ui.fragments.comments;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +22,11 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.CommentsAdapter;
 import com.example.mobv2.adapters.ImagesAdapter;
 import com.example.mobv2.callbacks.CommentCallback;
-import com.example.mobv2.callbacks.GetCommentCallback;
 import com.example.mobv2.databinding.FragmentCommentsBinding;
+import com.example.mobv2.models.Comment;
 import com.example.mobv2.models.Image;
 import com.example.mobv2.models.Post;
+import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.utils.SimpleTextWatcher;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
+        implements HasToolbar
 {
     private CommentsFragmentViewModel viewModel;
 
@@ -87,7 +90,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
     }
 
-    protected void initToolbar()
+    public void initToolbar()
     {
         toolbar = binding.toolbar;
         var post = viewModel.getPostItem()
@@ -110,27 +113,26 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         itemPost.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
 
 //        itemPost.appreciationUpButton.setOnClickListener(view -> onAppreciationUpClick(view, position));
-        itemPost.appreciationsCountView.setText(String.valueOf(post.getAppreciationsCount()));
+//        itemPost.appreciationsCountView.setText(String.valueOf(post.getAppreciationsCount()));
 //        itemPost.appreciationDownButton.setOnClickListener(this::onAppreciationDownClick);
         itemPost.appreciationUpButton.setSelected(false);
 //        itemPost.appreciationUpButton.getDrawable().setTint(0);
         itemPost.appreciationDownButton.setSelected(false);
 //        itemPost.appreciationDownButton.getDrawable().setTint(0);
-        if (post.getAppreciated() == 1)
-        {
-            itemPost.appreciationUpButton.setSelected(true);
-            itemPost.appreciationUpButton.getButtonDrawable()
-                                       .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
-        }
-        else if (post.getAppreciated() == 0)
-        {
-            itemPost.appreciationDownButton.setSelected(true);
-            itemPost.appreciationDownButton.getButtonDrawable()
-                                         .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
-        }
+//        if (post.getAppreciated() == 1)
+//        {
+//            itemPost.appreciationUpButton.setSelected(true);
+//            itemPost.appreciationUpButton.getButtonDrawable()
+//                                       .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
+//        }
+//        else if (post.getAppreciated() == 0)
+//        {
+//            itemPost.appreciationDownButton.setSelected(true);
+//            itemPost.appreciationDownButton.getButtonDrawable()
+//                                         .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
+//        }
 
-        itemPost.showReactionsView.setOnClickListener(view -> viewModel.getPostItem()
-                                                                       .onShowReactionsViewClick(itemPost.reactionsView));
+        itemPost.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(itemPost.reactionsView));
 
         Pair<TextView, RecyclerView> content =
                 new Pair<>(itemPost.postTextView, itemPost.postImagesView);
@@ -141,6 +143,13 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
                                                    .getReactionsAdapter());
 
         itemPost.commentView.setVisibility(View.GONE);
+    }
+
+    private void onShowReactionsViewClick(View view)
+    {
+        view.setVisibility(view.getVisibility() == View.GONE
+                ? View.VISIBLE
+                : View.GONE);
     }
 
     private void initPostContent(@NonNull Pair<TextView, RecyclerView> content)
@@ -164,7 +173,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
                     images.add(new Image("", url, Image.IMAGE_ONLINE));
                 }
                 ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
+                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3),
+                        StaggeredGridLayoutManager.VERTICAL));
                 content.second.setAdapter(adapter);
                 break;
         }
@@ -175,15 +185,17 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         commentsRecycler = binding.commentsRecycler;
         commentsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         commentsAdapter = new CommentsAdapter(mainActivity, viewModel.getPostItem()
-                                                                     .getPost(), new ArrayList<>());
+                                                                     .getPost());
         commentsRecycler.setAdapter(commentsAdapter);
 
-        var post = viewModel.getPostItem()
-                            .getPost();
-        for (int i = 0; i < viewModel.getCommentsCount(); i++)
-        {
-            MainActivity.MOB_SERVER_API.getComment(new GetCommentCallback(mainActivity, commentsRecycler, true), post.getId(), i, true, MainActivity.token);
-        }
+//        var post = viewModel.getPostItem()
+//                            .getPost();
+//
+//        for (String commentId : post.getCommentsIds())
+//        {
+//            MainActivity.MOB_SERVER_API.getComment(new GetCommentCallback(mainActivity, commentsRecycler),
+//                    commentId, MainActivity.token);
+//        }
     }
 
     private void initMessageView()
@@ -221,15 +233,35 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         sendButton.setEnabled(false);
         sendButton.getDrawable()
                   .setTint(getResources().getColor(R.color.gray_200));
-        sendButton.setOnClickListener(v ->
-        {
-            var post = viewModel.getPostItem()
-                                .getPost();
-            var messageText = messageView.getText();
-            MainActivity.MOB_SERVER_API.comment(new CommentCallback(mainActivity, commentsRecycler, post.getId()), messageText.toString(), post.getId(), MainActivity.token);
-            messageText.clear();
-        });
+        sendButton.setOnClickListener(this::onSendButtonClick);
     }
 
+    private void onSendButtonClick(View view)
+    {
+        var post = viewModel.getPostItem()
+                            .getPost();
+        var messageText = messageView.getText();
+        MainActivity.MOB_SERVER_API.commentThePost(new CommentCallback(mainActivity, this::createComment),
+                messageText.toString(), post.getId(), MainActivity.token);
+    }
 
+    private void createComment(String commentId)
+    {
+        var post = viewModel.getPostItem()
+                            .getPost();
+        Editable messageText = messageView.getText();
+
+        Comment comment =
+                Comment.createNewComment(commentId, post.getUser(), messageText.toString());
+        commentsAdapter.addComment(comment);
+        post.getCommentsIds()
+            .add(commentId);
+
+        messageText.clear();
+    }
+
+    public interface Callback
+    {
+        void createComment(String commentId);
+    }
 }

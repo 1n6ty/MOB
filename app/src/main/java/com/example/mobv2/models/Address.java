@@ -2,51 +2,90 @@ package com.example.mobv2.models;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.internal.LinkedTreeMap;
+import com.example.mobv2.utils.abstractions.ParsableFromMap;
+
+import java.util.Map;
 
 public class Address
 {
-    private final int id;
+    public static final String WITHOUT_ID = "-1";
+
+    private final String id;
 
     private final String country;
     private final String city;
     private final String street;
     private final int house;
-    private final double x;
-    private final double y;
 
-    public Address(int id,
-                   String country,
+    public Address(String country,
                    String city,
                    String street,
-                   int house,
-                   double x,
-                   double y)
+                   int house)
+    {
+        id = WITHOUT_ID;
+        this.country = country;
+        this.city = city;
+        this.street = street;
+        this.house = house;
+    }
+
+    private Address(String id,
+                    String country,
+                    String city,
+                    String street,
+                    int house)
     {
         this.id = id;
         this.country = country;
         this.city = city;
         this.street = street;
         this.house = house;
-        this.x = x;
-        this.y = y;
     }
 
-    public static Address parseFromMap(LinkedTreeMap<String, Object> map)
+    public static class AddressBuilder implements ParsableFromMap<Address>
     {
-        if (map == null)
-            return null;
+        private String id;
+        private String country;
+        private String city;
+        private String street;
+        private int house;
 
-        int id = ((Double) map.get("id")).intValue();
+        public Address parseFromString(String addressString)
+        {
+            String[] addressStrings = addressString.split(", ");
 
-        var country = (String) map.get("country");
-        var city = (String) map.get("city");
-        var street = (String) map.get("street");
-        var house = ((Double) map.get("house")).intValue();
-        var x = (double) map.get("x");
-        var y = (double) map.get("y");
+            country = addressStrings[0];
+            city = addressStrings[1];
+            street = addressStrings[2];
+            house = Integer.parseInt(addressStrings[3]);
 
-        return new Address(id, country, city, street, house, x, y);
+            return new Address(country, city, street, house);
+        }
+
+        @Override
+        public Address parseFromMap(Map<String, Object> map)
+        {
+            if (map == null)
+                return null;
+
+            parseIdFromMap(map);
+            parseFullInfoFromMap(map);
+
+            return new Address(id, country, city, street, house);
+        }
+
+        private void parseIdFromMap(Map<String, Object> map)
+        {
+            id = String.valueOf(((Double) map.get("id")).intValue());
+        }
+
+        private void parseFullInfoFromMap(Map<String, Object> map)
+        {
+            country = (String) map.get("country");
+            city = (String) map.get("city");
+            street = (String) map.get("street");
+            house = ((Double) map.get("house")).intValue();
+        }
     }
 
     @NonNull
@@ -56,7 +95,7 @@ public class Address
         return getPrimary() + ", " + getSecondary();
     }
 
-    public int getId()
+    public String getId()
     {
         return id;
     }
@@ -89,15 +128,5 @@ public class Address
     public int getHouse()
     {
         return house;
-    }
-
-    public double getX()
-    {
-        return x;
-    }
-
-    public double getY()
-    {
-        return y;
     }
 }

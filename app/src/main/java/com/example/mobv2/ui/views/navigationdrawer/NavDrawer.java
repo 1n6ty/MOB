@@ -51,7 +51,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     private void initNavigationView()
     {
         navigationView = mainActivity.findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+        navigationView.setNavigationItemSelectedListener(this);
 
         headerView = navigationView.getHeaderView(0);
 

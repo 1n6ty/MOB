@@ -10,6 +10,18 @@ public class MarkerAddition
     private final LatLng position;
     private final BitmapDescriptor descriptor;
 
+    public MarkerAddition(double latitude,
+                          double longitude)
+    {
+        this("", latitude, longitude);
+    }
+
+    public MarkerAddition(String title,
+                          LatLng latLng)
+    {
+        this(title, latLng.latitude, latLng.longitude, null);
+    }
+
     public MarkerAddition(String title,
                           double latitude,
                           double longitude)

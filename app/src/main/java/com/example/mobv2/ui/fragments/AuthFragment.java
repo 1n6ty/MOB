@@ -11,9 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.mobv2.R;
+import com.example.mobv2.callbacks.AuthCallback;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.callbacks.AuthCallback;
 import com.example.mobv2.ui.fragments.main.MainFragment;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding>
@@ -101,11 +101,5 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
 
         // unnecessary
         binding.skipAuthButton.setOnClickListener(v -> mainActivity.replaceFragment(new MainFragment()));
-    }
-
-    @Override
-    protected void initToolbar()
-    {
-        // there is no toolbar
     }
 }

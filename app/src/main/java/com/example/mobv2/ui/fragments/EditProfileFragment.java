@@ -10,12 +10,14 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
+import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
+        implements HasToolbar
 {
     private Toolbar toolbar;
 
@@ -37,8 +39,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         initSettingsAddressesView();
     }
 
-    @Override
-    protected void initToolbar()
+    public void initToolbar()
     {
         toolbar = binding.toolbar;
 
@@ -53,7 +54,9 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
             return;
         }
 
-        Glide.with(this).load(url).into(binding.avatarView);
+        Glide.with(this)
+             .load(url)
+             .into(binding.avatarView);
 
         super.initToolbar(toolbar, mainActivity.getPrivatePreferences()
                                                .getString(MainActivity.USER_FULLNAME_KEY, ""));

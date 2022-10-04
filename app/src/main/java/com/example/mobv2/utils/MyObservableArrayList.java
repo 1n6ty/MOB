@@ -1,18 +1,28 @@
 package com.example.mobv2.utils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class MyObservableArrayList<T> extends ArrayList<T>
 {
     private OnListChangedCallback<T> callback;
 
+    public MyObservableArrayList()
+    {
+    }
+
+    public MyObservableArrayList(@NonNull Collection<? extends T> c)
+    {
+        super(c);
+    }
+
     public void setOnListChangedCallback(OnListChangedCallback<T> callback)
     {
         this.callback = callback;
     }
-
 
     @Override
     public boolean add(T t)

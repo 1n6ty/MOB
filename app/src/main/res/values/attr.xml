@@ -6,6 +6,9 @@
     <attr name="colorToolbarIcon" format="color" />
     <attr name="backgroundMainToolbar" format="color" />
     <attr name="colorMainToolbarTitle" format="color" />
+    <attr name="colorMarkerCreatorToolbarTitle"  format="color" />
+    <attr name="colorMarkerCreatorToolbarSubtitle" format="color" />
+    <attr name="colorMarkerCreatorToolbarIcon" format="color" />
     <attr name="backgroundPopupMenu" format="color" />
     <attr name="colorPopupMenuIcon" format="color" />
     <attr name="colorPopupMenuText" format="color" />

@@ -1,10 +1,12 @@
 package com.example.mobv2.models;
 
+import com.example.mobv2.utils.abstractions.ParsableFromMap;
+
 import java.util.Map;
 
 public class User
 {
-    private final int id;
+    private final String id;
 
     private final String avatarUrl;
     private final String nickName;
@@ -13,16 +15,7 @@ public class User
     private final String email;
     private final String phoneNumber;
 
-    public User(int id,
-                String avatarUrl,
-                String name,
-                String surname,
-                String phoneNumber)
-    {
-        this(id, avatarUrl, null, name, surname, null, phoneNumber);
-    }
-
-    public User(int id,
+    private User(String id,
                 String avatarUrl,
                 String nickName,
                 String name,
@@ -39,25 +32,67 @@ public class User
         this.phoneNumber = phoneNumber;
     }
 
-    public static User parseFromMap(Map<String, Object> map)
+    public static class UserBuilder implements ParsableFromMap<User>
     {
-        if (map == null)
-            return null;
+        private String id;
 
-        int id = ((Double) map.get("id")).intValue();
+        private String avatarUrl;
+        private String nickName;
+        private String name;
+        private String surname;
+        private String email;
+        private String phoneNumber;
 
-       var avatarUrl = (String) map.get("profile_img_url");
-       var nickName = (String) map.get("nick_name");
-       var fullName = ((String) map.get("name")).split(" ");
-       var name = fullName[0];
-       var surname = fullName.length > 1 ? fullName[1] : "";
-       var email = (String) map.get("email");
-       var phoneNumber = (String) map.get("phone_number");
+        @Override
+        public User parseFromMap(Map<String, Object> map)
+        {
+            if (map == null)
+                return null;
 
-        return new User(id, avatarUrl, nickName, name, surname, email, phoneNumber);
+            parseIdFromMap(map);
+            parseAvatarUrlFromMap(map);
+            parseNickNameFromMap(map);
+            parseFullNameFromMap(map);
+            parseEmailFromMap(map);
+            parsePhoneNumberFromMap(map);
+
+            return new User(id, avatarUrl, nickName, name, surname, email, phoneNumber);
+        }
+
+        private void parseIdFromMap(Map<String, Object> map)
+        {
+            id = String.valueOf(((Double)map.get("id")).intValue());
+        }
+
+        private void parseAvatarUrlFromMap(Map<String, Object> map)
+        {
+            avatarUrl = (String) map.get("profile_img_url");
+        }
+
+        private void parseNickNameFromMap(Map<String, Object> map)
+        {
+            nickName = (String) map.get("nick");
+        }
+
+        private void parseFullNameFromMap(Map<String, Object> map)
+        {
+            var fullName = ((String) map.get("full_name")).split(" ");
+            name = fullName[0];
+            surname = fullName.length > 1 ? fullName[1] : "";
+        }
+
+        private void parseEmailFromMap(Map<String, Object> map)
+        {
+            email = (String) map.get("email");
+        }
+
+        private void parsePhoneNumberFromMap(Map<String, Object> map)
+        {
+            phoneNumber = (String) map.get("phone_number");
+        }
     }
 
-    public int getId()
+    public String getId()
     {
         return id;
     }

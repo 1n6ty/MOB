@@ -19,9 +19,11 @@ import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
+import com.example.mobv2.ui.abstractions.Updatable;
 import com.example.mobv2.ui.activities.MainActivity;
 
 public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
+    implements Updatable
 {
     protected MainActivity mainActivity;
     protected T binding;
@@ -68,8 +70,6 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
         }
         window.setNavigationBarColor(color);
     }
-
-    protected abstract void initToolbar();
 
     protected void initToolbar(Toolbar toolbar,
                                String title)

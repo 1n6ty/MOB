@@ -34,7 +34,7 @@
                 android:layout_marginTop="@dimen/toolbar_rest_margin_top"
                 app:navigationIcon="@drawable/ic_arrow"
                 app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
-                app:subtitle="@{@string/comments_message + ' ' + bindingContext.commentsCount}" />
+                app:subtitle="@{@string/comments_count + ' ' + bindingContext.postItem.post.commentsCount}" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
@@ -102,7 +102,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/horizontal_small_margin"
                 android:fitsSystemWindows="true"
-                android:hint="@string/comments_message"
+                android:hint="@string/comments_count"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 app:layout_constraintBottom_toBottomOf="parent"

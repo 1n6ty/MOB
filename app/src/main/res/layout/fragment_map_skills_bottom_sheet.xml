@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundPrimaryWindow">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?backgroundSecondaryWindow"
+            app:elevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                style="@style/markerCreatorToolbarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginTop="@dimen/vertical_margin"
+                app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?backgroundSecondaryWindow"
+            android:orientation="vertical"
+            android:paddingVertical="@dimen/vertical_margin"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/create_sub_address_marker_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="Create sub address marker"
+                android:textAppearance="@style/settingsItemHeaderTextStyle"
+                app:cornerRadius="0dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/create_address_marker_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="Create address marker"
+                android:textAppearance="@style/settingsItemHeaderTextStyle"
+                app:cornerRadius="0dp" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
