@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.ReactionAdapter;
+import com.example.mobv2.adapters.abstractions.ReactionsAdapter;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.models.Reaction;
 import com.example.mobv2.ui.activities.MainActivity;
@@ -17,11 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdapter.ReactionViewHolder>
-        implements ReactionAdapter
+        implements ReactionsAdapter
 {
     private final MainActivity mainActivity;
     private final List<Reaction> reactions;
-
     private final String postId;
 
     public ReactionsPostAdapter(MainActivity mainActivity,
@@ -30,7 +29,6 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
     {
         this.mainActivity = mainActivity;
         this.reactions = reactions;
-
         this.postId = postId;
     }
 

@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,17 +42,18 @@ import java.util.List;
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
 {
     private final MainActivity mainActivity;
-    private final MapAdapter mapAdapter;
+    private final MapAdapter.MapAdapterCallback callback;
 
     private final List<Post> posts;
 
     // TODO destroy the mapAdapter from this side
     public PostsAdapter(MainActivity mainActivity,
-                        MapAdapter mapAdapter)
+                        MapAdapter.MapAdapterCallback callback)
     {
         this.mainActivity = mainActivity;
-        this.mapAdapter = mapAdapter;
-        this.posts = new ArrayList<>();
+        this.callback = callback;
+
+        posts = new ArrayList<>();
     }
 
     @NonNull
@@ -87,8 +89,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         var post = posts.get(position);
         var user = post.getUser();
 
-        holder.binding.setCommentsCount(post.getCommentsCount());
-        holder.binding.setAppreciationsCount(post.getAppreciationsCount());
+        holder.setCommentsCount(post.getCommentsCount());
+        holder.setAppreciationsCount(post.getAppreciationsCount());
 
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
 
@@ -107,14 +109,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.reactionsView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         holder.reactionsView.setAdapter(reactionsAdapter);
 
-        holder.commentView.setOnClickListener(view ->
-        {
-            var postItem = new PostItem(post, reactionsAdapter);
-            var viewModel =
-                    new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
-            viewModel.setPostItem(postItem);
-            mainActivity.goToFragment(new CommentsFragment());
-        });
+        holder.commentView.setOnClickListener(view -> onCommentViewClick(view, post, reactionsAdapter));
     }
 
     private void onShowReactionsViewClick(View view)
@@ -122,6 +117,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         view.setVisibility(view.getVisibility() == View.GONE
                 ? View.VISIBLE
                 : View.GONE);
+    }
+
+    private void onCommentViewClick(View view,
+                                    Post post,
+                                    ReactionsPostAdapter reactionsAdapter)
+    {
+        var postItem = new PostItem(post, reactionsAdapter);
+        var viewModel =
+                new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
+        viewModel.setPostItem(postItem);
+        mainActivity.goToFragment(new CommentsFragment());
     }
 
     public void addPost(Post post)
@@ -320,7 +326,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     {
         Post post = posts.get(position);
 
-        mapAdapter.removeMarkerByPostId(post.getId());
+        callback.removeMarkerByPostId(post.getId());
         posts.remove(post);
         notifyItemRemoved(position);
 
@@ -373,15 +379,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             commentsCountView = binding.commentsCountView;
         }
 
-//        private void setCommentsCount(ObservableInt count)
-//        {
-//            binding.setCommentsCount(count);
-//        }
-//
-//        private void setAppreciationsCount(ObservableInt count)
-//        {
-//            binding.setAppreciationsCount(count);
-//        }
+        private void setCommentsCount(ObservableInt count)
+        {
+            binding.setCommentsCount(count);
+        }
+
+        private void setAppreciationsCount(ObservableInt count)
+        {
+            binding.setAppreciationsCount(count);
+        }
     }
 
     public static class PostItem

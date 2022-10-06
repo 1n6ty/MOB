@@ -6,10 +6,8 @@ import com.example.mobv2.adapters.MapAdapter;
 import com.example.mobv2.models.MarkerInfo;
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.utils.MarkerAddition;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
-
-import java.util.HashMap;
 
 public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
 {
@@ -34,9 +32,10 @@ public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
             var mark = (LinkedTreeMap<String, Double>) postWithMarkMap.get("mark");
             double x = mark.get("x");
             double y = mark.get("y");
-            HashMap<String, Object> metadata = new HashMap<>();
-            metadata.put("post_id", Integer.valueOf(postId));
-            mapAdapter.addMarker(new MarkerAddition("The mark", x, y).create(), MarkerInfo.SUB_ADDRESS_MARKER, metadata);
+            MarkerInfo markerInfo =
+                    new MarkerInfo("The mark", new LatLng(x, y), MarkerInfo.SUB_ADDRESS_MARKER);
+            markerInfo.getMetadata().put("post_id", Integer.valueOf(postId));
+            mapAdapter.addMarker(markerInfo);
         }
     }
 

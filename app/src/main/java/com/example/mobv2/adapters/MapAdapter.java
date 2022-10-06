@@ -24,10 +24,8 @@ import com.example.mobv2.utils.MapView;
 import com.example.mobv2.utils.MarkerAddition;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -69,9 +67,7 @@ public class MapAdapter extends MapView.Adapter
     {
         this.googleMap = googleMap;
 
-        googleMap.setOnMarkerClickListener(this::onMarkerClick);
-        googleMap.setOnMapClickListener(latLng -> onMapClick());
-        googleMap.setOnMapLongClickListener(this::onMapLongClick);
+        setGoogleMapListeners(googleMap);
 
         Toolbar postsToolbar = markersAdapterHelper.postsToolbar;
         postsToolbar.setNavigationOnClickListener(view -> onMapClick());
@@ -88,50 +84,45 @@ public class MapAdapter extends MapView.Adapter
                                            .getString(MainActivity.ADDRESS_FULL_KEY, "");
 
         if (addressString.isEmpty()) return;
-
         LatLng addressLatLng =
                 getLatLngByAddress(new Address.AddressBuilder().parseFromString(addressString));
         // add address marker
-        addMarker(new MarkerAddition(addressString, addressLatLng).create(), MarkerInfo.ADDRESS_MARKER);
+        addMarker(new MarkerInfo(addressString, addressLatLng, MarkerInfo.ADDRESS_MARKER));
 
         // add other markers
         MainActivity.MOB_SERVER_API.getMarks(new GetMarksCallback(mainActivity, this), MainActivity.token);
         animateCameraTo(addressLatLng);
     }
 
+    private void setGoogleMapListeners(GoogleMap googleMap)
+    {
+        googleMap.setOnMarkerClickListener(this::onMarkerClick);
+        googleMap.setOnMapClickListener(latLng -> onMapClick());
+        googleMap.setOnMapLongClickListener(this::onMapLongClick);
+    }
+
     @Override
-    public void onBindMarker(int position)
+    public void onBindMarker(Marker marker,
+                             int position)
     {
         MarkerInfo markerInfo = markerInfoList.get(position);
 
-        switch (markerInfo.getMarkerCondition())
+        markerInfo.setId(marker.getId());
+
+        marker.setTitle(markerInfo.getTitle());
+        marker.setPosition(markerInfo.getPosition());
+        marker.setTag(markerInfo.getTag());
+
+        int drawableId;
+        if (markerInfo.isClicked())
         {
-            case MarkerInfo.MARKER_NOT_CLICKED:
-                int drawableId = drawableIds[markerInfo.getMarkerType()][0];
-                BitmapDescriptor icon =
-                        BitmapConverter.drawableToBitmapDescriptor(mainActivity.getResources(), drawableId);
-                markerInfo.getMarker()
-                          .setIcon(icon);
-                break;
-            case MarkerInfo.MARKER_CLICKED:
-                drawableId = drawableIds[markerInfo.getMarkerType()][1];
-                icon =
-                        BitmapConverter.drawableToBitmapDescriptor(mainActivity.getResources(), drawableId);
-                markerInfo.getMarker()
-                          .setIcon(icon);
-                break;
-            case MarkerInfo.MARKER_ADDED:
-                drawableId = drawableIds[markerInfo.getMarkerType()][0];
-                icon =
-                        BitmapConverter.drawableToBitmapDescriptor(mainActivity.getResources(), drawableId);
-                markerInfo.getMarker()
-                          .setIcon(icon);
-                break;
-            case MarkerInfo.MARKER_REMOVED:
-                markerInfo.getMarker()
-                          .remove();
-                break;
+            drawableId = drawableIds[markerInfo.getMarkerType()][1];
         }
+        else
+        {
+            drawableId = drawableIds[markerInfo.getMarkerType()][0];
+        }
+        marker.setIcon(BitmapConverter.drawableToBitmapDescriptor(mainActivity.getResources(), drawableId));
     }
 
     private void onMapClick()
@@ -170,15 +161,12 @@ public class MapAdapter extends MapView.Adapter
                 int postId = ((Double) response.get("id")).intValue();
                 double x = latLng.latitude;
                 double y = latLng.longitude;
-                Marker marker =
-                        googleMap.addMarker(new MarkerAddition("The mark", x, y).create());
                 MarkerInfo markerInfo =
-                        new MarkerInfo(marker, MarkerInfo.SUB_ADDRESS_MARKER);
+                        new MarkerInfo("The mark", new LatLng(x, y), MarkerInfo.SUB_ADDRESS_MARKER);
                 markerInfo.getMetadata()
                           .put("post_id", postId);
                 markerInfoList.add(markerInfo);
-                markerInfo.setMarkerCondition(MarkerInfo.MARKER_ADDED);
-                notifyItemChanged(markerInfoList.size() - 1);
+                notifyItemInserted(markerInfoList.size() - 1);
             }
 
             @Override
@@ -195,105 +183,6 @@ public class MapAdapter extends MapView.Adapter
         Address address = getAddressByLatLng(latLng);
 
         markerCreatorViewModel.setAddress(address);
-    }
-
-    private void animateCameraTo(@NonNull LatLng latLng)
-    {
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM));
-    }
-
-    private boolean onMarkerClick(Marker marker)
-    {
-        deselectClickedMarker();
-
-        for (int i = 0, markersSize = markerInfoList.size(); i < markersSize; i++)
-        {
-            MarkerInfo markerInfo = markerInfoList.get(i);
-            if (markerInfo.getMarker()
-                          .getId()
-                          .equals(marker.getId()))
-            {
-                this.markerInfo = markerInfo;
-                markerInfo.setMarkerCondition(MarkerInfo.MARKER_CLICKED);
-                refreshPostsRecycler();
-                refreshPosts();
-                animateCameraTo(markerInfo.getMarker()
-                                          .getPosition());
-                notifyItemChanged(i);
-                break;
-            }
-        }
-
-        return true;
-    }
-
-    private void refreshPostsRecycler()
-    {
-        if (markerInfo == null) return;
-
-        markersAdapterHelper.postsRecycler.setLayoutManager(new LinearLayoutManager(mainActivity));
-        var postsAdapter = new PostsAdapter(mainActivity, this);
-        markersAdapterHelper.postsRecycler.setAdapter(postsAdapter);
-
-        if (markerInfo.getMarkerType() == MarkerInfo.ADDRESS_MARKER)
-        {
-            for (var markerInfoItem : markerInfoList)
-            {
-                if (markerInfoItem.getMarkerType() == MarkerInfo.SUB_ADDRESS_MARKER)
-                {
-                    MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler), String.valueOf(markerInfoItem.getMetadata()
-                                                                                                                                              .get("post_id")), MainActivity.token);
-                }
-            }
-        }
-        else if (markerInfo.getMarkerType() == MarkerInfo.SUB_ADDRESS_MARKER)
-        {
-            MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler), String.valueOf(markerInfo.getMetadata()
-                                                                                                                                  .get("post_id")), MainActivity.token);
-        }
-    }
-
-    private void refreshPosts()
-    {
-        if (markerInfo == null) return;
-
-        markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-
-        final boolean isAddressMarker =
-                markerInfo.getMarkerType() == MarkerInfo.ADDRESS_MARKER;
-        Menu postsToolbarMenu = markersAdapterHelper.postsToolbar.getMenu();
-        postsToolbarMenu.findItem(R.id.menu_posts_reverse)
-                        .setVisible(isAddressMarker);
-        postsToolbarMenu.findItem(R.id.menu_show_more)
-                        .setVisible(isAddressMarker);
-    }
-
-    private void deselectClickedMarker()
-    {
-        if (markerInfo != null && markerInfo.getMarkerCondition() == MarkerInfo.MARKER_CLICKED)
-        {
-            markerInfo.setMarkerCondition(MarkerInfo.MARKER_NOT_CLICKED);
-            notifyItemChanged(markerInfoList.indexOf(markerInfo));
-        }
-    }
-
-    private LatLng getLatLngByAddress(Address address)
-    {
-        LatLng latLng = null;
-        try
-        {
-            Geocoder geocoder = new Geocoder(mainActivity, LOCALE);
-            android.location.Address mapAddress =
-                    geocoder.getFromLocationName(address.toString(), 1)
-                            .get(0);
-            latLng = new LatLng(mapAddress.getLatitude(), mapAddress.getLongitude());
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        return latLng;
     }
 
     private Address getAddressByLatLng(@NonNull LatLng latLng)
@@ -319,34 +208,110 @@ public class MapAdapter extends MapView.Adapter
         return address;
     }
 
+    private void animateCameraTo(@NonNull LatLng latLng)
+    {
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM));
+    }
+
+    private boolean onMarkerClick(Marker marker)
+    {
+        deselectClickedMarker();
+
+        for (int i = 0, markersSize = markerInfoList.size(); i < markersSize; i++)
+        {
+            MarkerInfo markerInfo = markerInfoList.get(i);
+            if (markerInfo.getId()
+                          .equals(marker.getId()))
+            {
+                this.markerInfo = markerInfo;
+                refreshPostsRecycler();
+                refreshPosts();
+                markerInfo.setClicked(true);
+                animateCameraTo(markerInfo.getPosition());
+                notifyItemChanged(i);
+                break;
+            }
+        }
+
+        return true;
+    }
+
+    private void deselectClickedMarker()
+    {
+        if (markerInfo != null && markerInfo.isClicked())
+        {
+            markerInfo.setClicked(false);
+            notifyItemChanged(markerInfoList.indexOf(markerInfo));
+        }
+    }
+
+    private void refreshPostsRecycler()
+    {
+        if (markerInfo == null) return;
+
+        markersAdapterHelper.postsRecycler.setLayoutManager(new LinearLayoutManager(mainActivity));
+        var postsAdapter = new PostsAdapter(mainActivity, this::removeMarkerByPostId);
+        markersAdapterHelper.postsRecycler.setAdapter(postsAdapter);
+
+        switch (markerInfo.getMarkerType())
+        {
+            case MarkerInfo.ADDRESS_MARKER:
+                for (var markerInfoItem : markerInfoList)
+                {
+                    if (markerInfoItem.getMarkerType() == MarkerInfo.SUB_ADDRESS_MARKER)
+                    {
+                        MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler),
+                                String.valueOf(markerInfoItem.getMetadata()
+                                                             .get("post_id")), MainActivity.token);
+                    }
+                }
+                break;
+            case MarkerInfo.SUB_ADDRESS_MARKER:
+                MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler),
+                        String.valueOf(markerInfo.getMetadata()
+                                                 .get("post_id")), MainActivity.token);
+                break;
+        }
+    }
+
+    private void refreshPosts()
+    {
+        if (markerInfo == null) return;
+
+        markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+
+        final boolean isAddressMarker =
+                markerInfo.getMarkerType() == MarkerInfo.ADDRESS_MARKER;
+        Menu postsToolbarMenu = markersAdapterHelper.postsToolbar.getMenu();
+        postsToolbarMenu.findItem(R.id.menu_posts_reverse)
+                        .setVisible(isAddressMarker);
+        postsToolbarMenu.findItem(R.id.menu_show_more)
+                        .setVisible(isAddressMarker);
+    }
+
+    private LatLng getLatLngByAddress(Address address)
+    {
+        LatLng latLng = null;
+        try
+        {
+            Geocoder geocoder = new Geocoder(mainActivity, LOCALE);
+            android.location.Address mapAddress =
+                    geocoder.getFromLocationName(address.toString(), 1)
+                            .get(0);
+            latLng = new LatLng(mapAddress.getLatitude(), mapAddress.getLongitude());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return latLng;
+    }
+
     public void addMarker(MarkerInfo markerInfo)
     {
-        Marker marker = markerInfo.getMarker();
-        googleMap.addMarker(new MarkerAddition(marker.getTitle(), marker.getPosition().latitude, marker.getPosition().longitude).create());
-        markerInfo.setMarkerCondition(MarkerInfo.MARKER_ADDED);
         markerInfoList.add(markerInfo);
-        notifyItemChanged(markerInfoList.indexOf(markerInfo));
-    }
-
-    public void addMarker(MarkerOptions markerOptions,
-                          int markerType)
-    {
-        addMarker(markerOptions, markerType, null);
-    }
-
-    public void addMarker(MarkerOptions markerOptions,
-                          int markerType,
-                          Map<String, Object> metadata)
-    {
-        Marker marker = googleMap.addMarker(markerOptions);
-        MarkerInfo markerInfo = new MarkerInfo(marker, markerType);
-
-        if (metadata != null)
-            markerInfo.getMetadata()
-                      .putAll(metadata);
-        markerInfoList.add(markerInfo);
-        markerInfo.setMarkerCondition(MarkerInfo.MARKER_ADDED);
-        notifyItemChanged(markerInfoList.size() - 1);
+        notifyItemInserted(markerInfoList.size() - 1);
     }
 
     public void removeMarkerByPostId(String postId)
@@ -355,12 +320,11 @@ public class MapAdapter extends MapView.Adapter
         {
             MarkerInfo markerInfo = markerInfoList.get(i);
             Map<String, Object> metadata = markerInfo.getMetadata();
-            if (markerInfo.getMarkerType() == MarkerInfo.SUB_ADDRESS_MARKER && (String.valueOf(metadata.get("post_id"))).equals(postId))
+            if (markerInfo.getMarkerType() == MarkerInfo.SUB_ADDRESS_MARKER &&
+                    (String.valueOf(metadata.get("post_id"))).equals(postId))
             {
-                markerInfo.setMarkerCondition(MarkerInfo.MARKER_REMOVED);
-                notifyItemChanged(i);
                 markerInfoList.remove(i);
-                deselectClickedMarker();
+                notifyItemRemoved(i);
 
                 markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 break;
@@ -389,5 +353,16 @@ public class MapAdapter extends MapView.Adapter
             this.postsToolbar = postsToolbar;
             this.postsRecycler = postsRecycler;
         }
+    }
+
+    @Override
+    public int getItemCount()
+    {
+        return markerInfoList.size();
+    }
+
+    public interface MapAdapterCallback
+    {
+        void removeMarkerByPostId(String postId);
     }
 }

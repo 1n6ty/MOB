@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.databinding.ItemReactionBinding;
 
-public interface ReactionAdapter
+public interface ReactionsAdapter
 {
     boolean addReaction(String emoji);
 

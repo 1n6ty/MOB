@@ -4,17 +4,93 @@ import android.database.Observable;
 
 import androidx.annotation.NonNull;
 
+import com.example.mobv2.adapters.abstractions.AdapterHelper;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapView
 {
+    private static final MarkerOptions MARKER_OPTIONS_DEFAULT =
+            new MarkerOptions().position(new LatLng(189, 189));
+
     private final GoogleMap googleMap;
     private Adapter adapter;
+    private AdapterHelper adapterHelper;
+    private List<Marker> markers = new ArrayList<>();
+
     private final MapViewDataObserver observer = new MapViewDataObserver();
 
     public MapView(GoogleMap googleMap)
     {
         this.googleMap = googleMap;
+
+        adapterHelper = new AdapterHelper(new AdapterHelper.Callback()
+        {
+            @Override
+            public Marker findMarker(int position)
+            {
+                return markers.get(position);
+            }
+
+            @Override
+            public void onItemRangeChanged(int positionStart,
+                                           int itemCount)
+            {
+                if (itemCount == 1)
+                {
+                    adapter.bindMarker(findMarker(positionStart), positionStart);
+                    return;
+                }
+
+                for (int i = positionStart; i < itemCount; i++)
+                {
+                    adapter.bindMarker(findMarker(positionStart), i);
+                }
+            }
+
+            @Override
+            public void onItemRangeInserted(int positionStart,
+                                            int itemCount)
+            {
+                if (itemCount == 1)
+                {
+                    Marker marker = googleMap.addMarker(MARKER_OPTIONS_DEFAULT);
+                    markers.add(marker);
+                    adapter.bindMarker(findMarker(positionStart), positionStart);
+                    return;
+                }
+
+                for (int i = positionStart; i < itemCount; i++)
+                {
+                    Marker marker = googleMap.addMarker(MARKER_OPTIONS_DEFAULT);
+                    markers.add(marker);
+                    adapter.bindMarker(findMarker(i), i);
+                }
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart,
+                                           int itemCount)
+            {
+                if (itemCount == 1)
+                {
+                    markers.get(positionStart).remove();
+                    adapter.bindMarker(findMarker(positionStart), positionStart);
+                    return;
+                }
+
+                for (int i = positionStart; i < itemCount; i++)
+                {
+                    markers.get(i).remove();
+                    adapter.bindMarker(findMarker(i), i);
+                }
+            }
+        });
     }
 
     public Adapter getAdapter()
@@ -30,11 +106,20 @@ public class MapView
         this.adapter = adapter;
         if (adapter != null)
         {
+            onAdapterChanged();
             adapter.registerAdapterDataObserver(observer);
 
             adapter.onCreate(googleMap);
         }
+    }
 
+    private void onAdapterChanged()
+    {
+        for (int i = 0; i < adapter.getItemCount(); i++)
+        {
+            Marker marker = googleMap.addMarker(MARKER_OPTIONS_DEFAULT);
+            markers.add(marker);
+        }
     }
 
     public static abstract class Adapter
@@ -43,12 +128,14 @@ public class MapView
 
         public abstract void onCreate(GoogleMap googleMap);
 
-        public abstract void onBindMarker(int position);
+        public abstract void onBindMarker(Marker marker, int position);
 
-        public void bindMarker(int position)
+        public void bindMarker(Marker marker, int position)
         {
-            onBindMarker(position);
+            onBindMarker(marker, position);
         }
+
+        public abstract int getItemCount();
 
         public final boolean hasObservers()
         {
@@ -70,9 +157,9 @@ public class MapView
             observable.notifyChanged();
         }
 
-        public final void notifyItemChanged(int position)
+        public final void notifyItemChanged(int positionStart)
         {
-            observable.notifyItemRangeChanged(position, 1);
+            observable.notifyItemRangeChanged(positionStart, 1);
         }
 
         public final void notifyItemRangeChanged(int positionStart,
@@ -81,7 +168,7 @@ public class MapView
             observable.notifyItemRangeChanged(positionStart, itemCount);
         }
 
-        /*public final void notifyItemInserted(int position)
+        public final void notifyItemInserted(int position)
         {
             observable.notifyItemRangeInserted(position, 1);
         }
@@ -101,7 +188,7 @@ public class MapView
                                                  int itemCount)
         {
             observable.notifyItemRangeRemoved(positionStart, itemCount);
-        }*/
+        }
     }
 
     private static class AdapterDataObservable extends Observable<AdapterDataObserver>
@@ -130,7 +217,7 @@ public class MapView
             }
         }
 
-        /*public void notifyItemRangeInserted(int positionStart,
+        public void notifyItemRangeInserted(int positionStart,
                                             int itemCount)
         {
             for (int i = mObservers.size() - 1; i >= 0; i--)
@@ -148,7 +235,7 @@ public class MapView
                 mObservers.get(i)
                           .onItemRangeRemoved(positionStart, itemCount);
             }
-        }*/
+        }
     }
 
     public abstract static class AdapterDataObserver
@@ -164,7 +251,7 @@ public class MapView
             // do nothing
         }
 
-        /*public void onItemRangeInserted(int positionStart,
+        public void onItemRangeInserted(int positionStart,
                                         int itemCount)
         {
             // do nothing
@@ -174,7 +261,7 @@ public class MapView
                                        int itemCount)
         {
             // do nothing
-        }*/
+        }
     }
 
     private class MapViewDataObserver extends AdapterDataObserver
@@ -189,30 +276,21 @@ public class MapView
         public void onItemRangeChanged(int positionStart,
                                        int itemCount)
         {
-            if (itemCount == 1)
-            {
-                adapter.bindMarker(positionStart);
-                return;
-            }
-
-            for (int i = positionStart; i < itemCount; i++)
-            {
-                adapter.bindMarker(i);
-            }
+            adapterHelper.onItemRangeChanged(positionStart, itemCount);
         }
 
-        /*@Override
+        @Override
         public void onItemRangeInserted(int positionStart,
                                         int itemCount)
         {
-            super.onItemRangeInserted(positionStart, itemCount);
+            adapterHelper.onItemRangeInserted(positionStart, itemCount);
         }
 
         @Override
         public void onItemRangeRemoved(int positionStart,
                                        int itemCount)
         {
-            super.onItemRangeRemoved(positionStart, itemCount);
-        }*/
+            adapterHelper.onItemRangeRemoved(positionStart, itemCount);
+        }
     }
 }

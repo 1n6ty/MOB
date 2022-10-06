@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.ImagesAdapter;
@@ -33,7 +33,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
         implements HasToolbar, ActivityResultCallback<List<Uri>>
 {
     private final ActivityResultLauncher<String> launcher =
-            registerForActivityResult(new ActivityResultContracts.GetMultipleContents(), this);
+            registerForActivityResult(new ActivityResultContracts.GetMultipleContents(),this);
 
     private final List<String> imagePaths;
 
@@ -113,7 +113,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
         }
 
         ImagesAdapter adapter = new ImagesAdapter((MainActivity) getActivity(), images);
-        imagesView.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
+        imagesView.setLayoutManager(new LinearLayoutManager(getContext()));
         imagesView.setAdapter(adapter);
     }
 
@@ -127,5 +127,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
         String title = markerTitleView.getText()
                                       .toString();
         MainActivity.MOB_SERVER_API.post(callback, text, title, latLng.latitude, latLng.longitude, imagePaths, MainActivity.token);
+
+        mainActivity.toPreviousFragment();
     }
 }

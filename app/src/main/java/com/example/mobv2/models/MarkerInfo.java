@@ -1,8 +1,6 @@
 package com.example.mobv2.models;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,26 +8,52 @@ import java.util.Map;
 public class MarkerInfo
 {
     public static final int ADDRESS_MARKER = 0, SUB_ADDRESS_MARKER = 1;
-    public static final int MARKER_NOT_CLICKED = 0, MARKER_CLICKED = 1, MARKER_ADDED = 2, MARKER_REMOVED = 3;
 
-    private final Marker marker;
+    private String id;
+
+    private String title;
+    private LatLng position;
+    private Object tag;
+
     private final int markerType;
     private final Map<String, Object> metadata;
-    private int markerCondition;
+    private boolean clicked;
 
-    public MarkerInfo(Marker marker,
+    public MarkerInfo(String title,
+                      LatLng position,
                       int markerType)
     {
-        this.marker = marker;
+        this.title = title;
+        this.position = position;
         this.markerType = markerType;
-        this.metadata = new HashMap<>();
-        this.markerCondition = MARKER_NOT_CLICKED;
+
+        metadata = new HashMap<>();
+        tag = null;
     }
 
-    @NonNull
-    public Marker getMarker()
+    public String getId()
     {
-        return marker;
+        return id;
+    }
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public LatLng getPosition()
+    {
+        return position;
+    }
+
+    public Object getTag()
+    {
+        return tag;
     }
 
     public int getMarkerType()
@@ -42,13 +66,13 @@ public class MarkerInfo
         return metadata;
     }
 
-    public int getMarkerCondition()
+    public boolean isClicked()
     {
-        return markerCondition;
+        return clicked;
     }
 
-    public void setMarkerCondition(int markerCondition)
+    public void setClicked(boolean clicked)
     {
-        this.markerCondition = markerCondition;
+        this.clicked = clicked;
     }
 }

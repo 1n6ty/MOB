@@ -50,7 +50,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
 
         if (image.getType() == Image.IMAGE_ONLINE)
         {
-            MainActivity.loadImageInView((String) image.getPath(), holder.itemView, holder.postImageView);
+//            MainActivity.loadImageInView((String) image.getPath(), holder.itemView, holder.postImageView);
         }
         else if (image.getType() == Image.IMAGE_OFFLINE)
         {
@@ -70,7 +70,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         return images.size();
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder
+    public static class ImageViewHolder extends RecyclerView.ViewHolder
     {
         private final ImageView postImageView;
 
