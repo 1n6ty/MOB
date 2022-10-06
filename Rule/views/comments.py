@@ -58,7 +58,6 @@ def getComment(req):
         return JsonResponse({
             'response': {
                 'id': comment.id,
-                'date': str(comment.date),
                 'user': {
                     'nick': comment.user.nick,
                     'full_name': comment.user.full_name,
@@ -69,7 +68,8 @@ def getComment(req):
                 },
                 'data': {
                     'content': comment.content,
-                    'comment_ids': [i.id for i in comment.comments.all()]
+                    'comment_ids': [i.id for i in comment.comments.all()],
+                    'date': comment.date.strftime('%d.%m.%Y/%H:%M'),
                 },
                 'reactions': comment.reactions,
                 'rate': comment.rate

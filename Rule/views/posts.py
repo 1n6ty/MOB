@@ -62,7 +62,6 @@ def getPost(req):
 
         return JsonResponse({
             'response': {
-                'date': str(post.date),
                 'id': post.id,
                 'user': {
                     'nick': post.user.nick,
@@ -76,7 +75,8 @@ def getPost(req):
                     'title': post.title,
                     'img_urls': post.images["images"],
                     'content': post.content,
-                    'comment_ids': [i.id for i in post.comments.all()]
+                    'comment_ids': [i.id for i in post.comments.all()],
+                    'date': post.date.strftime('%d.%m.%Y/%H:%M'),
                 },
                 'reactions': post.reactions,
                 'rate': post.rate
