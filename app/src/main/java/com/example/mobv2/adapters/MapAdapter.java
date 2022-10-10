@@ -1,6 +1,7 @@
 package com.example.mobv2.adapters;
 
 import android.location.Geocoder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -13,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.callbacks.GetMarksCallback;
 import com.example.mobv2.callbacks.GetPostCallback;
-import com.example.mobv2.models.Address;
 import com.example.mobv2.models.MarkerInfo;
+import com.example.mobv2.models.MyAddress;
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.markercreators.MapSkillsBottomSheetFragment;
@@ -68,7 +69,44 @@ public class MapAdapter extends MapView.Adapter
         this.googleMap = googleMap;
 
         setGoogleMapListeners(googleMap);
+        setPostsToolbarListeners();
 
+        String addressString = mainActivity.getPrivatePreferences()
+                                           .getString(MainActivity.ADDRESS_FULL_KEY, "");
+
+        if (addressString.isEmpty()) return;
+        LatLng addressLatLng =
+                getLatLngByAddress(new MyAddress.AddressBuilder().parseFromString(addressString));
+        // add address marker
+        addMarker(new MarkerInfo(addressString, addressLatLng, MarkerInfo.ADDRESS_MARKER));
+
+        // add other markers
+        MainActivity.MOB_SERVER_API.getMarks(new GetMarksCallback(mainActivity, this::parseMarkersFromMapAndAddToMarkers), MainActivity.token);
+        animateCameraTo(addressLatLng);
+    }
+
+    private void parseMarkersFromMapAndAddToMarkers(LinkedTreeMap<String, Object> map)
+    {
+        for (var postId : map.keySet())
+        {
+            var postWithMarkMap = (LinkedTreeMap<String, Object>) map.get(postId);
+            var markerInfo = new MarkerInfo.MarkerInfoBuilder().parseFromMap(postWithMarkMap);
+            markerInfo.getMetadata()
+                      .put("post_id", Integer.valueOf(postId));
+
+            addMarker(markerInfo);
+        }
+    }
+
+    private void setGoogleMapListeners(GoogleMap googleMap)
+    {
+        googleMap.setOnMarkerClickListener(this::onMarkerClick);
+        googleMap.setOnMapClickListener(latLng -> onMapClick());
+        googleMap.setOnMapLongClickListener(this::onMapLongClick);
+    }
+
+    private void setPostsToolbarListeners()
+    {
         Toolbar postsToolbar = markersAdapterHelper.postsToolbar;
         postsToolbar.setNavigationOnClickListener(view -> onMapClick());
         postsToolbar.getMenu()
@@ -78,27 +116,6 @@ public class MapAdapter extends MapView.Adapter
                         refreshPostsRecycler();
                         return true;
                     });
-
-
-        String addressString = mainActivity.getPrivatePreferences()
-                                           .getString(MainActivity.ADDRESS_FULL_KEY, "");
-
-        if (addressString.isEmpty()) return;
-        LatLng addressLatLng =
-                getLatLngByAddress(new Address.AddressBuilder().parseFromString(addressString));
-        // add address marker
-        addMarker(new MarkerInfo(addressString, addressLatLng, MarkerInfo.ADDRESS_MARKER));
-
-        // add other markers
-        MainActivity.MOB_SERVER_API.getMarks(new GetMarksCallback(mainActivity, this), MainActivity.token);
-        animateCameraTo(addressLatLng);
-    }
-
-    private void setGoogleMapListeners(GoogleMap googleMap)
-    {
-        googleMap.setOnMarkerClickListener(this::onMarkerClick);
-        googleMap.setOnMapClickListener(latLng -> onMapClick());
-        googleMap.setOnMapLongClickListener(this::onMapLongClick);
     }
 
     @Override
@@ -113,15 +130,10 @@ public class MapAdapter extends MapView.Adapter
         marker.setPosition(markerInfo.getPosition());
         marker.setTag(markerInfo.getTag());
 
-        int drawableId;
-        if (markerInfo.isClicked())
-        {
-            drawableId = drawableIds[markerInfo.getMarkerType()][1];
-        }
-        else
-        {
-            drawableId = drawableIds[markerInfo.getMarkerType()][0];
-        }
+        int drawableId = markerInfo.isClicked()
+                ? drawableIds[markerInfo.getMarkerType()][1]
+                : drawableIds[markerInfo.getMarkerType()][0];
+
         marker.setIcon(BitmapConverter.drawableToBitmapDescriptor(mainActivity.getResources(), drawableId));
     }
 
@@ -156,6 +168,8 @@ public class MapAdapter extends MapView.Adapter
             @Override
             public void funcOk(LinkedTreeMap<String, Object> obj)
             {
+                Log.v("DEBUG", obj.toString());
+
                 var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
                 int postId = ((Double) response.get("id")).intValue();
@@ -172,29 +186,31 @@ public class MapAdapter extends MapView.Adapter
             @Override
             public void funcBad(LinkedTreeMap<String, Object> obj)
             {
+                Log.v("DEBUG", obj.toString());
             }
 
             @Override
             public void fail(Throwable obj)
             {
+                Log.v("DEBUG", obj.toString());
             }
         });
 
-        Address address = getAddressByLatLng(latLng);
+        MyAddress address = getAddressByLatLng(latLng);
 
         markerCreatorViewModel.setAddress(address);
     }
 
-    private Address getAddressByLatLng(@NonNull LatLng latLng)
+    private MyAddress getAddressByLatLng(@NonNull LatLng latLng)
     {
-        Address address = null;
+        MyAddress address = null;
         try
         {
             Geocoder geocoder = new Geocoder(mainActivity, LOCALE);
             android.location.Address mapAddress =
                     geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
                             .get(0);
-            address = new Address(mapAddress.getCountryName(),
+            address = new MyAddress(mapAddress.getCountryName(),
                     mapAddress.getLocality(),
                     mapAddress.getThoroughfare(),
                     Integer.parseInt(mapAddress.getFeatureName()));
@@ -289,7 +305,7 @@ public class MapAdapter extends MapView.Adapter
                         .setVisible(isAddressMarker);
     }
 
-    private LatLng getLatLngByAddress(Address address)
+    private LatLng getLatLngByAddress(MyAddress address)
     {
         LatLng latLng = null;
         try
@@ -364,5 +380,10 @@ public class MapAdapter extends MapView.Adapter
     public interface MapAdapterCallback
     {
         void removeMarkerByPostId(String postId);
+    }
+
+    public interface Callback
+    {
+        void parseMarkersFromMapAndAddToMarkers(LinkedTreeMap<String, Object> map);
     }
 }

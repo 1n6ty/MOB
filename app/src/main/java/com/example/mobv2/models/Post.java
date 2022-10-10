@@ -3,6 +3,7 @@ package com.example.mobv2.models;
 import androidx.annotation.Nullable;
 import androidx.databinding.ObservableInt;
 
+import com.example.mobv2.models.abstractions.Takable;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
@@ -16,7 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class Post
+public class Post implements Takable
 {
     public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
 
@@ -69,90 +70,11 @@ public class Post
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
         commentsCount = new ObservableInt(commentsIds.size());
-        this.commentsIds.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
-        {
-            @Override
-            public void onAdded(String string)
-            {
-                commentsCount.set(commentsCount.get() + 1);
-            }
-
-            @Override
-            public void onAdded(int index,
-                                String element)
-            {
-                commentsCount.set(commentsCount.get() + 1);
-            }
-
-            @Override
-            public void onRemoved(int index)
-            {
-                commentsCount.set(commentsCount.get() - 1);
-            }
-
-            @Override
-            public void onRemoved(@Nullable Object o)
-            {
-                commentsCount.set(commentsCount.get() - 1);
-            }
-        });
+        this.commentsIds.setOnListChangedCallback(new Operation(commentsCount, 1, -1));
 
         appreciationsCount = new ObservableInt(positiveRates.size() - negativeRates.size());
-        this.positiveRates.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
-        {
-            @Override
-            public void onAdded(String string)
-            {
-                appreciationsCount.set(appreciationsCount.get() + 1);
-            }
-
-            @Override
-            public void onAdded(int index,
-                                String element)
-            {
-                appreciationsCount.set(appreciationsCount.get() + 1);
-            }
-
-            @Override
-            public void onRemoved(int index)
-            {
-                appreciationsCount.set(appreciationsCount.get() - 1);
-            }
-
-            @Override
-            public void onRemoved(@Nullable Object o)
-            {
-                appreciationsCount.set(appreciationsCount.get() - 1);
-            }
-        });
-
-        this.negativeRates.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
-        {
-            @Override
-            public void onAdded(String string)
-            {
-                appreciationsCount.set(appreciationsCount.get() - 1);
-            }
-
-            @Override
-            public void onAdded(int index,
-                                String element)
-            {
-                appreciationsCount.set(appreciationsCount.get() - 1);
-            }
-
-            @Override
-            public void onRemoved(int index)
-            {
-                appreciationsCount.set(appreciationsCount.get() + 1);
-            }
-
-            @Override
-            public void onRemoved(@Nullable Object o)
-            {
-                appreciationsCount.set(appreciationsCount.get() + 1);
-            }
-        });
+        this.positiveRates.setOnListChangedCallback(new Operation(appreciationsCount, 1, -1));
+        this.negativeRates.setOnListChangedCallback(new Operation(appreciationsCount, -1, 1));
     }
 
     public String getTitle()
@@ -312,5 +234,46 @@ public class Post
     public ObservableInt getAppreciationsCount()
     {
         return appreciationsCount;
+    }
+
+    static class Operation implements MyObservableArrayList.OnListChangedCallback<String>
+    {
+        private final ObservableInt observableInt;
+        private final int firstOperand;
+        private final int secondOperand;
+
+        public Operation(ObservableInt observableInt,
+                         int firstOperand,
+                         int secondOperand)
+        {
+            this.observableInt = observableInt;
+            this.firstOperand = firstOperand;
+            this.secondOperand = secondOperand;
+        }
+
+        @Override
+        public void onAdded(String string)
+        {
+            observableInt.set(observableInt.get() + firstOperand);
+        }
+
+        @Override
+        public void onAdded(int index,
+                            String element)
+        {
+            observableInt.set(observableInt.get() + firstOperand);
+        }
+
+        @Override
+        public void onRemoved(int index)
+        {
+            observableInt.set(observableInt.get() + secondOperand);
+        }
+
+        @Override
+        public void onRemoved(@Nullable Object o)
+        {
+            observableInt.set(observableInt.get() + secondOperand);
+        }
     }
 }

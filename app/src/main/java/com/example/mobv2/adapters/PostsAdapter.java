@@ -94,22 +94,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
 
-        holder.fullnameView.setText(user.getFullname());
+        holder.fullNameView.setText(user.getFullname());
 
         holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
-        holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsView));
+        holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
 
         initContent(holder.content, position);
 
         var reactionsAdapter =
                 new ReactionsPostAdapter(mainActivity, post.getReactions(), post.getId());
-        holder.reactionsView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        holder.reactionsView.setAdapter(reactionsAdapter);
+        holder.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
 
-        holder.commentView.setOnClickListener(view -> onCommentViewClick(view, post, reactionsAdapter));
+        holder.showCommentsView.setOnClickListener(view -> onCommentViewClick(view, post, reactionsAdapter));
     }
 
     private void onShowReactionsViewClick(View view)
@@ -240,7 +240,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         int[] menuIds =
                 {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
 
-        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_view);
+        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_recycler_view);
         var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
         for (int id : menuIds)
         {
@@ -349,15 +349,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         private final com.example.mobv2.databinding.ItemPostBinding binding;
 
         private final ShapeableImageView avatarView;
-        private final TextView fullnameView;
+        private final TextView fullNameView;
         private final TextView dateView;
         private final Pair<TextView, RecyclerView> content;
         private final RadioButton appreciationUpView;
         private final TextView appreciationsCountView;
         private final RadioButton appreciationDownView;
         private final View showReactionsView;
-        private final RecyclerView reactionsView;
-        private final LinearLayout commentView;
+        private final RecyclerView reactionsRecyclerView;
+        private final LinearLayout showCommentsView;
         private final TextView commentsCountView;
 
         public PostViewHolder(@NonNull View itemView)
@@ -367,15 +367,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             binding = ItemPostBinding.bind(itemView);
 
             avatarView = binding.avatarView;
-            fullnameView = binding.fullnameView;
+            fullNameView = binding.fullNameView;
             dateView = binding.dateView;
-            content = new Pair<>(binding.postTextView, binding.postImagesView);
+            content = new Pair<>(binding.postTextView, binding.postImagesRecyclerView);
             appreciationUpView = binding.appreciationUpButton;
             appreciationsCountView = binding.appreciationsCountView;
             appreciationDownView = binding.appreciationDownButton;
             showReactionsView = binding.showReactionsView;
-            reactionsView = binding.reactionsView;
-            commentView = binding.commentView;
+            reactionsRecyclerView = binding.reactionsRecyclerView;
+            showCommentsView = binding.showCommentsView;
             commentsCountView = binding.commentsCountView;
         }
 

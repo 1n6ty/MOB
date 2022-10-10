@@ -28,7 +28,7 @@ public class CommentCallback implements MOBServerAPI.MOBAPICallback
 
         String commentId = String.valueOf((((Double) response.get("comment_id"))).intValue());
 
-        callback.createComment(commentId);
+        callback.createCommentByIdAndAddToPosts(commentId);
     }
 
     @Override

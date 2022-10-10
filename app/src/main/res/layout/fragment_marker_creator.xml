@@ -93,7 +93,7 @@
                         app:tint="?colorPrimaryFabIcon" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/images_view"
+                        android:id="@+id/images_recycler_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:itemCount="1"

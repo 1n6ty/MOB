@@ -65,7 +65,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/fullname_view"
+                        android:id="@+id/fullName_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/sample_fullname"
@@ -87,12 +87,12 @@
                 android:layout_marginHorizontal="@dimen/horizontal_margin"
                 android:layout_marginBottom="@dimen/vertical_small_margin"
                 android:textAppearance="@style/itemContentTextStyle"
-                app:layout_constraintBottom_toTopOf="@+id/post_images_view"
+                app:layout_constraintBottom_toTopOf="@+id/post_images_recycler_view"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
                 tools:text="Content" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/post_images_view"
+                android:id="@+id/post_images_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/horizontal_very_small_margin"
@@ -115,7 +115,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_images_view">
+                app:layout_constraintTop_toBottomOf="@+id/post_images_recycler_view">
 
                 <RadioGroup
                     android:id="@+id/appreciations_group"
@@ -172,7 +172,7 @@
                         app:srcCompat="@drawable/ic_arrow_down" />
 
                     <LinearLayout
-                        android:id="@+id/comment_view"
+                        android:id="@+id/show_comments_view"
                         style="@style/commentButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">
@@ -195,7 +195,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/reactions_view"
+                android:id="@+id/reactions_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/horizontal_margin"

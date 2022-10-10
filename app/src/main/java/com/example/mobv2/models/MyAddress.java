@@ -6,7 +6,7 @@ import com.example.mobv2.utils.abstractions.ParsableFromMap;
 
 import java.util.Map;
 
-public class Address
+public class MyAddress
 {
     public static final String WITHOUT_ID = "-1";
 
@@ -17,10 +17,10 @@ public class Address
     private final String street;
     private final int house;
 
-    public Address(String country,
-                   String city,
-                   String street,
-                   int house)
+    public MyAddress(String country,
+                     String city,
+                     String street,
+                     int house)
     {
         id = WITHOUT_ID;
         this.country = country;
@@ -29,11 +29,11 @@ public class Address
         this.house = house;
     }
 
-    private Address(String id,
-                    String country,
-                    String city,
-                    String street,
-                    int house)
+    private MyAddress(String id,
+                      String country,
+                      String city,
+                      String street,
+                      int house)
     {
         this.id = id;
         this.country = country;
@@ -42,7 +42,7 @@ public class Address
         this.house = house;
     }
 
-    public static class AddressBuilder implements ParsableFromMap<Address>
+    public static class AddressBuilder implements ParsableFromMap<MyAddress>
     {
         private String id;
         private String country;
@@ -50,7 +50,7 @@ public class Address
         private String street;
         private int house;
 
-        public Address parseFromString(String addressString)
+        public MyAddress parseFromString(String addressString)
         {
             String[] addressStrings = addressString.split(", ");
 
@@ -59,11 +59,11 @@ public class Address
             street = addressStrings[2];
             house = Integer.parseInt(addressStrings[3]);
 
-            return new Address(country, city, street, house);
+            return new MyAddress(country, city, street, house);
         }
 
         @Override
-        public Address parseFromMap(Map<String, Object> map)
+        public MyAddress parseFromMap(Map<String, Object> map)
         {
             if (map == null)
                 return null;
@@ -71,7 +71,7 @@ public class Address
             parseIdFromMap(map);
             parseFullInfoFromMap(map);
 
-            return new Address(id, country, city, street, house);
+            return new MyAddress(id, country, city, street, house);
         }
 
         private void parseIdFromMap(Map<String, Object> map)

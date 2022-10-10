@@ -1,6 +1,7 @@
 package com.example.mobv2.ui.fragments.main;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -39,13 +40,15 @@ import java.net.URL;
 public class MainFragment extends BaseFragment<FragmentMainBinding>
         implements HasToolbar
 {
+    private SharedPreferences preferences;
+
     private MainFragmentViewModel viewModel;
 
     private Toolbar toolbar;
     private NavDrawer navDrawer;
     private BottomSheetBehavior<View> sheetBehavior;
     private Toolbar postsToolbar;
-    private RecyclerView postsRecycler;
+    private RecyclerView postsRecyclerView;
 
     private MapView mapView;
     private MapAdapter mapAdapter;
@@ -62,6 +65,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                              @Nullable Bundle savedInstanceState)
     {
         var view = super.onCreateView(inflater, container, savedInstanceState);
+        preferences = mainActivity.getPrivatePreferences();
 
         initViewModel();
         binding.setBindingContext(viewModel);
@@ -78,21 +82,16 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         initToolbar();
 
         initMap();
-
         initBottomSheet();
-
-        // set address only on launch
-        setAddress();
+        setAddressInToken();
     }
 
     @Override
     public void update()
     {
         super.update();
-        viewModel.setFullname(mainActivity.getPrivatePreferences()
-                                          .getString(MainActivity.USER_FULLNAME_KEY, ""));
-        viewModel.setAddress(mainActivity.getPrivatePreferences()
-                                         .getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
+        viewModel.setFullname(preferences.getString(MainActivity.USER_FULLNAME_KEY, ""));
+        viewModel.setAddress(preferences.getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
 
         if (viewModel.isAddressChanged())
         {
@@ -105,11 +104,10 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         }
     }
 
-    private void setAddress()
+    private void setAddressInToken()
     {
-        MainActivity.MOB_SERVER_API.setLocation(new SetAddressCallback(getContext()),
-                mainActivity.getPrivatePreferences()
-                            .getString(MainActivity.ADDRESS_ID_KEY, ""), MainActivity.token);
+        MainActivity.MOB_SERVER_API.setLocation(new SetAddressCallback(mainActivity),
+                preferences.getString(MainActivity.ADDRESS_ID_KEY, ""), MainActivity.token);
     }
 
     private void initViewModel()
@@ -124,15 +122,13 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         navDrawer = new NavDrawer(mainActivity);
 
-        viewModel.setFullname(mainActivity.getPrivatePreferences()
-                                          .getString(MainActivity.USER_FULLNAME_KEY, ""));
-        viewModel.setAddress(mainActivity.getPrivatePreferences()
-                                         .getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
+        viewModel.setFullname(preferences.getString(MainActivity.USER_FULLNAME_KEY, ""));
+        viewModel.setAddress(preferences.getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
         URL url;
         try
         {
-            url = new URL("http://192.168.0.104:8000" + mainActivity.getPrivatePreferences()
-                                                                    .getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+            url =
+                    new URL("http://192.168.0.104:8000" + preferences.getString(MainActivity.USER_AVATAR_URL_KEY, ""));
         }
         catch (MalformedURLException e)
         {
@@ -171,7 +167,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private void initBottomSheet()
     {
         postsToolbar = binding.postsToolbar;
-        postsRecycler = binding.postsRecycler;
+        postsRecyclerView = binding.postsRecyclerView;
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -185,7 +181,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         postsToolbar.setOnMenuItemClickListener(item ->
         {
-            PostsAdapter postsAdapter = (PostsAdapter) postsRecycler.getAdapter();
+            PostsAdapter postsAdapter = (PostsAdapter) postsRecyclerView.getAdapter();
             if (postsAdapter == null) return false;
             switch (item.getItemId())
             {
@@ -207,7 +203,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         mapView = new MapView(googleMap);
         mapAdapter =
-                new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecycler));
+                new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
         mapView.setAdapter(mapAdapter);
     }
 }

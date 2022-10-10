@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,8 +23,8 @@ import com.example.mobv2.R;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.Comment;
-import com.example.mobv2.models.Post;
 import com.example.mobv2.models.User;
+import com.example.mobv2.models.abstractions.Takable;
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -37,19 +38,20 @@ import java.util.List;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
 {
     private final MainActivity mainActivity;
-    private final Post post;
+    private final Takable takable;
 
     private final List<Comment> comments;
 
+    private int lastIndex = 0;
+
     public CommentsAdapter(MainActivity mainActivity,
-                           Post post)
+                           Takable takable)
     {
         this.mainActivity = mainActivity;
-        this.post = post;
+        this.takable = takable;
         this.comments = new ArrayList<>();
 
-        var commentsIds = post.getCommentsIds();
-
+        var commentsIds = takable.getCommentsIds();
         for (int i = 0; i < 4; i++)
         {
             MainActivity.MOB_SERVER_API.getComment(new MOBServerAPI.MOBAPICallback()
@@ -62,8 +64,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                     var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
                     Comment comment = new Comment.CommentBuilder().parseFromMap(response);
-
                     addComment(comment);
+
+                    lastIndex++;
                 }
 
                 @Override
@@ -79,6 +82,64 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 }
             }, commentsIds.get(commentsIds.size() - 1 - i), MainActivity.token);
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView)
+    {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView,
+                                             int newState)
+            {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView,
+                                   int dx,
+                                   int dy)
+            {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager =
+                        (LinearLayoutManager) recyclerView.getLayoutManager();
+                final int totalItemCount = layoutManager.getItemCount();
+                final int visibleItemCount = layoutManager.getChildCount();
+                final int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+
+                if (lastIndex < getItemCount() && (totalItemCount - visibleItemCount <= firstVisibleItem))
+                {
+                    var commentsIds = takable.getCommentsIds();
+                    MainActivity.MOB_SERVER_API.getComment(new MOBServerAPI.MOBAPICallback()
+                    {
+                        @Override
+                        public void funcOk(LinkedTreeMap<String, Object> obj)
+                        {
+                            Log.v("DEBUG", obj.toString());
+
+                            var response = (LinkedTreeMap<String, Object>) obj.get("response");
+
+                            Comment comment = new Comment.CommentBuilder().parseFromMap(response);
+                            addComment(comment);
+                        }
+
+                        @Override
+                        public void funcBad(LinkedTreeMap<String, Object> obj)
+                        {
+                            Log.v("DEBUG", obj.toString());
+                        }
+
+                        @Override
+                        public void fail(Throwable obj)
+                        {
+                            Log.v("DEBUG", obj.toString());
+                        }
+                    }, commentsIds.get(lastIndex++), MainActivity.token);
+                }
+            }
+        });
     }
 
     @NonNull
@@ -108,12 +169,21 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
-        holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsView));
+        holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
 
         var reactionsAdapter =
                 new ReactionsCommentAdapter(mainActivity, comment.getReactions(), comment.getId());
-        holder.reactionsView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        holder.reactionsView.setAdapter(reactionsAdapter);
+        holder.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
+
+        holder.showCommentsButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+
+            }
+        });
     }
 
     private void onShowReactionsViewClick(View view)
@@ -182,7 +252,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         int[] menuIds =
                 {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
 
-        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_view);
+        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_recycler_view);
         var reactionsAdapter = (ReactionsCommentAdapter) reactionsView.getAdapter();
         for (int id : menuIds)
         {
@@ -241,11 +311,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     {
         var comment = comments.get(position);
 
-        comments.remove(comment);
+        comments.remove(position);
         notifyItemRemoved(position);
 
-        post.getCommentsIds()
-            .remove(comment.getId());
+        takable.getCommentsIds()
+               .remove(comment.getId());
 
         MainActivity.MOB_SERVER_API.commentDelete(new MOBAPICallbackImpl(), String.valueOf(comment.getId()), MainActivity.token);
 
@@ -271,7 +341,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         private final TextView appreciationsCountView;
         private final ImageView appreciationDownView;
         private final ImageView showReactionsView;
-        private final RecyclerView reactionsView;
+        private final RecyclerView reactionsRecyclerView;
+        private final Button showCommentsButton;
 
         public CommentViewHolder(@NonNull View itemView)
         {
@@ -287,7 +358,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             appreciationsCountView = binding.appreciationsCountView;
             appreciationDownView = binding.appreciationDownView;
             showReactionsView = binding.showReactionsView;
-            reactionsView = binding.reactionsView;
+            reactionsRecyclerView = binding.reactionsRecyclerView;
+            showCommentsButton = binding.showCommentsButton;
         }
     }
 }

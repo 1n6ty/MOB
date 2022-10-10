@@ -2,7 +2,6 @@ package com.example.mobv2.ui.fragments.main
 
 import androidx.databinding.Bindable
 import com.example.mobv2.BR
-import com.example.mobv2.models.MarkerInfo
 import com.example.mobv2.utils.ObservableViewModel
 
 class MainFragmentViewModel : ObservableViewModel() {
@@ -12,7 +11,6 @@ class MainFragmentViewModel : ObservableViewModel() {
     var fullname = ""
         set(value) {
             field = value
-
             notifyPropertyChanged(BR.fullname)
         }
 
@@ -20,7 +18,6 @@ class MainFragmentViewModel : ObservableViewModel() {
     var address = ""
         set(value) {
             field = value
-
             notifyPropertyChanged(BR.address)
         };
 
@@ -28,7 +25,6 @@ class MainFragmentViewModel : ObservableViewModel() {
     var postTitle = ""
         set(value) {
             field = value
-
             notifyPropertyChanged(BR.postTitle)
         }
 }

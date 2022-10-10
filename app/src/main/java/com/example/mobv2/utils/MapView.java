@@ -16,12 +16,12 @@ import java.util.List;
 public class MapView
 {
     private static final MarkerOptions MARKER_OPTIONS_DEFAULT =
-            new MarkerOptions().position(new LatLng(189, 189));
+            new MarkerOptions().position(new LatLng(0, 0));
 
     private final GoogleMap googleMap;
     private Adapter adapter;
-    private AdapterHelper adapterHelper;
-    private List<Marker> markers = new ArrayList<>();
+    private final AdapterHelper adapterHelper;
+    private final List<Marker> markers = new ArrayList<>();
 
     private final MapViewDataObserver observer = new MapViewDataObserver();
 
@@ -79,14 +79,16 @@ public class MapView
             {
                 if (itemCount == 1)
                 {
-                    markers.get(positionStart).remove();
+                    markers.get(positionStart)
+                           .remove();
                     adapter.bindMarker(findMarker(positionStart), positionStart);
                     return;
                 }
 
                 for (int i = positionStart; i < itemCount; i++)
                 {
-                    markers.get(i).remove();
+                    markers.get(i)
+                           .remove();
                     adapter.bindMarker(findMarker(i), i);
                 }
             }
@@ -128,9 +130,11 @@ public class MapView
 
         public abstract void onCreate(GoogleMap googleMap);
 
-        public abstract void onBindMarker(Marker marker, int position);
+        public abstract void onBindMarker(Marker marker,
+                                          int position);
 
-        public void bindMarker(Marker marker, int position)
+        public void bindMarker(Marker marker,
+                               int position)
         {
             onBindMarker(marker, position);
         }

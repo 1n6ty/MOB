@@ -16,12 +16,12 @@ public class User
     private final String phoneNumber;
 
     private User(String id,
-                String avatarUrl,
-                String nickName,
-                String name,
-                String surname,
-                String email,
-                String phoneNumber)
+                 String avatarUrl,
+                 String nickName,
+                 String name,
+                 String surname,
+                 String email,
+                 String phoneNumber)
     {
         this.id = id;
         this.avatarUrl = avatarUrl;
@@ -61,7 +61,7 @@ public class User
 
         private void parseIdFromMap(Map<String, Object> map)
         {
-            id = String.valueOf(((Double)map.get("id")).intValue());
+            id = String.valueOf(((Double) map.get("id")).intValue());
         }
 
         private void parseAvatarUrlFromMap(Map<String, Object> map)

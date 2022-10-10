@@ -41,7 +41,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     private CommentsFragmentViewModel viewModel;
 
     private Toolbar toolbar;
-    private RecyclerView commentsRecycler;
+    private RecyclerView commentsRecyclerView;
     private CommentsAdapter commentsAdapter;
     private EditText messageView;
     private ImageButton sendButton;
@@ -108,7 +108,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
         MainActivity.loadImageInView(user.getAvatarUrl(), itemPost.getRoot(), itemPost.avatarView);
 
-        itemPost.fullnameView.setText(user.getFullname());
+        itemPost.fullNameView.setText(user.getFullname());
 
         itemPost.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
 
@@ -132,17 +132,17 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 //                                         .setTint(mainActivity.getAttribute(androidx.appcompat.R.attr.colorAccent));
 //        }
 
-        itemPost.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(itemPost.reactionsView));
+        itemPost.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(itemPost.reactionsRecyclerView));
 
         Pair<TextView, RecyclerView> content =
-                new Pair<>(itemPost.postTextView, itemPost.postImagesView);
+                new Pair<>(itemPost.postTextView, itemPost.postImagesRecyclerView);
         initPostContent(content);
 
-        itemPost.reactionsView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        itemPost.reactionsView.setAdapter(viewModel.getPostItem()
+        itemPost.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        itemPost.reactionsRecyclerView.setAdapter(viewModel.getPostItem()
                                                    .getReactionsAdapter());
 
-        itemPost.commentView.setVisibility(View.GONE);
+        itemPost.showCommentsView.setVisibility(View.GONE);
     }
 
     private void onShowReactionsViewClick(View view)
@@ -182,11 +182,11 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     private void initCommentsRecycler()
     {
-        commentsRecycler = binding.commentsRecycler;
-        commentsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        commentsRecyclerView = binding.commentsRecyclerView;
+        commentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentsAdapter = new CommentsAdapter(mainActivity, viewModel.getPostItem()
                                                                      .getPost());
-        commentsRecycler.setAdapter(commentsAdapter);
+        commentsRecyclerView.setAdapter(commentsAdapter);
 
 //        var post = viewModel.getPostItem()
 //                            .getPost();
@@ -241,11 +241,11 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         var post = viewModel.getPostItem()
                             .getPost();
         var messageText = messageView.getText();
-        MainActivity.MOB_SERVER_API.commentThePost(new CommentCallback(mainActivity, this::createComment),
+        MainActivity.MOB_SERVER_API.commentThePost(new CommentCallback(mainActivity, this::createCommentByIdAndAddToPosts),
                 messageText.toString(), post.getId(), MainActivity.token);
     }
 
-    private void createComment(String commentId)
+    private void createCommentByIdAndAddToPosts(String commentId)
     {
         var post = viewModel.getPostItem()
                             .getPost();
@@ -262,6 +262,6 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     public interface Callback
     {
-        void createComment(String commentId);
+        void createCommentByIdAndAddToPosts(String commentId);
     }
 }

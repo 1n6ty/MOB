@@ -6,5 +6,5 @@ import com.example.mobv2.utils.ObservableViewModel
 import com.example.mobv2.adapters.PostsAdapter.PostItem
 
 class CommentsFragmentViewModel : ObservableViewModel() {
-    var postItem: PostItem? = null
+    lateinit var postItem: PostItem
 }

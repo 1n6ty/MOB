@@ -1,5 +1,6 @@
 package com.example.mobv2.ui.callbacks;
 
+import android.content.res.Resources;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -35,15 +36,14 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
     {
         materialCardView.setRadius(0);
 
+        Resources resources = mainActivity.getResources();
         switch (newState)
         {
             case BottomSheetBehavior.STATE_COLLAPSED:
-                materialCardView.setRadius(mainActivity.getResources()
-                                                       .getDimension(R.dimen.horizontal_margin));
+                materialCardView.setRadius(resources.getDimension(R.dimen.horizontal_margin));
                 postsAppBar.setVisibility(View.INVISIBLE);
                 mainActivity.getWindow()
-                            .setNavigationBarColor(mainActivity.getResources()
-                                                               .getColor(mainActivity.getAttribute(R.attr.backgroundSecondaryWindow)));
+                            .setNavigationBarColor(resources.getColor(mainActivity.getAttribute(R.attr.backgroundSecondaryWindow)));
                 break;
             case BottomSheetBehavior.STATE_HIDDEN:
                 postsAppBar.setVisibility(View.GONE);
@@ -51,8 +51,7 @@ public class PostsSheetCallback extends BottomSheetBehavior.BottomSheetCallback
             case BottomSheetBehavior.STATE_HALF_EXPANDED:
             case BottomSheetBehavior.STATE_EXPANDED:
                 mainActivity.getWindow()
-                            .setNavigationBarColor(mainActivity.getResources()
-                                                               .getColor(mainActivity.getAttribute(R.attr.backgroundPrimaryWindow)));
+                            .setNavigationBarColor(resources.getColor(mainActivity.getAttribute(R.attr.backgroundPrimaryWindow)));
             case BottomSheetBehavior.STATE_DRAGGING:
             case BottomSheetBehavior.STATE_SETTLING:
                 postsAppBar.setVisibility(View.VISIBLE);

@@ -19,10 +19,6 @@ import java.util.List;
 public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding>
         implements HasToolbar
 {
-    private static final int SWIPE_MIN_DISTANCE = 120;
-    private static final int SWIPE_MAX_OFF_PATH = 250;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 100;
-
     private Toolbar toolbar;
 
     private List<Image> images;

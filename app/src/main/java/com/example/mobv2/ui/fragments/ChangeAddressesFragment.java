@@ -11,16 +11,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.adapters.AddressesAdapter;
 import com.example.mobv2.callbacks.GetAddressesCallback;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
+import com.example.mobv2.models.MyAddress;
 import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.google.gson.internal.LinkedTreeMap;
+
+import java.util.List;
 
 public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddressesBinding>
         implements HasToolbar
 {
     private Toolbar toolbar;
-    private RecyclerView addressesRecycler;
+    private RecyclerView addressesRecyclerView;
+    private ImageView noAddressesView;
+    private AddressesAdapter addressAdapter;
 
     public ChangeAddressesFragment()
     {
@@ -46,12 +53,32 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
 
     private void initAddressesRecycler()
     {
-        addressesRecycler = binding.addressesRecycler;
-        ImageView noAddressesView = binding.noAddressesView;
+        addressesRecyclerView = binding.addressesRecyclerView;
+        noAddressesView = binding.noAddressesView;
+        addressAdapter = new AddressesAdapter(mainActivity);
 
-        addressesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        addressesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        addressesRecyclerView.setAdapter(addressAdapter);
         noAddressesView.setVisibility(View.VISIBLE);
 
-        MainActivity.MOB_SERVER_API.me(new GetAddressesCallback(mainActivity, addressesRecycler, noAddressesView), MainActivity.token);
+        MainActivity.MOB_SERVER_API.me(new GetAddressesCallback(mainActivity, this::parseAddressesFromMapListAndAddToAddresses), MainActivity.token);
+    }
+
+    private void parseAddressesFromMapListAndAddToAddresses(List<LinkedTreeMap<String, Object>> mapList)
+    {
+        for (LinkedTreeMap<String, Object> item : mapList)
+        {
+            MyAddress address = new MyAddress.AddressBuilder().parseFromMap(item);
+            addressAdapter.addAddress(address);
+        }
+
+        noAddressesView.setVisibility(addressAdapter.getItemCount() < 1
+                ? View.VISIBLE
+                : View.INVISIBLE);
+    }
+
+    public interface Callback
+    {
+        void parseAddressesFromMapListAndAddToAddresses(List<LinkedTreeMap<String, Object>> mapList);
     }
 }

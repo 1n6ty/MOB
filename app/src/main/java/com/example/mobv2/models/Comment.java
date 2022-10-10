@@ -1,5 +1,6 @@
 package com.example.mobv2.models;
 
+import com.example.mobv2.models.abstractions.Takable;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -12,7 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class Comment
+public class Comment implements Takable
 {
     private final String id;
 
@@ -20,18 +21,18 @@ public class Comment
     private final Date date;
     private final String text;
     private final List<Reaction> reactions;
-    private final List<Integer> commentsIds;
-    private final List<Integer> positiveRates;
-    private final List<Integer> negativeRates;
+    private final List<String> commentsIds;
+    private final List<String> positiveRates;
+    private final List<String> negativeRates;
 
     private Comment(String id,
                     User user,
                     Date date,
                     String text,
                     List<Reaction> reactions,
-                    List<Integer> commentsIds,
-                    List<Integer> positiveRates,
-                    List<Integer> negativeRates)
+                    List<String> commentsIds,
+                    List<String> positiveRates,
+                    List<String> negativeRates)
     {
         this.id = id;
         this.user = user;
@@ -62,9 +63,9 @@ public class Comment
         private Date date;
         private String text;
         private List<Reaction> reactions;
-        private List<Integer> commentsIds;
-        private List<Integer> positiveRates;
-        private List<Integer> negativeRates;
+        private List<String> commentsIds;
+        private List<String> positiveRates;
+        private List<String> negativeRates;
 
         @Override
         public Comment parseFromMap(Map<String, Object> map)
@@ -110,7 +111,10 @@ public class Comment
         {
             var dataMap = (LinkedTreeMap<String, Object>) map.get("data");
             text = (String) dataMap.get("content");
-            commentsIds = (ArrayList<Integer>) dataMap.get("comment_ids");
+
+            commentsIds = new ArrayList<>();
+            for (var commentId : (ArrayList<Double>) dataMap.get("comment_ids"))
+                commentsIds.add(String.valueOf(commentId.intValue()));
         }
 
         private void parseReactionsFromMap(Map<String, Object> map)
@@ -130,9 +134,14 @@ public class Comment
 
         private void parseRateFromMap(Map<String, Object> map)
         {
-            var rateMap = (LinkedTreeMap<String, ArrayList<Integer>>) map.get("rate");
-            positiveRates = rateMap.get("p");
-            negativeRates = rateMap.get("n");
+            var rateMap = (LinkedTreeMap<String, ArrayList<Double>>) map.get("rate");
+            positiveRates = new ArrayList<>();
+            for (Double userId : rateMap.get("p"))
+                positiveRates.add(String.valueOf(userId.intValue()));
+
+            negativeRates = new ArrayList<>();
+            for (Double userId : rateMap.get("m"))
+                negativeRates.add(String.valueOf(userId.intValue()));
         }
     }
 
@@ -161,17 +170,17 @@ public class Comment
         return reactions;
     }
 
-    public List<Integer> getCommentsIds()
+    public List<String> getCommentsIds()
     {
         return commentsIds;
     }
 
-    public List<Integer> getPositiveRates()
+    public List<String> getPositiveRates()
     {
         return positiveRates;
     }
 
-    public List<Integer> getNegativeRates()
+    public List<String> getNegativeRates()
     {
         return negativeRates;
     }

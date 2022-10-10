@@ -36,7 +36,6 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     private NavigationView navigationView;
     private View headerView;
 
-
     public NavDrawer(MainActivity mainActivity)
     {
         this.mainActivity = mainActivity;
@@ -61,7 +60,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         binding.setBindingContext(mainFragmentViewModel);
     }
 
-    public void updateHeaderView()
+    private void updateHeaderView()
     {
         URL url;
         try

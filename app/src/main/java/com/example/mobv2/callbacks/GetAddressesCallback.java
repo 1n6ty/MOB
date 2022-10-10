@@ -1,32 +1,24 @@
 package com.example.mobv2.callbacks;
 
 import android.util.Log;
-import android.view.View;
 
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.mobv2.adapters.AddressesAdapter;
-import com.example.mobv2.models.Address;
 import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.fragments.ChangeAddressesFragment;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GetAddressesCallback implements MOBServerAPI.MOBAPICallback
 {
     private final MainActivity mainActivity;
-    private final RecyclerView recyclerView;
-    private final View noAddressesView;
+    private final ChangeAddressesFragment.Callback callback;
 
     public GetAddressesCallback(MainActivity mainActivity,
-                                RecyclerView recyclerView,
-                                View noAddressesView)
+                                ChangeAddressesFragment.Callback callback)
     {
         this.mainActivity = mainActivity;
-        this.recyclerView = recyclerView;
-        this.noAddressesView = noAddressesView;
+        this.callback = callback;
     }
 
     @Override
@@ -34,24 +26,10 @@ public class GetAddressesCallback implements MOBServerAPI.MOBAPICallback
     {
         Log.v("DEBUG", obj.toString());
 
-        LinkedTreeMap<String, Object> response =
-                (LinkedTreeMap<String, Object>) obj.get("response");
-        List<LinkedTreeMap<String, Object>> addressesMapList =
-                (List<LinkedTreeMap<String, Object>>) response.get("addresses");
+        var response = (LinkedTreeMap<String, Object>) obj.get("response");
+        var addressesMapList = (List<LinkedTreeMap<String, Object>>) response.get("addresses");
 
-        ArrayList<Address> addresses = new ArrayList<>();
-
-
-        for (LinkedTreeMap<String, Object> item : addressesMapList)
-        {
-            Address address = new Address.AddressBuilder().parseFromMap(item);
-            addresses.add(address);
-        }
-
-        recyclerView.setAdapter(new AddressesAdapter(mainActivity, addresses));
-        noAddressesView.setVisibility(addresses.size() < 1
-                ? View.VISIBLE
-                : View.INVISIBLE);
+        callback.parseAddressesFromMapListAndAddToAddresses(addressesMapList);
     }
 
     @Override

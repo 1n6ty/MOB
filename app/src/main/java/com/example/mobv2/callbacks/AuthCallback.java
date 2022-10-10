@@ -26,8 +26,8 @@ public class AuthCallback implements MOBServerAPI.MOBAPICallback
     public void funcOk(LinkedTreeMap<String, Object> obj)
     {
         Log.v("DEBUG", obj.toString());
-        LinkedTreeMap<String, Object> response =
-                (LinkedTreeMap<String, Object>) obj.get("response");
+
+        var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
         MainActivity.token = (String) response.get("token");
 

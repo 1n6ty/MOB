@@ -78,16 +78,11 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
                 errorPasswordView.setVisibility(View.INVISIBLE);
             }, DELAY);
 
-            if (phoneNumberText.isEmpty() && passwordText.isEmpty())
-            {
-                errorPhoneNumberView.setVisibility(View.VISIBLE);
-                errorPasswordView.setVisibility(View.VISIBLE);
-            }
-            else if (phoneNumberText.isEmpty())
+            if (phoneNumberText.isEmpty())
             {
                 errorPhoneNumberView.setVisibility(View.VISIBLE);
             }
-            else if (passwordText.isEmpty())
+            if (passwordText.isEmpty())
             {
                 errorPasswordView.setVisibility(View.VISIBLE);
             }

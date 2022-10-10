@@ -42,7 +42,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
     private Toolbar toolbar;
     private EditText markerTitleView;
     private EditText markerTextView;
-    private RecyclerView imagesView;
+    private RecyclerView imagesRecyclerView;
     private ImageView addImageButton;
 
     public MarkerCreatorFragment()
@@ -87,7 +87,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
     private void initImagesInfo()
     {
         addImageButton = binding.addImageButton;
-        imagesView = binding.imagesView;
+        imagesRecyclerView = binding.imagesRecyclerView;
 
         addImageButton.setOnClickListener(view ->
         {
@@ -113,8 +113,8 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
         }
 
         ImagesAdapter adapter = new ImagesAdapter((MainActivity) getActivity(), images);
-        imagesView.setLayoutManager(new LinearLayoutManager(getContext()));
-        imagesView.setAdapter(adapter);
+        imagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        imagesRecyclerView.setAdapter(adapter);
     }
 
     private void onConfirmAddingMarkerButtonClick(View view)
