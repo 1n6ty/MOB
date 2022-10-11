@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from Rule.models import User, Comment, Address
 
+@csrf_exempt
 def getComment(req):
     if req.method == 'GET':
         # get request parameters
@@ -57,9 +58,8 @@ def getComment(req):
 
         return JsonResponse({
             'response': {
-                'id': comment.id,
                 'user': {
-                    'nick': comment.user.nick,
+                    'nick_name': comment.user.nick,
                     'full_name': comment.user.full_name,
                     'email': comment.user.email,
                     'phone_number': comment.user.phone_number,
@@ -67,9 +67,10 @@ def getComment(req):
                     'profile_img_url': comment.user.profile_img.url
                 },
                 'data': {
+                    'id': comment.id,
                     'content': comment.content,
                     'comment_ids': [i.id for i in comment.comments.all()],
-                    'date': comment.date.strftime('%d.%m.%Y/%H:%M'),
+                    'public_date': comment.date.strftime('%d.%m.%Y/%H:%M'),
                 },
                 'reactions': comment.reactions,
                 'rate': comment.rate
@@ -330,7 +331,7 @@ def comment(req):
 
         return JsonResponse({
             'response': {
-                "comment_id": new_c.id
+                "id": new_c.id
             }
             }, status=200)
     return HttpResponse(status=405)

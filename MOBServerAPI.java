@@ -108,7 +108,7 @@ public class MOBServerAPI {
                                                                    @Header("Authorization") String token);
         @FormUrlEncoded
         @POST("urbaAPI/comment/create/")
-        Call<LinkedTreeMap<String, Object>> comment(@Field("parent_id") String post_id, @Field("content") String content, @Field("parent") String litera,
+        Call<LinkedTreeMap<String, Object>> comment(@Field("parent_id") String parent_id, @Field("content") String content, @Field("parent") String litera,
                                                     @Header("Authorization") String token);
 
         @FormUrlEncoded
@@ -130,6 +130,9 @@ public class MOBServerAPI {
         @FormUrlEncoded
         @POST("urbaAPI/user/edit/")
         Call<LinkedTreeMap<String, Object>> editUserPhone(@Field("phone_number") String phone_number, @Header("Authorization") String token);
+        @FormUrlEncoded
+        @POST("urbaAPI/user/edit/")
+        Call<LinkedTreeMap<String, Object>> editUserBio(@Field("Bio") String bio, @Header("Authorization") String token);
         @Multipart
         @POST("urbaAPI/user/edit/")
         Call<LinkedTreeMap<String, Object>> editUserProfileImg(@Part MultipartBody.Part img, @Header("Authorization") String token);
@@ -165,6 +168,11 @@ public class MOBServerAPI {
         @FormUrlEncoded
         @POST("urbaAPI/post/delete/")
         Call<LinkedTreeMap<String, Object>> deletePost(@Field("post_id") String post_id, @Header("Authorization") String token);
+
+        @FormUrlEncoded
+        @POST("urbaAPI/address/create/")
+        Call<LinkedTreeMap<String, Object>> createAddress(@Field("country") String country, @Field("city") String city,
+                                                            @Field("street") String street, @Field("house") String house, @Header("Authorization") String token);
     }
 
     public void refreshToken(MOBAPICallback obj,
@@ -218,9 +226,14 @@ public class MOBServerAPI {
             call.enqueue(createResponseCallback(obj));
         }
     }
-    public void comment(MOBAPICallback obj,
-                 String text, String parentId, String parent, String token){
-        Call<LinkedTreeMap<String, Object>> call = MOBAPI.comment(parentId, text, parent, token);
+    public void commentPost(MOBAPICallback obj,
+                 String text, String parentId, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.comment(parentId, text, "p", token);
+        call.enqueue(createResponseCallback(obj));
+    }
+    public void commentComment(MOBAPICallback obj,
+                 String text, String parentId, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.comment(parentId, text, "c", token);
         call.enqueue(createResponseCallback(obj));
     }
 
@@ -230,9 +243,13 @@ public class MOBServerAPI {
         call.enqueue(createResponseCallback(obj));
     }
     public void editUser(MOBAPICallback obj,
-                         String name, String nick_name, String password, String email, String phone_number, String new_profile_img_url, String token){
+                         String name, String nick_name, String password, String email, String bio, String phone_number, String new_profile_img_url, String token){
         if(name != null){
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserName(name, token);
+            call.enqueue(createResponseCallback(obj));
+        }
+        if(bio != null){
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserBio(name, token);
             call.enqueue(createResponseCallback(obj));
         }
         if(nick_name != null){
@@ -307,6 +324,13 @@ public class MOBServerAPI {
     public void commentDelete(MOBAPICallback obj,
                     String commentId, String token){
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.deleteComment(commentId, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+
+    public void createAddress(MOBAPICallback obj,
+                    String country, String city,
+                    String street, String house, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.createAddress(country, city, street, house, token);
         call.enqueue(createResponseCallback(obj));
     }
 }

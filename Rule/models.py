@@ -5,7 +5,7 @@ class Address(models.Model):
     country = models.CharField(max_length = 255, blank=False)
     city = models.CharField(max_length = 255, blank=False)
     street = models.CharField(max_length = 255, blank=False)
-    house = models.PositiveIntegerField(blank=False)
+    house = models.CharField(max_length = 10, blank = False)
     posts = models.ManyToManyField('PostWithMark', blank = True)
     comments = models.ManyToManyField('Comment', blank=True)
     users = models.ManyToManyField('User', blank=True, related_name="users")
@@ -19,6 +19,7 @@ class User(models.Model):
     phone_number = models.CharField(max_length= 17, unique=True, blank=False)
     password = models.CharField(max_length = 255, blank=False)
     addresses = models.ManyToManyField('Address', blank = True)
+    bio = models.CharField(max_length = 255, blank = True)
     prv_key = models.BigIntegerField(default=0)
     refresh = models.TextField(default='0')
 

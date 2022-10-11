@@ -5,11 +5,12 @@ from Rule.views.views import sessionTime, isCorruptedToken, getDataFromToken, cr
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
-from Rule.models import User
+from Rule.models import Address, User
 import random, time, string
 from MOB.settings import BASE_DIR
 from django.core.files import File
 
+@csrf_exempt
 def auth(req):
     if req.method == 'GET':
         # get request parameters
@@ -29,6 +30,9 @@ def auth(req):
             return JsonResponse({
                 'msg': "user_not_found"
             }, status = 404)
+        addresses = user.addresses.all()
+        if addresses.count() == 0:
+            addresses = 'none'
 
         # setting up session
         user.prv_key = random.randint(2**16, 2**32)
@@ -48,9 +52,25 @@ def auth(req):
                     'email': user.email,
                     'phone_number': user.phone_number,
                     'full_name': user.full_name,
-                    'nick': user.nick,
-                    'profile_img_url': user.profile_img.url 
-                }
+                    'nick_name': user.nick,
+                    'profile_img_url': user.profile_img.url,
+                    'bio': user.bio,
+                },
+                'addresses': addresses if addresses == 'none' else [{
+                    'country': i.country,
+                    'city': i.city,
+                    'street': i.street,
+                    'house': i.house,
+                    'owner': {
+                        'nick': i.owner.nick,
+                        'full_name': i.owner.full_name,
+                        'email': i.owner.email,
+                        'bio': i.owner.bio,
+                        'id': i.owner.id,
+                        'profile_img_url': i.owner.profile_img.url
+                    },
+                    'id': i.id
+                } for i in addresses]
             }
         }, status = 200)
 
@@ -104,9 +124,11 @@ def getUserProfile(req):
             'response': {
                 'user': {
                     'id': user_profile.id,
-                    'nick': user_profile.nick,
+                    'nick_name': user_profile.nick,
                     'full_name': user_profile.full_name,
-                    'profile_img_url': user_profile.profile_img.url
+                    'profile_img_url': user_profile.profile_img.url,
+                    'email': user_profile.email,
+                    'bio': user.bio,
                 }
             }
         }, status = 200)
@@ -161,10 +183,11 @@ def getMe(req):
         return JsonResponse({
             'response': {
                 'user': {
-                    'nick': user.nick,
+                    'nick_name': user.nick,
                     'full_name': user.full_name,
                     'email': user.email,
                     'phone_number': user.phone_number,
+                    'bio': user.bio,
                     'id': user.id,
                     'profile_img_url': user.profile_img.url
                 },
@@ -173,6 +196,15 @@ def getMe(req):
                     'city': current_address.city,
                     'street': current_address.street,
                     'house': current_address.house,
+                    'user_ids': [i.id for i in current_address.users],
+                    'owner': {
+                        'nick_name': current_address.owner.nick,
+                        'full_name': current_address.owner.full_name,
+                        'email': current_address.owner.email,
+                        'bio': current_address.owner.bio,
+                        'id': current_address.owner.id,
+                        'profile_img_url': current_address.owner.profile_img.url
+                    },
                     'id': current_address.id
                 },
                 'addresses': addresses if addresses == 'none' else [{
@@ -180,6 +212,14 @@ def getMe(req):
                     'city': i.city,
                     'street': i.street,
                     'house': i.house,
+                    'owner': {
+                        'nick_name': i.owner.nick,
+                        'full_name': i.owner.full_name,
+                        'email': i.owner.email,
+                        'bio': i.owner.bio,
+                        'id': i.owner.id,
+                        'profile_img_url': i.owner.profile_img.url
+                    },
                     'id': i.id
                 } for i in addresses]
             }
@@ -270,9 +310,12 @@ def editUser(req):
         new_full_name = req.POST.get('full_name', False)
         new_password = req.POST.get('password', False)
         new_email = req.POST.get('email', False)
+        new_bio = req.POST.get('bio', False)
         new_phone_number = req.POST.get('phone_number', False)
         if new_nick:
             user.nick = new_nick
+        if new_bio:
+            user.bio = new_bio
         if new_full_name:
             user.full_name = new_full_name
         if new_password:
@@ -301,6 +344,7 @@ def editUser(req):
         }, status = 200)
     return HttpResponse(status = 405)
 
+@csrf_exempt
 def refreshToken(req):
     if req.method == 'GET':
         # get request parameters

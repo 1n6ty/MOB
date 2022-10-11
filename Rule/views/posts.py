@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 
 fs = FileSystemStorage(location = MEDIA_ROOT + '/posts/')
 
+@csrf_exempt
 def getPost(req):
     if req.method == 'GET':
         # get request parameters
@@ -62,9 +63,8 @@ def getPost(req):
 
         return JsonResponse({
             'response': {
-                'id': post.id,
                 'user': {
-                    'nick': post.user.nick,
+                    'nick_name': post.user.nick,
                     'full_name': post.user.full_name,
                     'email': post.user.email,
                     'phone_number': post.user.phone_number,
@@ -72,11 +72,12 @@ def getPost(req):
                     'profile_img_url': post.user.profile_img.url
                 },
                 'data': {
+                    'id': post.id,
                     'title': post.title,
-                    'img_urls': post.images["images"],
+                    'image_urls': post.images["images"],
                     'content': post.content,
                     'comment_ids': [i.id for i in post.comments.all()],
-                    'date': post.date.strftime('%d.%m.%Y/%H:%M'),
+                    'public_date': post.date.strftime('%d.%m.%Y/%H:%M'),
                 },
                 'reactions': post.reactions,
                 'rate': post.rate
