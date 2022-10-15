@@ -22,10 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
-import com.example.mobv2.models.Comment;
-import com.example.mobv2.models.User;
+import com.example.mobv2.models.CommentImpl;
+import com.example.mobv2.models.abstractions.Comment;
 import com.example.mobv2.models.abstractions.Takable;
-import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.internal.LinkedTreeMap;
@@ -34,6 +34,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import serverapi.MOBServerAPI;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
 {
@@ -54,7 +56,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var commentsIds = takable.getCommentsIds();
         for (int i = 0; i < 4; i++)
         {
-            MainActivity.MOB_SERVER_API.getComment(new MOBServerAPI.MOBAPICallback()
+            mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
             {
                 @Override
                 public void funcOk(LinkedTreeMap<String, Object> obj)
@@ -63,7 +65,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
                     var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-                    Comment comment = new Comment.CommentBuilder().parseFromMap(response);
+                    CommentImpl comment = new CommentImpl.CommentBuilder().parseFromMap(response);
                     addComment(comment);
 
                     lastIndex++;
@@ -112,7 +114,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 if (lastIndex < getItemCount() && (totalItemCount - visibleItemCount <= firstVisibleItem))
                 {
                     var commentsIds = takable.getCommentsIds();
-                    MainActivity.MOB_SERVER_API.getComment(new MOBServerAPI.MOBAPICallback()
+                    mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
                     {
                         @Override
                         public void funcOk(LinkedTreeMap<String, Object> obj)
@@ -121,7 +123,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
                             var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-                            Comment comment = new Comment.CommentBuilder().parseFromMap(response);
+                            CommentImpl comment =
+                                    new CommentImpl.CommentBuilder().parseFromMap(response);
                             addComment(comment);
                         }
 
@@ -161,7 +164,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
 
-        holder.fullNameView.setText(user.getFullname());
+        holder.fullNameView.setText(user.getFullName());
 
         holder.commentTextView.setText(comment.getText());
 
@@ -317,7 +320,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         takable.getCommentsIds()
                .remove(comment.getId());
 
-        MainActivity.MOB_SERVER_API.commentDelete(new MOBAPICallbackImpl(), String.valueOf(comment.getId()), MainActivity.token);
+        mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);
 
         Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
              .show();

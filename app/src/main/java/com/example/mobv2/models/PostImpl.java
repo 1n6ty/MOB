@@ -3,7 +3,9 @@ package com.example.mobv2.models;
 import androidx.annotation.Nullable;
 import androidx.databinding.ObservableInt;
 
+import com.example.mobv2.models.abstractions.Post;
 import com.example.mobv2.models.abstractions.Takable;
+import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
@@ -15,40 +17,38 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
-public class Post implements Takable
+public class PostImpl implements Post, Takable
 {
     public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
 
     private final String id;
 
-    private final User user;
+    private final UserImpl user;
     private final Date date;
+    private final String title;
     private final String text;
+    private final List<String> images;
     private final List<Reaction> reactions;
     private final MyObservableArrayList<String> commentsIds;
     private final MyObservableArrayList<String> positiveRates;
     private final MyObservableArrayList<String> negativeRates;
 
-    private final String title;
-    private final List<String> images;
-
-    private final int type;
-
     private final ObservableInt commentsCount;
     private final ObservableInt appreciationsCount;
 
-    private Post(String id,
-                 User user,
-                 Date date,
-                 String title,
-                 String text,
-                 List<String> images,
-                 List<Reaction> reactions,
-                 List<String> commentsIds,
-                 List<String> positiveRates,
-                 List<String> negativeRates)
+    private final int type;
+
+    private PostImpl(String id,
+                     UserImpl user,
+                     Date date,
+                     String title,
+                     String text,
+                     List<String> images,
+                     List<Reaction> reactions,
+                     List<String> commentsIds,
+                     List<String> positiveRates,
+                     List<String> negativeRates)
     {
         this.id = id;
         this.title = title;
@@ -57,12 +57,9 @@ public class Post implements Takable
         this.text = text;
         this.images = images;
 
-        if (images == null || images.isEmpty())
-            type = POST_ONLY_TEXT;
-        else if (text == null || text.isEmpty())
-            type = POST_ONLY_IMAGES;
-        else
-            type = POST_FULL;
+        if (images == null || images.isEmpty()) type = POST_ONLY_TEXT;
+        else if (text == null || text.isEmpty()) type = POST_ONLY_IMAGES;
+        else type = POST_FULL;
 
         this.reactions = reactions;
         this.commentsIds = new MyObservableArrayList<>(commentsIds);
@@ -77,26 +74,11 @@ public class Post implements Takable
         this.negativeRates.setOnListChangedCallback(new Operation(appreciationsCount, -1, 1));
     }
 
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public List<String> getImages()
-    {
-        return images;
-    }
-
-    public int getType()
-    {
-        return type;
-    }
-
-    public static final class PostBuilder implements ParsableFromMap<Post>
+    public static final class PostBuilder implements ParsableFromMap<PostImpl>
     {
         private String id;
 
-        private User user;
+        private UserImpl user;
         private Date date;
         private String text;
         private List<Reaction> reactions;
@@ -107,10 +89,9 @@ public class Post implements Takable
         private List<String> images;
 
         @Override
-        public Post parseFromMap(Map<String, Object> map)
+        public PostImpl parseFromMap(Map<String, Object> map)
         {
-            if (map == null)
-                return null;
+            if (map == null) return null;
 
             parseDateFromMap(map);
             parseIdFromMap(map);
@@ -119,26 +100,26 @@ public class Post implements Takable
             parseReactionsFromMap(map);
             parseRateFromMap(map);
 
-            return new Post(id, user, date, title, text, images, reactions, commentsIds, positiveRates, negativeRates);
+            return new PostImpl(id, user, date, title, text, images, reactions, commentsIds, positiveRates, negativeRates);
         }
 
         private void parseIdFromMap(Map<String, Object> map)
         {
-            id = String.valueOf(((Double) map.get("id")).intValue());
+            id = String.valueOf(((Double) getDataMap(map).get("id")).intValue());
         }
 
         private void parseUserFromMap(Map<String, Object> map)
         {
             var userMap = (LinkedTreeMap<String, Object>) map.get("user");
-            user = new User.UserBuilder().parseFromMap(userMap);
+            user = new UserImpl.UserBuilder().parseFromMap(userMap);
         }
 
         private void parseDateFromMap(Map<String, Object> map)
         {
             try
             {
-                var formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                date = formatter.parse((String) Objects.requireNonNull(map.get("date")));
+                var formatter = new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault());
+                date = formatter.parse((String) ((getDataMap(map).get("public_date"))));
             }
             catch (ParseException e)
             {
@@ -148,13 +129,14 @@ public class Post implements Takable
 
         private void parseDataFromMap(Map<String, Object> map)
         {
-            var dataMap = (LinkedTreeMap<String, Object>) map.get("data");
+            var dataMap = getDataMap(map);
             title = (String) dataMap.get("title");
             text = (String) dataMap.get("content");
             images = (ArrayList<String>) dataMap.get("img_urls");
 
             commentsIds = new ArrayList<>();
-            for (var commentId : (ArrayList<Double>) dataMap.get("comment_ids"))
+            var rawCommentIds = (ArrayList<Double>) dataMap.get("comment_ids");
+            for (var commentId : rawCommentIds)
                 commentsIds.add(String.valueOf(commentId.intValue()));
         }
 
@@ -184,43 +166,68 @@ public class Post implements Takable
             for (Double userId : rateMap.get("m"))
                 negativeRates.add(String.valueOf(userId.intValue()));
         }
+
+        private LinkedTreeMap<String, Object> getDataMap(Map<String, Object> map)
+        {
+            return (LinkedTreeMap<String, Object>) map.get("data");
+        }
     }
 
+    @Override
     public String getId()
     {
         return id;
     }
 
+    @Override
     public User getUser()
     {
         return user;
     }
 
+    @Override
     public Date getDate()
     {
         return date;
     }
 
+    @Override
+    public String getTitle()
+    {
+        return title;
+    }
+
+    @Override
     public String getText()
     {
         return text;
     }
 
+    @Override
+    public List<String> getImages()
+    {
+        return images;
+    }
+
+    @Override
     public List<Reaction> getReactions()
     {
         return reactions;
     }
 
+    @Override
     public List<String> getCommentsIds()
     {
         return commentsIds;
     }
 
+    @Override
     public List<String> getPositiveRates()
     {
         return positiveRates;
     }
 
+    @Override
     public List<String> getNegativeRates()
     {
         return negativeRates;
@@ -236,7 +243,12 @@ public class Post implements Takable
         return appreciationsCount;
     }
 
-    static class Operation implements MyObservableArrayList.OnListChangedCallback<String>
+    public int getType()
+    {
+        return type;
+    }
+
+    private static class Operation implements MyObservableArrayList.OnListChangedCallback<String>
     {
         private final ObservableInt observableInt;
         private final int firstOperand;

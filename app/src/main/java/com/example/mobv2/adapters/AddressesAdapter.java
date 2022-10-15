@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.ItemAddressBinding;
-import com.example.mobv2.models.MyAddress;
+import com.example.mobv2.models.abstractions.Address;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
 
@@ -52,7 +52,7 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
                                  int position)
     {
         AddressItem addressItem = addressItems.get(position);
-        MyAddress address = addressItem.getAddress();
+        Address address = addressItem.getAddress();
 
         holder.addressPrimaryView.setText(address.getPrimary());
         holder.addressSecondaryView.setText(address.getSecondary());
@@ -87,8 +87,8 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         }
 
         addressItem.setChecked(true);
-        MyAddress address = addressItem.getAddress();
-        MainActivity.MOB_SERVER_API.setLocation(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
+        Address address = addressItem.getAddress();
+        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(MainActivity.ADDRESS_ID_KEY, address.getId());
         editor.putString(MainActivity.ADDRESS_FULL_KEY, address.toString());
@@ -102,7 +102,7 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         notifyItemRangeChanged(0, addressItems.size());
     }
 
-    public void addAddress(MyAddress address)
+    public void addAddress(Address address)
     {
         addressItems.add(new AddressItem(address, false));
         notifyItemInserted(addressItems.size() - 1);
@@ -133,17 +133,17 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
 
     protected static class AddressItem
     {
-        private final MyAddress address;
+        private final Address address;
         private boolean checked;
 
-        public AddressItem(MyAddress address,
+        public AddressItem(Address address,
                            boolean checked)
         {
             this.address = address;
             this.checked = checked;
         }
 
-        public MyAddress getAddress()
+        public Address getAddress()
         {
             return address;
         }

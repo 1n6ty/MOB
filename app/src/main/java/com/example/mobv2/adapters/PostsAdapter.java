@@ -26,7 +26,7 @@ import com.example.mobv2.R;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.Image;
-import com.example.mobv2.models.Post;
+import com.example.mobv2.models.PostImpl;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.comments.CommentsFragment;
 import com.example.mobv2.ui.fragments.comments.CommentsFragmentViewModel;
@@ -38,13 +38,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
 {
     private final MainActivity mainActivity;
     private final MapAdapter.MapAdapterCallback callback;
 
-    private final List<Post> posts;
+    private final List<PostImpl> posts;
 
     // TODO destroy the mapAdapter from this side
     public PostsAdapter(MainActivity mainActivity,
@@ -94,9 +95,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
 
-        holder.fullNameView.setText(user.getFullname());
+        holder.fullNameView.setText(user.getFullName());
 
-        holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
+        holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(post.getDate()));
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
@@ -120,7 +121,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     }
 
     private void onCommentViewClick(View view,
-                                    Post post,
+                                    PostImpl post,
                                     ReactionsPostAdapter reactionsAdapter)
     {
         var postItem = new PostItem(post, reactionsAdapter);
@@ -130,7 +131,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         mainActivity.goToFragment(new CommentsFragment());
     }
 
-    public void addPost(Post post)
+    public void addPost(PostImpl post)
     {
         Date date = post.getDate();
         if (posts.isEmpty() || date.compareTo(posts.get(posts.size() - 1)
@@ -224,12 +225,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         switch (post.getType())
         {
-            case Post.POST_ONLY_TEXT:
-            case Post.POST_FULL:
+            case PostImpl.POST_ONLY_TEXT:
+            case PostImpl.POST_FULL:
                 menu.findItem(R.id.menu_copy_post)
                     .setVisible(true);
                 break;
-            case Post.POST_ONLY_IMAGES:
+            case PostImpl.POST_ONLY_IMAGES:
                 menu.findItem(R.id.menu_copy_post)
                     .setVisible(false);
                 break;
@@ -277,12 +278,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         switch (post.getType())
         {
-            case Post.POST_ONLY_TEXT:
+            case PostImpl.POST_ONLY_TEXT:
                 content.second.setVisibility(View.GONE);
                 break;
-            case Post.POST_ONLY_IMAGES:
+            case PostImpl.POST_ONLY_IMAGES:
                 content.first.setVisibility(View.GONE);
-            case Post.POST_FULL:
+            case PostImpl.POST_FULL:
                 List<Image> images = new ArrayList<>();
                 for (String url : post.getImages())
                 {
@@ -324,13 +325,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     private boolean deletePost(int position)
     {
-        Post post = posts.get(position);
+        PostImpl post = posts.get(position);
 
         callback.removeMarkerByPostId(post.getId());
         posts.remove(post);
         notifyItemRemoved(position);
 
-        MainActivity.MOB_SERVER_API.postDelete(new MOBAPICallbackImpl(), String.valueOf(post.getId()), MainActivity.token);
+        mainActivity.mobServerAPI.postDelete(new MOBAPICallbackImpl(), post.getId(), MainActivity.token);
 
         Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
              .show();
@@ -392,17 +393,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     public static class PostItem
     {
-        private final Post post;
+        private final PostImpl post;
         private final ReactionsPostAdapter reactionsPostAdapter;
 
-        public PostItem(Post post,
+        public PostItem(PostImpl post,
                         ReactionsPostAdapter reactionsPostAdapter)
         {
             this.post = post;
             this.reactionsPostAdapter = reactionsPostAdapter;
         }
 
-        public Post getPost()
+        public PostImpl getPost()
         {
             return post;
         }

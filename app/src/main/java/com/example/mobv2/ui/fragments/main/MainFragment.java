@@ -106,7 +106,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void setAddressInToken()
     {
-        MainActivity.MOB_SERVER_API.setLocation(new SetAddressCallback(mainActivity),
+        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
                 preferences.getString(MainActivity.ADDRESS_ID_KEY, ""), MainActivity.token);
     }
 

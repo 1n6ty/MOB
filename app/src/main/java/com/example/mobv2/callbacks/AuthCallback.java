@@ -1,25 +1,26 @@
 package com.example.mobv2.callbacks;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.mobv2.R;
-import com.example.mobv2.models.User;
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.main.MainFragment;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.Map;
+import serverapi.MOBServerAPI;
 
 public class AuthCallback implements MOBServerAPI.MOBAPICallback
 {
     private final MainActivity mainActivity;
+    private final AuthFragment.Callback callback;
 
-    public AuthCallback(MainActivity mainActivity)
+    public AuthCallback(MainActivity mainActivity,
+                        AuthFragment.Callback callback)
     {
         this.mainActivity = mainActivity;
+        this.callback = callback;
     }
 
     @Override
@@ -29,19 +30,7 @@ public class AuthCallback implements MOBServerAPI.MOBAPICallback
 
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-        MainActivity.token = (String) response.get("token");
-
-        User user = new User.UserBuilder().parseFromMap((Map<String, Object>) response.get("user"));
-
-        SharedPreferences.Editor editor = mainActivity.getPrivatePreferences()
-                                                      .edit();
-        editor.putString(MainActivity.USER_ID_KEY, user.getId());
-        editor.putString(MainActivity.USER_AVATAR_URL_KEY, user.getAvatarUrl());
-        editor.putString(MainActivity.USER_NICKNAME_KEY, user.getNickName());
-        editor.putString(MainActivity.USER_FULLNAME_KEY, user.getFullname());
-        editor.putString(MainActivity.USER_EMAIL_KEY, user.getEmail());
-        editor.putString(MainActivity.USER_PHONE_NUMBER_KEY, user.getPhoneNumber());
-        editor.apply();
+        callback.parseUserInfoFromMapAndAddToLocalDatabase(response);
 
         mainActivity.replaceFragment(new MainFragment());
     }

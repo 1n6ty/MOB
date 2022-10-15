@@ -1,10 +1,11 @@
 package com.example.mobv2.models;
 
+import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 
 import java.util.Map;
 
-public class User
+public class UserImpl implements User
 {
     private final String id;
 
@@ -15,13 +16,13 @@ public class User
     private final String email;
     private final String phoneNumber;
 
-    private User(String id,
-                 String avatarUrl,
-                 String nickName,
-                 String name,
-                 String surname,
-                 String email,
-                 String phoneNumber)
+    protected UserImpl(String id,
+                       String avatarUrl,
+                       String nickName,
+                       String name,
+                       String surname,
+                       String email,
+                       String phoneNumber)
     {
         this.id = id;
         this.avatarUrl = avatarUrl;
@@ -32,7 +33,7 @@ public class User
         this.phoneNumber = phoneNumber;
     }
 
-    public static class UserBuilder implements ParsableFromMap<User>
+    public static class UserBuilder implements ParsableFromMap<UserImpl>
     {
         private String id;
 
@@ -44,7 +45,7 @@ public class User
         private String phoneNumber;
 
         @Override
-        public User parseFromMap(Map<String, Object> map)
+        public UserImpl parseFromMap(Map<String, Object> map)
         {
             if (map == null)
                 return null;
@@ -56,7 +57,7 @@ public class User
             parseEmailFromMap(map);
             parsePhoneNumberFromMap(map);
 
-            return new User(id, avatarUrl, nickName, name, surname, email, phoneNumber);
+            return new UserImpl(id, avatarUrl, nickName, name, surname, email, phoneNumber);
         }
 
         private void parseIdFromMap(Map<String, Object> map)
@@ -92,41 +93,49 @@ public class User
         }
     }
 
+    @Override
     public String getId()
     {
         return id;
     }
 
+    @Override
     public String getAvatarUrl()
     {
         return avatarUrl;
     }
 
+    @Override
     public String getNickName()
     {
         return nickName;
     }
 
-    public String getFullname()
+    @Override
+    public String getFullName()
     {
         return name + " " + surname;
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
+    @Override
     public String getSurname()
     {
         return surname;
     }
 
+    @Override
     public String getEmail()
     {
         return email;
     }
 
+    @Override
     public String getPhoneNumber()
     {
         return phoneNumber;

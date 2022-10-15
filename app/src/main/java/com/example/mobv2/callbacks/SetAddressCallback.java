@@ -2,9 +2,10 @@ package com.example.mobv2.callbacks;
 
 import android.util.Log;
 
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
+
+import serverapi.MOBServerAPI;
 
 public class SetAddressCallback implements MOBServerAPI.MOBAPICallback
 {

@@ -92,7 +92,7 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
 
         //TODO change
         reactions.add(new Reaction(emoji, userIdsWhoLiked, true));
-        MainActivity.MOB_SERVER_API.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
+        mainActivity.mobServerAPI.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         notifyItemInserted(reactions.size() - 1);
         return true;
     }
@@ -111,13 +111,13 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
         {
             reaction.setChecked(false);
             userIdsWhoLiked.remove(userId);
-            MainActivity.MOB_SERVER_API.postUnreact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
+            mainActivity.mobServerAPI.postUnreact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         }
         else
         {
             reaction.setChecked(true);
             userIdsWhoLiked.add(userId);
-            MainActivity.MOB_SERVER_API.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
+            mainActivity.mobServerAPI.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         }
 
         //TODO will be remade

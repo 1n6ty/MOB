@@ -1,6 +1,8 @@
 package com.example.mobv2.models;
 
+import com.example.mobv2.models.abstractions.Comment;
 import com.example.mobv2.models.abstractions.Takable;
+import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -11,13 +13,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
-public class Comment implements Takable
+public class CommentImpl implements Comment, Takable
 {
     private final String id;
 
-    private final User user;
+    private final UserImpl user;
     private final Date date;
     private final String text;
     private final List<Reaction> reactions;
@@ -25,17 +26,17 @@ public class Comment implements Takable
     private final List<String> positiveRates;
     private final List<String> negativeRates;
 
-    private Comment(String id,
-                    User user,
-                    Date date,
-                    String text,
-                    List<Reaction> reactions,
-                    List<String> commentsIds,
-                    List<String> positiveRates,
-                    List<String> negativeRates)
+    private CommentImpl(String id,
+                        User user,
+                        Date date,
+                        String text,
+                        List<Reaction> reactions,
+                        List<String> commentsIds,
+                        List<String> positiveRates,
+                        List<String> negativeRates)
     {
         this.id = id;
-        this.user = user;
+        this.user = (UserImpl) user;
         this.date = date;
         this.text = text;
         this.reactions = reactions;
@@ -44,18 +45,14 @@ public class Comment implements Takable
         this.negativeRates = negativeRates;
     }
 
-    public static Comment createNewComment(String id,
-                                           User user,
-                                           String text)
+    public static CommentImpl createNewComment(String id,
+                                               User user,
+                                               String text)
     {
-        return new Comment(id, user, new Date(), text,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>());
+        return new CommentImpl(id, user, new Date(), text, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
-    public static final class CommentBuilder implements ParsableFromMap<Comment>
+    public static final class CommentBuilder implements ParsableFromMap<CommentImpl>
     {
         private String id;
 
@@ -68,10 +65,9 @@ public class Comment implements Takable
         private List<String> negativeRates;
 
         @Override
-        public Comment parseFromMap(Map<String, Object> map)
+        public CommentImpl parseFromMap(Map<String, Object> map)
         {
-            if (map == null)
-                return null;
+            if (map == null) return null;
 
             parseDateFromMap(map);
             parseIdFromMap(map);
@@ -80,18 +76,18 @@ public class Comment implements Takable
             parseReactionsFromMap(map);
             parseRateFromMap(map);
 
-            return new Comment(id, user, date, text, reactions, commentsIds, positiveRates, negativeRates);
+            return new CommentImpl(id, user, date, text, reactions, commentsIds, positiveRates, negativeRates);
         }
 
         private void parseIdFromMap(Map<String, Object> map)
         {
-            id = String.valueOf(((Double) map.get("id")).intValue());
+            id = String.valueOf(((Double) getDataMap(map).get("id")).intValue());
         }
 
         private void parseUserFromMap(Map<String, Object> map)
         {
             var userMap = (LinkedTreeMap<String, Object>) map.get("user");
-            user = new User.UserBuilder().parseFromMap(userMap);
+            user = new UserImpl.UserBuilder().parseFromMap(userMap);
         }
 
         private void parseDateFromMap(Map<String, Object> map)
@@ -99,7 +95,7 @@ public class Comment implements Takable
             try
             {
                 var formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                date = formatter.parse((String) Objects.requireNonNull(map.get("date")));
+                date = formatter.parse((String) ((getDataMap(map).get("public_date"))));
             }
             catch (ParseException e)
             {
@@ -109,11 +105,12 @@ public class Comment implements Takable
 
         private void parseDataFromMap(Map<String, Object> map)
         {
-            var dataMap = (LinkedTreeMap<String, Object>) map.get("data");
+            var dataMap = getDataMap(map);
             text = (String) dataMap.get("content");
 
             commentsIds = new ArrayList<>();
-            for (var commentId : (ArrayList<Double>) dataMap.get("comment_ids"))
+            var rawCommentIds = (ArrayList<Double>) dataMap.get("comment_ids");
+            for (var commentId : rawCommentIds)
                 commentsIds.add(String.valueOf(commentId.intValue()));
         }
 
@@ -143,43 +140,56 @@ public class Comment implements Takable
             for (Double userId : rateMap.get("m"))
                 negativeRates.add(String.valueOf(userId.intValue()));
         }
+
+        private LinkedTreeMap<String, Object> getDataMap(Map<String, Object> map)
+        {
+            return (LinkedTreeMap<String, Object>) map.get("data");
+        }
     }
 
+    @Override
     public String getId()
     {
         return id;
     }
 
+    @Override
     public User getUser()
     {
         return user;
     }
 
+    @Override
     public Date getDate()
     {
         return date;
     }
 
+    @Override
     public String getText()
     {
         return text;
     }
 
+    @Override
     public List<Reaction> getReactions()
     {
         return reactions;
     }
 
+    @Override
     public List<String> getCommentsIds()
     {
         return commentsIds;
     }
 
+    @Override
     public List<String> getPositiveRates()
     {
         return positiveRates;
     }
 
+    @Override
     public List<String> getNegativeRates()
     {
         return negativeRates;

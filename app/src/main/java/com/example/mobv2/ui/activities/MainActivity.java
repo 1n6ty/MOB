@@ -10,11 +10,11 @@ import android.widget.ImageView;
 import androidx.annotation.AnimatorRes;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ActivityMainBinding;
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.fragments.main.MainFragment;
@@ -22,12 +22,17 @@ import com.example.mobv2.ui.fragments.main.MainFragment;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import localdatabase.ApplicationDatabase;
+import serverapi.MOBServerAPI;
+
 public class MainActivity extends ThemedActivity
 {
+    private static final String ip = "http://192.168.0.104:8000";
+
     //WARNING UNSAFE
-    public static final MOBServerAPI MOB_SERVER_API =
-            new MOBServerAPI("http://192.168.0.104:8000/");
     public static String token = "";
+    public MOBServerAPI mobServerAPI;
+    public ApplicationDatabase appDatabase;
 
     // USER
     public static final String USER_ID_KEY = "USER_ID_KEY";
@@ -40,23 +45,24 @@ public class MainActivity extends ThemedActivity
     // ADDRESS
     public static final String ADDRESS_ID_KEY = "ADDRESS_ID_KEY";
     public static final String ADDRESS_FULL_KEY = "ADDRESS_FULL_KEY";
-    /*
-    public static final String ADDRESS_COUNTRY_KEY = "ADDRESS_COUNTRY_KEY";
-    public static final String ADDRESS_CITY_KEY = "ADDRESS_CITY_KEY";
-    public static final String ADDRESS_STREET_KEY = "ADDRESS_CITY_KEY";
-    public static final String ADDRESS_HOUSE_KEY = "ADDRESS_HOUSE_KEY";
-     */
-
-    public static MOBServerAPI.MOBAPICallback[] callbacks;
 
     private ActivityMainBinding binding;
 
     private FrameLayout navContentFrame;
 
+    public MainActivity()
+    {
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        mobServerAPI = new MOBServerAPI(ip + "/");
+        appDatabase =
+                Room.databaseBuilder(getApplicationContext(), ApplicationDatabase.class, "information_about_session_database")
+                    .build();
 
         initViewBinding();
 
@@ -161,7 +167,7 @@ public class MainActivity extends ThemedActivity
         URL url;
         try
         {
-            url = new URL("http://192.168.0.104:8000" + path);
+            url = new URL(ip + path);
         }
         catch (MalformedURLException e)
         {

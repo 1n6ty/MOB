@@ -36,7 +36,7 @@
                     android:layout_marginHorizontal="@dimen/horizontal_margin"
                     android:autofillHints="phone"
                     android:hint="@string/auth_phone_hint"
-                    android:inputType="phone" />
+                    android:inputType="text" />
             </LinearLayout>
 
             <LinearLayout

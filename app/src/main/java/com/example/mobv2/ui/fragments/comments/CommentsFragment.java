@@ -23,9 +23,9 @@ import com.example.mobv2.adapters.CommentsAdapter;
 import com.example.mobv2.adapters.ImagesAdapter;
 import com.example.mobv2.callbacks.CommentCallback;
 import com.example.mobv2.databinding.FragmentCommentsBinding;
-import com.example.mobv2.models.Comment;
+import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.Image;
-import com.example.mobv2.models.Post;
+import com.example.mobv2.models.PostImpl;
 import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
@@ -108,7 +108,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
         MainActivity.loadImageInView(user.getAvatarUrl(), itemPost.getRoot(), itemPost.avatarView);
 
-        itemPost.fullNameView.setText(user.getFullname());
+        itemPost.fullNameView.setText(user.getFullName());
 
         itemPost.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(post.getDate()));
 
@@ -140,7 +140,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
         itemPost.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         itemPost.reactionsRecyclerView.setAdapter(viewModel.getPostItem()
-                                                   .getReactionsAdapter());
+                                                           .getReactionsAdapter());
 
         itemPost.showCommentsView.setVisibility(View.GONE);
     }
@@ -159,13 +159,13 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
         switch (post.getType())
         {
-            case Post.POST_ONLY_TEXT:
+            case PostImpl.POST_ONLY_TEXT:
                 content.first.setText(post.getText());
                 content.second.setVisibility(View.GONE);
                 break;
-            case Post.POST_ONLY_IMAGES:
+            case PostImpl.POST_ONLY_IMAGES:
                 content.first.setVisibility(View.GONE);
-            case Post.POST_FULL:
+            case PostImpl.POST_FULL:
                 content.first.setText(post.getText());
                 List<Image> images = new ArrayList<>();
                 for (String url : post.getImages())
@@ -241,7 +241,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         var post = viewModel.getPostItem()
                             .getPost();
         var messageText = messageView.getText();
-        MainActivity.MOB_SERVER_API.commentThePost(new CommentCallback(mainActivity, this::createCommentByIdAndAddToPosts),
+        mainActivity.mobServerAPI.commentPost(new CommentCallback(mainActivity, this::createCommentByIdAndAddToPosts),
                 messageText.toString(), post.getId(), MainActivity.token);
     }
 
@@ -251,8 +251,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
                             .getPost();
         Editable messageText = messageView.getText();
 
-        Comment comment =
-                Comment.createNewComment(commentId, post.getUser(), messageText.toString());
+        CommentImpl comment =
+                CommentImpl.createNewComment(commentId, post.getUser(), messageText.toString());
         commentsAdapter.addComment(comment);
         post.getCommentsIds()
             .add(commentId);

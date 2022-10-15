@@ -14,7 +14,8 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.AddressesAdapter;
 import com.example.mobv2.callbacks.GetAddressesCallback;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
-import com.example.mobv2.models.MyAddress;
+import com.example.mobv2.models.AddressImpl;
+import com.example.mobv2.models.abstractions.Address;
 import com.example.mobv2.ui.abstractions.HasToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
@@ -61,14 +62,14 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         addressesRecyclerView.setAdapter(addressAdapter);
         noAddressesView.setVisibility(View.VISIBLE);
 
-        MainActivity.MOB_SERVER_API.me(new GetAddressesCallback(mainActivity, this::parseAddressesFromMapListAndAddToAddresses), MainActivity.token);
+        mainActivity.mobServerAPI.me(new GetAddressesCallback(mainActivity, this::parseAddressesFromMapListAndAddToAddresses), MainActivity.token);
     }
 
     private void parseAddressesFromMapListAndAddToAddresses(List<LinkedTreeMap<String, Object>> mapList)
     {
         for (LinkedTreeMap<String, Object> item : mapList)
         {
-            MyAddress address = new MyAddress.AddressBuilder().parseFromMap(item);
+            Address address = new AddressImpl.AddressBuilder().parseFromMap(item);
             addressAdapter.addAddress(address);
         }
 

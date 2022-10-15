@@ -5,9 +5,10 @@ import android.util.Log;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.adapters.PostsAdapter;
-import com.example.mobv2.models.Post;
-import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.models.PostImpl;
 import com.google.gson.internal.LinkedTreeMap;
+
+import serverapi.MOBServerAPI;
 
 public class GetPostCallback implements MOBServerAPI.MOBAPICallback
 {
@@ -25,7 +26,7 @@ public class GetPostCallback implements MOBServerAPI.MOBAPICallback
 
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-        Post post = new Post.PostBuilder().parseFromMap(response);
+        PostImpl post = new PostImpl.PostBuilder().parseFromMap(response);
         var postsAdapter = (PostsAdapter) postsRecycler.getAdapter();
         postsAdapter.addPost(post);
         postsRecycler.scrollToPosition(0);

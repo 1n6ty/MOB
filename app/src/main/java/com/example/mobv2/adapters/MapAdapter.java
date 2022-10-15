@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.callbacks.GetMarksCallback;
 import com.example.mobv2.callbacks.GetPostCallback;
+import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.models.MarkerInfo;
-import com.example.mobv2.models.MyAddress;
-import com.example.mobv2.serverapi.MOBServerAPI;
+import com.example.mobv2.models.abstractions.Address;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.markercreators.MapSkillsBottomSheetFragment;
 import com.example.mobv2.ui.fragments.markercreators.MarkerCreatorViewModel;
@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import serverapi.MOBServerAPI;
 
 public class MapAdapter extends MapView.Adapter
 {
@@ -76,12 +78,12 @@ public class MapAdapter extends MapView.Adapter
 
         if (addressString.isEmpty()) return;
         LatLng addressLatLng =
-                getLatLngByAddress(new MyAddress.AddressBuilder().parseFromString(addressString));
+                getLatLngByAddress(new AddressImpl.AddressBuilder().parseFromString(addressString));
         // add address marker
         addMarker(new MarkerInfo(addressString, addressLatLng, MarkerInfo.ADDRESS_MARKER));
 
         // add other markers
-        MainActivity.MOB_SERVER_API.getMarks(new GetMarksCallback(mainActivity, this::parseMarkersFromMapAndAddToMarkers), MainActivity.token);
+        mainActivity.mobServerAPI.getMarks(new GetMarksCallback(mainActivity, this::parseMarkersFromMapAndAddToMarkers), MainActivity.token);
         animateCameraTo(addressLatLng);
     }
 
@@ -196,24 +198,24 @@ public class MapAdapter extends MapView.Adapter
             }
         });
 
-        MyAddress address = getAddressByLatLng(latLng);
+        Address address = getAddressByLatLng(latLng);
 
         markerCreatorViewModel.setAddress(address);
     }
 
-    private MyAddress getAddressByLatLng(@NonNull LatLng latLng)
+    private Address getAddressByLatLng(@NonNull LatLng latLng)
     {
-        MyAddress address = null;
+        Address address = null;
         try
         {
             Geocoder geocoder = new Geocoder(mainActivity, LOCALE);
             android.location.Address mapAddress =
                     geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
                             .get(0);
-            address = new MyAddress(mapAddress.getCountryName(),
+            address = AddressImpl.createRawAddress(mapAddress.getCountryName(),
                     mapAddress.getLocality(),
                     mapAddress.getThoroughfare(),
-                    Integer.parseInt(mapAddress.getFeatureName()));
+                    mapAddress.getFeatureName());
 
         }
         catch (IOException e)
@@ -276,14 +278,14 @@ public class MapAdapter extends MapView.Adapter
                 {
                     if (markerInfoItem.getMarkerType() == MarkerInfo.SUB_ADDRESS_MARKER)
                     {
-                        MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler),
+                        mainActivity.mobServerAPI.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler),
                                 String.valueOf(markerInfoItem.getMetadata()
                                                              .get("post_id")), MainActivity.token);
                     }
                 }
                 break;
             case MarkerInfo.SUB_ADDRESS_MARKER:
-                MainActivity.MOB_SERVER_API.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler),
+                mainActivity.mobServerAPI.getPost(new GetPostCallback(markersAdapterHelper.postsRecycler),
                         String.valueOf(markerInfo.getMetadata()
                                                  .get("post_id")), MainActivity.token);
                 break;
@@ -296,8 +298,7 @@ public class MapAdapter extends MapView.Adapter
 
         markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
 
-        final boolean isAddressMarker =
-                markerInfo.getMarkerType() == MarkerInfo.ADDRESS_MARKER;
+        final boolean isAddressMarker = markerInfo.getMarkerType() == MarkerInfo.ADDRESS_MARKER;
         Menu postsToolbarMenu = markersAdapterHelper.postsToolbar.getMenu();
         postsToolbarMenu.findItem(R.id.menu_posts_reverse)
                         .setVisible(isAddressMarker);
@@ -305,7 +306,7 @@ public class MapAdapter extends MapView.Adapter
                         .setVisible(isAddressMarker);
     }
 
-    private LatLng getLatLngByAddress(MyAddress address)
+    private LatLng getLatLngByAddress(Address address)
     {
         LatLng latLng = null;
         try

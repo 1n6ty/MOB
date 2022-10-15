@@ -2,8 +2,9 @@ package com.example.mobv2.callbacks;
 
 import android.util.Log;
 
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.google.gson.internal.LinkedTreeMap;
+
+import serverapi.MOBServerAPI;
 
 public class MOBAPICallbackImpl implements MOBServerAPI.MOBAPICallback
 {

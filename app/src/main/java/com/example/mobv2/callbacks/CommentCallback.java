@@ -2,10 +2,11 @@ package com.example.mobv2.callbacks;
 
 import android.util.Log;
 
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.comments.CommentsFragment;
 import com.google.gson.internal.LinkedTreeMap;
+
+import serverapi.MOBServerAPI;
 
 public class CommentCallback implements MOBServerAPI.MOBAPICallback
 {

@@ -3,9 +3,10 @@ package com.example.mobv2.callbacks;
 import android.util.Log;
 
 import com.example.mobv2.adapters.MapAdapter;
-import com.example.mobv2.serverapi.MOBServerAPI;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
+
+import serverapi.MOBServerAPI;
 
 public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
 {
