@@ -196,7 +196,7 @@ def getMe(req):
                     'city': current_address.city,
                     'street': current_address.street,
                     'house': current_address.house,
-                    'user_ids': [i.id for i in current_address.users],
+                    'user_ids': [i.id for i in current_address.users.all()],
                     'owner': {
                         'nick_name': current_address.owner.nick,
                         'full_name': current_address.owner.full_name,
@@ -212,6 +212,7 @@ def getMe(req):
                     'city': i.city,
                     'street': i.street,
                     'house': i.house,
+                    'user_ids': [i.id for i in i.users.all()],
                     'owner': {
                         'nick_name': i.owner.nick,
                         'full_name': i.owner.full_name,

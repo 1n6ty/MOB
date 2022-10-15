@@ -1,6 +1,6 @@
 from django.urls import path
 
-from Rule.views.address import setLocation, getMarks
+from Rule.views.address import createAddress, joinAddress, leaveAddress, setLocation, getMarks
 from Rule.views.comments import commentInc, commentDec, comment, deleteComment, reactComment, unreactComment, getComment, deleteComment
 from Rule.views.posts import createPost, getPost, deletePost, postInc, postDec, reactPost, unreactPost
 from Rule.views.user import auth, editUser, getMe, refreshToken, register, getUserProfile
@@ -15,6 +15,9 @@ urlpatterns = [
 
     path('address/set/', setLocation),
     path('address/marks/get/', getMarks),
+    path('address/create/', createAddress),
+    path('address/join/<int:id>/', joinAddress),
+    path('address/leave/<int:id>/', leaveAddress),
 
     path('post/create/', createPost),
     path('post/get/', getPost),

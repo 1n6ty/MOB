@@ -5,7 +5,7 @@ class Address(models.Model):
     country = models.CharField(max_length = 255, blank=False)
     city = models.CharField(max_length = 255, blank=False)
     street = models.CharField(max_length = 255, blank=False)
-    house = models.CharField(max_length = 10, blank = False)
+    house = models.CharField(max_length = 20, blank = False)
     posts = models.ManyToManyField('PostWithMark', blank = True)
     comments = models.ManyToManyField('Comment', blank=True)
     users = models.ManyToManyField('User', blank=True, related_name="users")

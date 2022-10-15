@@ -1,4 +1,3 @@
-from psutil import users
 from Rule.views.views import isCorruptedToken, getDataFromToken, createSessionToken, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
@@ -166,11 +165,11 @@ def createAddress(req):
     return HttpResponse(status = 405)
 
 @csrf_exempt
-def joinAddress(req):
+def joinAddress(req, id):
     if req.method == 'POST':
         # get request parameters
         token = req.META.get('HTTP_AUTHORIZATION', False)
-        id = req.POST.get('id', False)
+        id = id
         if not (token and id):
             return JsonResponse({
                 'msg': "bad_request"
@@ -224,11 +223,11 @@ def joinAddress(req):
     return HttpResponse(status = 405)
 
 @csrf_exempt
-def leaveAddress(req):
+def leaveAddress(req, id):
     if req.method == 'POST':
         # get request parameters
         token = req.META.get('HTTP_AUTHORIZATION', False)
-        id = req.POST.get('id', False)
+        id = id
         if not (token and id):
             return JsonResponse({
                 'msg': "bad_request"

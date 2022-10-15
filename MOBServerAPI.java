@@ -23,6 +23,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
+import retrofit2.http.Path;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -173,6 +174,10 @@ public class MOBServerAPI {
         @POST("urbaAPI/address/create/")
         Call<LinkedTreeMap<String, Object>> createAddress(@Field("country") String country, @Field("city") String city,
                                                             @Field("street") String street, @Field("house") String house, @Header("Authorization") String token);
+        @POST("urbaAPI/address/join/{id}/")
+        Call<LinkedTreeMap<String, Object>> joinAddress(@Path("id") String address_id, @Header("Authorization") String token);
+        @POST("urbaAPI/address/leave/{id}/")
+        Call<LinkedTreeMap<String, Object>> leaveAddress(@Path("id") String address_id, @Header("Authorization") String token);
     }
 
     public void refreshToken(MOBAPICallback obj,
@@ -331,6 +336,16 @@ public class MOBServerAPI {
                     String country, String city,
                     String street, String house, String token){
         Call<LinkedTreeMap<String, Object>> call = MOBAPI.createAddress(country, city, street, house, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+    public void joinAddress(MOBAPICallback obj,
+                    String address_id, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.joinAddress(address_id, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+    public void leaveAddress(MOBAPICallback obj,
+                    String address_id, String token){
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.leaveAddress(address_id, token);
         call.enqueue(createResponseCallback(obj));
     }
 }
