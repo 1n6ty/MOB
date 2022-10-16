@@ -61,6 +61,7 @@ def auth(req):
                     'city': i.city,
                     'street': i.street,
                     'house': i.house,
+                    'user_ids': [i.id for i in i.users.all()],
                     'owner': {
                         'nick': i.owner.nick,
                         'full_name': i.owner.full_name,
