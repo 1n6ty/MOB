@@ -1,6 +1,6 @@
 from itertools import chain
 from MOB.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
-from Rule.views.views import isCorruptedToken, getDataFromToken, sessionTimeExpired
+from Rule.views.views import isCorruptedToken, getDataFromToken, removeCommas, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from Rule.models import Address, User, PostWithMark
@@ -212,14 +212,13 @@ def createPost(req):
         try:
             markx = float(req.POST['markx'])
             marky = float(req.POST['marky'])
-            post = PostWithMark.objects.create(user = user, content = content, mark = {'x': markx, 'y': marky}, title = title)
+            post = PostWithMark.objects.create(user = user, content = removeCommas(content), mark = {'x': markx, 'y': marky}, title = removeCommas(title))
         except KeyError:
-            post = PostWithMark.objects.create(user = user, content = content, title = title)
+            post = PostWithMark.objects.create(user = user, content = removeCommas(content), title = removeCommas(title))
         
         idF = len([name for name in os.listdir(MEDIA_ROOT + '/posts/')])
         post.images["images"] = []
         for f in req.FILES.getlist('images'):
-            print(1)
             fs.save(f'post_{idF}.jpg', f);
             post.images["images"].append(str(MEDIA_URL) + f'posts/post_{idF}.jpg')
             idF += 1

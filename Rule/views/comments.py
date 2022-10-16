@@ -1,5 +1,5 @@
 from itertools import chain
-from Rule.views.views import isCorruptedToken, getDataFromToken, sessionTimeExpired
+from Rule.views.views import isCorruptedToken, getDataFromToken, removeCommas, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from Rule.models import User, Comment, Address
@@ -303,7 +303,7 @@ def comment(req):
             return JsonResponse({
                 'msg': "no_such_address"
             }, status = 404)
-        parent = address.comments.filter(id = parent_id).all() if parent_litera == 'c' else address.posts.filter(id = parent_id).all()
+        parent = address.comments.filter(id = parent_id).all() if removeCommas(parent_litera) == 'c' else address.posts.filter(id = parent_id).all()
         if parent.count() > 0:
             parent = parent[0]
         else:
@@ -322,7 +322,7 @@ def comment(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        new_c = Comment(user=user, content=content)
+        new_c = Comment(user=user, content=removeCommas(content))
         new_c.save()
         parent.comments.add(new_c)
         parent.save()

@@ -25,3 +25,8 @@ def sessionTimeExpired(timeU: int) -> bool:
     if int(time.time()) < timeU:
         return False
     return True
+
+def removeCommas(s: str):
+    if s[0] == '\"' or s[0] == '\'': s = s[1: ]
+    if s[-1] == '\"' or s[-1] == '\'': s = s[: -1]
+    return s
