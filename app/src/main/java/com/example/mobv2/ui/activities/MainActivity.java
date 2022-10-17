@@ -31,29 +31,13 @@ public class MainActivity extends ThemedActivity
 
     //WARNING UNSAFE
     public static String token = "";
+    public static String refresh = "";
     public MOBServerAPI mobServerAPI;
     public ApplicationDatabase appDatabase;
-
-    // USER
-    public static final String USER_ID_KEY = "USER_ID_KEY";
-    public static final String USER_AVATAR_URL_KEY = "USER_AVATAR_URL_KEY";
-    public static final String USER_NICKNAME_KEY = "USER_NICKNAME_KEY";
-    public static final String USER_FULLNAME_KEY = "USER_FULLNAME_KEY";
-    public static final String USER_EMAIL_KEY = "USER_EMAIL_KEY";
-    public static final String USER_PHONE_NUMBER_KEY = "USER_PHONE_NUMBER_KEY";
-
-    // ADDRESS
-    public static final String ADDRESS_ID_KEY = "ADDRESS_ID_KEY";
-    public static final String ADDRESS_FULL_KEY = "ADDRESS_FULL_KEY";
 
     private ActivityMainBinding binding;
 
     private FrameLayout navContentFrame;
-
-    public MainActivity()
-    {
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,6 +46,8 @@ public class MainActivity extends ThemedActivity
         mobServerAPI = new MOBServerAPI(ip + "/");
         appDatabase =
                 Room.databaseBuilder(getApplicationContext(), ApplicationDatabase.class, "information_about_session_database")
+                    .allowMainThreadQueries() // it can lock the UI because of threads
+//                    .fallbackToDestructiveMigration()  // it will destroy database and create the new
                     .build();
 
         initViewBinding();

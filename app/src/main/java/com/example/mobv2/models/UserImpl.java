@@ -1,28 +1,37 @@
 package com.example.mobv2.models;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 
 import java.util.Map;
 
+@Entity
 public class UserImpl implements User
 {
-    private final String id;
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "userid")
+    private String id;
 
-    private final String avatarUrl;
-    private final String nickName;
-    private final String name;
-    private final String surname;
-    private final String email;
-    private final String phoneNumber;
+    private String avatarUrl;
+    private String nickName;
+    private String name;
+    private String surname;
+    private String email;
+    private String phoneNumber;
 
-    protected UserImpl(String id,
-                       String avatarUrl,
-                       String nickName,
-                       String name,
-                       String surname,
-                       String email,
-                       String phoneNumber)
+    public UserImpl(String id,
+                    String avatarUrl,
+                    String nickName,
+                    String name,
+                    String surname,
+                    String email,
+                    String phoneNumber)
     {
         this.id = id;
         this.avatarUrl = avatarUrl;
@@ -31,6 +40,12 @@ public class UserImpl implements User
         this.surname = surname;
         this.email = email;
         this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public boolean compareById(User user)
+    {
+        return id.equals(user.getId());
     }
 
     public static class UserBuilder implements ParsableFromMap<UserImpl>
@@ -44,12 +59,10 @@ public class UserImpl implements User
         private String email;
         private String phoneNumber;
 
+        @NonNull
         @Override
-        public UserImpl parseFromMap(Map<String, Object> map)
+        public UserImpl parseFromMap(@NonNull Map<String, Object> map)
         {
-            if (map == null)
-                return null;
-
             parseIdFromMap(map);
             parseAvatarUrlFromMap(map);
             parseNickNameFromMap(map);
@@ -72,7 +85,7 @@ public class UserImpl implements User
 
         private void parseNickNameFromMap(Map<String, Object> map)
         {
-            nickName = (String) map.get("nick");
+            nickName = (String) map.get("nick_name");
         }
 
         private void parseFullNameFromMap(Map<String, Object> map)

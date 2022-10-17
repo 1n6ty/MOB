@@ -3,28 +3,29 @@ package localdatabase.daos;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.List;
+import com.example.mobv2.models.PostImpl;
 
-import localdatabase.models.PostEntity;
+import java.util.List;
 
 @Dao
 public interface PostDao
 {
-    @Query("SELECT * FROM postentity")
-    List<PostEntity> getAll();
+    @Query("SELECT * FROM postimpl")
+    List<PostImpl> getAll();
 
-    @Query("SELECT * FROM postentity WHERE postid = :id")
-    PostEntity getById(String id);
+    @Query("SELECT * FROM postimpl WHERE postid = :id")
+    PostImpl getById(String id);
 
-    @Insert
-    void insert(PostEntity post);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(PostImpl post);
 
     @Update
-    void update(PostEntity post);
+    void update(PostImpl post);
 
     @Delete
-    void delete(PostEntity post);
+    void delete(PostImpl post);
 }

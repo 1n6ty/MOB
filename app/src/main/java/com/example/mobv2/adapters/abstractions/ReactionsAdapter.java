@@ -10,8 +10,6 @@ import com.example.mobv2.databinding.ItemReactionBinding;
 
 public interface ReactionsAdapter
 {
-    boolean addReaction(String emoji);
-
     class ReactionViewHolder extends RecyclerView.ViewHolder
     {
         private final TextView reaction;

@@ -2,7 +2,7 @@ package com.example.mobv2.models.abstractions;
 
 import java.util.List;
 
-public interface Takable
+public interface HavingCommentsIds
 {
     List<String> getCommentsIds();
 }

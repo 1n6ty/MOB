@@ -1,6 +1,8 @@
 package com.example.mobv2.models.abstractions;
 
-public interface User
+import com.example.mobv2.utils.abstractions.Comparable;
+
+public interface User extends Comparable<User>
 {
     String getId();
 
@@ -17,4 +19,7 @@ public interface User
     String getEmail();
 
     String getPhoneNumber();
+
+    @Override
+    boolean compareById(User user);
 }

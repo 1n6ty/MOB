@@ -1,9 +1,14 @@
 package com.example.mobv2.models;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import com.example.mobv2.models.abstractions.Address;
-import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -11,27 +16,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import localdatabase.typeconverters.ListOfStringsConverter;
+
+@Entity
 public class AddressImpl implements Address
 {
     public static final String WITHOUT_ID = "-1";
 
-    private final String id;
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "addressid")
+    private String id;
 
-    private final User owner;
-    private final List<String> userIds;
-    private final String country;
-    private final String city;
-    private final String street;
-    private final String house;
+    @Embedded
+    private UserImpl owner;
+    @TypeConverters(ListOfStringsConverter.class)
+    private List<String> userIds;
+    private String country;
+    private String city;
+    private String street;
+    private String house;
 
+    private boolean current;
 
-    private AddressImpl(String id,
-                        User owner,
-                        List<String> userIds,
-                        String country,
-                        String city,
-                        String street,
-                        String house)
+    @Ignore
+    public AddressImpl()
+    {
+    }
+
+    public AddressImpl(String id,
+                       UserImpl owner,
+                       List<String> userIds,
+                       String country,
+                       String city,
+                       String street,
+                       String house)
     {
         this.id = id;
         this.owner = owner;
@@ -42,12 +61,18 @@ public class AddressImpl implements Address
         this.house = house;
     }
 
-    public static Address createRawAddress(String country,
+    public static AddressImpl createRawAddress(String country,
                                            String city,
                                            String street,
                                            String house)
     {
         return new AddressImpl(WITHOUT_ID, null, new ArrayList<>(), country, city, street, house);
+    }
+
+    @Override
+    public boolean compareById(Address address)
+    {
+        return id.equals(address.getId());
     }
 
     public static class AddressBuilder implements ParsableFromMap<Address>
@@ -59,9 +84,9 @@ public class AddressImpl implements Address
         private String house;
 
         private List<String> userIds;
-        private User owner;
+        private UserImpl owner;
 
-        public Address parseFromString(String addressString)
+        public AddressImpl parseFromString(String addressString)
         {
             String[] addressStrings = addressString.split(", ");
 
@@ -73,11 +98,10 @@ public class AddressImpl implements Address
             return AddressImpl.createRawAddress(country, city, street, house);
         }
 
+        @NonNull
         @Override
-        public Address parseFromMap(Map<String, Object> map)
+        public AddressImpl parseFromMap(@NonNull Map<String, Object> map)
         {
-            if (map == null) return null;
-
             parseIdFromMap(map);
             parseFullInfoFromMap(map);
             parseUserIdsFromMap(map);
@@ -111,7 +135,7 @@ public class AddressImpl implements Address
 
         private void parseOwnerFromMap(Map<String, Object> map)
         {
-            var userMap = (LinkedTreeMap<String, Object>) map.get("user");
+            var userMap = (LinkedTreeMap<String, Object>) map.get("owner");
             owner = new UserImpl.UserBuilder().parseFromMap(userMap);
         }
     }
@@ -159,14 +183,26 @@ public class AddressImpl implements Address
     }
 
     @Override
+    public UserImpl getOwner()
+    {
+        return owner;
+    }
+
+    @Override
     public List<String> getUserIds()
     {
         return userIds;
     }
 
     @Override
-    public User getOwner()
+    public boolean isCurrent()
     {
-        return owner;
+        return current;
+    }
+
+    @Override
+    public void setCurrent(boolean current)
+    {
+        this.current = current;
     }
 }

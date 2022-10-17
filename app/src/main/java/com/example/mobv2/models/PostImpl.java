@@ -1,11 +1,17 @@
 package com.example.mobv2.models;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.ObservableInt;
+import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import com.example.mobv2.models.abstractions.Post;
-import com.example.mobv2.models.abstractions.Takable;
-import com.example.mobv2.models.abstractions.User;
+import com.example.mobv2.models.abstractions.HavingCommentsIds;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
@@ -18,37 +24,56 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class PostImpl implements Post, Takable
+import localdatabase.typeconverters.DateConverter;
+import localdatabase.typeconverters.ListOfStringsConverter;
+import localdatabase.typeconverters.ReactionsConverter;
+
+@Entity
+public class PostImpl implements Post, HavingCommentsIds
 {
+    @Ignore
     public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
 
-    private final String id;
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "postid")
+    private String id;
 
-    private final UserImpl user;
-    private final Date date;
-    private final String title;
-    private final String text;
-    private final List<String> images;
-    private final List<Reaction> reactions;
-    private final MyObservableArrayList<String> commentsIds;
-    private final MyObservableArrayList<String> positiveRates;
-    private final MyObservableArrayList<String> negativeRates;
+    @Embedded
+    private UserImpl user;
+    @TypeConverters(DateConverter.class)
+    private Date date;
+    private String title;
+    private String text;
+    @TypeConverters(ListOfStringsConverter.class)
+    private List<String> images;
+    @TypeConverters(ReactionsConverter.class)
+    private List<Reaction> reactions;
+    @TypeConverters(ListOfStringsConverter.class)
+    private List<String> commentsIds;
+    @TypeConverters(ListOfStringsConverter.class)
+    private List<String> positiveRates;
+    @TypeConverters(ListOfStringsConverter.class)
+    private List<String> negativeRates;
 
+    @Ignore
     private final ObservableInt commentsCount;
-    private final ObservableInt appreciationsCount;
+    @Ignore
+    private final ObservableInt ratesCount;
 
+    @Ignore
     private final int type;
 
-    private PostImpl(String id,
-                     UserImpl user,
-                     Date date,
-                     String title,
-                     String text,
-                     List<String> images,
-                     List<Reaction> reactions,
-                     List<String> commentsIds,
-                     List<String> positiveRates,
-                     List<String> negativeRates)
+    public PostImpl(String id,
+                    UserImpl user,
+                    Date date,
+                    String title,
+                    String text,
+                    List<String> images,
+                    List<Reaction> reactions,
+                    List<String> commentsIds,
+                    List<String> positiveRates,
+                    List<String> negativeRates)
     {
         this.id = id;
         this.title = title;
@@ -67,11 +92,15 @@ public class PostImpl implements Post, Takable
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
         commentsCount = new ObservableInt(commentsIds.size());
-        this.commentsIds.setOnListChangedCallback(new Operation(commentsCount, 1, -1));
+        ((MyObservableArrayList<String>) this.commentsIds)
+                .setOnListChangedCallback(new Operation(commentsCount, 1, -1));
 
-        appreciationsCount = new ObservableInt(positiveRates.size() - negativeRates.size());
-        this.positiveRates.setOnListChangedCallback(new Operation(appreciationsCount, 1, -1));
-        this.negativeRates.setOnListChangedCallback(new Operation(appreciationsCount, -1, 1));
+        ratesCount = new ObservableInt(positiveRates.size() - negativeRates.size());
+        ((MyObservableArrayList<String>) this.positiveRates)
+                .setOnListChangedCallback(new Operation(ratesCount, 1, -1));
+
+        ((MyObservableArrayList<String>) this.negativeRates)
+                .setOnListChangedCallback(new Operation(ratesCount, -1, 1));
     }
 
     public static final class PostBuilder implements ParsableFromMap<PostImpl>
@@ -88,11 +117,10 @@ public class PostImpl implements Post, Takable
         private String title;
         private List<String> images;
 
+        @NonNull
         @Override
-        public PostImpl parseFromMap(Map<String, Object> map)
+        public PostImpl parseFromMap(@NonNull Map<String, Object> map)
         {
-            if (map == null) return null;
-
             parseDateFromMap(map);
             parseIdFromMap(map);
             parseUserFromMap(map);
@@ -180,7 +208,7 @@ public class PostImpl implements Post, Takable
     }
 
     @Override
-    public User getUser()
+    public UserImpl getUser()
     {
         return user;
     }
@@ -238,9 +266,9 @@ public class PostImpl implements Post, Takable
         return commentsCount;
     }
 
-    public ObservableInt getAppreciationsCount()
+    public ObservableInt getRatesCount()
     {
-        return appreciationsCount;
+        return ratesCount;
     }
 
     public int getType()

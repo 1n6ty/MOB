@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.adapters.abstractions.Addable;
 import com.example.mobv2.adapters.abstractions.ReactionsAdapter;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.models.Reaction;
@@ -16,9 +17,13 @@ import com.example.mobv2.ui.activities.MainActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import localdatabase.daos.UserDao;
+
 public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdapter.ReactionViewHolder>
-        implements ReactionsAdapter
+        implements ReactionsAdapter, Addable<String>
 {
+    private final UserDao userDao;
+
     private final MainActivity mainActivity;
     private final List<Reaction> reactions;
     private final String postId;
@@ -30,6 +35,8 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
         this.mainActivity = mainActivity;
         this.reactions = reactions;
         this.postId = postId;
+
+        userDao = mainActivity.appDatabase.userDao();
     }
 
     @NonNull
@@ -48,8 +55,7 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
     {
         Reaction reaction = reactions.get(holder.getAdapterPosition());
         List<String> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
-        String userId = mainActivity.getPrivatePreferences()
-                                    .getString(MainActivity.USER_ID_KEY, "");
+        String userId = userDao.getId();
 
         holder.getReaction()
               .setText(reaction.getEmoji());
@@ -60,7 +66,7 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
         holder.itemView.setOnClickListener(view -> toggleChecked(holder.getAdapterPosition()));
         holder.itemView.setBackgroundResource(0);
 
-        if (userIdsWhoLiked != null && userIdsWhoLiked.contains(userId))
+        if (userIdsWhoLiked.contains(userId))
         {
             reaction.setChecked(true);
         }
@@ -72,7 +78,8 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
         }
     }
 
-    public boolean addReaction(String emoji)
+    @Override
+    public void addElement(@NonNull String emoji)
     {
         for (int i = 0; i < reactions.size(); i++)
         {
@@ -81,20 +88,18 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
             if (currentEmoji.equals(emoji))
             {
                 toggleChecked(i);
-                return false;
+                return;
             }
         }
 
         List<String> userIdsWhoLiked = new ArrayList<>();
-        String userId = mainActivity.getPrivatePreferences()
-                                    .getString(MainActivity.USER_ID_KEY, "");
+        String userId = userDao.getId();
         userIdsWhoLiked.add(userId);
 
         //TODO change
         reactions.add(new Reaction(emoji, userIdsWhoLiked, true));
         mainActivity.mobServerAPI.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         notifyItemInserted(reactions.size() - 1);
-        return true;
     }
 
     private void toggleChecked(int position)
@@ -103,8 +108,7 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
 
         Reaction reaction = reactions.get(position);
 
-        String userId = mainActivity.getPrivatePreferences()
-                                    .getString(MainActivity.USER_ID_KEY, "");
+        String userId = userDao.getId();
         List<String> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
         String emoji = reaction.getEmoji();
         if (reaction.isChecked())

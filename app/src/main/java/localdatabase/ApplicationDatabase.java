@@ -3,19 +3,20 @@ package localdatabase;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
+import com.example.mobv2.models.AddressImpl;
+import com.example.mobv2.models.CommentImpl;
+import com.example.mobv2.models.PostImpl;
+import com.example.mobv2.models.UserImpl;
+
 import localdatabase.daos.AddressDao;
 import localdatabase.daos.CommentDao;
 import localdatabase.daos.PostDao;
 import localdatabase.daos.UserDao;
-import localdatabase.models.AddressEntity;
-import localdatabase.models.CommentEntity;
-import localdatabase.models.PostEntity;
-import localdatabase.models.UserEntity;
 
-@Database(entities = {AddressEntity.class,
-        UserEntity.class,
-        PostEntity.class,
-        CommentEntity.class}, version = 1)
+@Database(entities = {AddressImpl.class,
+        UserImpl.class,
+        PostImpl.class,
+        CommentImpl.class}, version = 2)
 public abstract class ApplicationDatabase extends RoomDatabase
 {
     public abstract AddressDao addressDao();

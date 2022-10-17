@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.NavHeaderMainBinding;
 import com.example.mobv2.models.MenuItemMetadatum;
+import com.example.mobv2.models.UserImpl;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.EditProfileFragment;
 import com.example.mobv2.ui.fragments.LanguageFragment;
@@ -30,6 +31,8 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 {
     private static final int PROFILE_GROUP = 0, SETTINGS_GROUP = 1;
 
+    private final UserImpl user;
+
     private final MainActivity mainActivity;
 
     private final DrawerLayout drawerLayout;
@@ -39,6 +42,9 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     public NavDrawer(MainActivity mainActivity)
     {
         this.mainActivity = mainActivity;
+
+        user = mainActivity.appDatabase.userDao()
+                                       .getOne();
 
         drawerLayout = mainActivity.findViewById(R.id.drawer_layout);
 
@@ -65,8 +71,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         URL url;
         try
         {
-            url = new URL("http://192.168.0.104:8000" + mainActivity.getPrivatePreferences()
-                                                                    .getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+            url = new URL("http://192.168.0.104:8000" + user.getAvatarUrl());
         }
         catch (MalformedURLException e)
         {

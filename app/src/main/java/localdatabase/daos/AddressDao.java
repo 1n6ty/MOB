@@ -3,28 +3,35 @@ package localdatabase.daos;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.List;
+import com.example.mobv2.models.AddressImpl;
 
-import localdatabase.models.AddressEntity;
+import java.util.List;
 
 @Dao
 public interface AddressDao
 {
-    @Query("SELECT * FROM addressentity")
-    List<AddressEntity> getAll();
+    @Query("SELECT * FROM addressimpl")
+    List<AddressImpl> getAll();
 
-    @Query("SELECT * FROM addressentity WHERE addressid = :id")
-    AddressEntity getById(String id);
+    @Query("SELECT * FROM addressimpl WHERE addressid = :id")
+    AddressImpl getById(String id);
 
-    @Insert
-    void insert(AddressEntity address);
+    @Query("SELECT * FROM addressimpl WHERE current")
+    AddressImpl getCurrent();
+
+    @Query("SELECT addressid FROM addressimpl WHERE current")
+    String getCurrentId();
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insert(AddressImpl address);
 
     @Update
-    void update(AddressEntity address);
+    void update(AddressImpl address);
 
     @Delete
-    void delete(AddressEntity address);
+    void delete(AddressImpl address);
 }

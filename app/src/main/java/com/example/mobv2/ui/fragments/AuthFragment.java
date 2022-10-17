@@ -1,6 +1,6 @@
 package com.example.mobv2.ui.fragments;
 
-import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -14,11 +14,12 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.callbacks.AuthCallback;
 import com.example.mobv2.databinding.FragmentAuthBinding;
+import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.models.UserImpl;
-import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.main.MainFragment;
 
+import java.util.List;
 import java.util.Map;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding>
@@ -107,19 +108,64 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding>
     private void parseUserInfoFromMapAndAddToLocalDatabase(Map<String, Object> map)
     {
         MainActivity.token = (String) map.get("token");
+        MainActivity.refresh = (String) map.get("refresh");
 
-        User user =
+        UserImpl user =
                 new UserImpl.UserBuilder().parseFromMap((Map<String, Object>) map.get("user"));
 
-        SharedPreferences.Editor editor = mainActivity.getPrivatePreferences()
-                                                      .edit();
-        editor.putString(MainActivity.USER_ID_KEY, user.getId());
-        editor.putString(MainActivity.USER_AVATAR_URL_KEY, user.getAvatarUrl());
-        editor.putString(MainActivity.USER_NICKNAME_KEY, user.getNickName());
-        editor.putString(MainActivity.USER_FULLNAME_KEY, user.getFullName());
-        editor.putString(MainActivity.USER_EMAIL_KEY, user.getEmail());
-        editor.putString(MainActivity.USER_PHONE_NUMBER_KEY, user.getPhoneNumber());
-        editor.apply();
+        AsyncTask.execute(() -> mainActivity.appDatabase.userDao()
+                                                        .insert(user));
+
+        var addressesMapList = (List<Map<String, Object>>) map.get("addresses");
+        AsyncTask.execute(() ->
+        {
+            for (Map<String, Object> addressMap : addressesMapList)
+            {
+                mainActivity.appDatabase.addressDao()
+                                        .insert(new AddressImpl.AddressBuilder().parseFromMap(addressMap));
+            }
+        });
+
+//        AsyncTask.execute(() ->
+//        {
+//            while (!Thread.interrupted())
+//            {
+//                try
+//                {
+//                    Thread.sleep(6000);
+//
+//                    mainActivity.mobServerAPI.refreshToken(new MOBServerAPI.MOBAPICallback()
+//                    {
+//                        @Override
+//                        public void funcOk(LinkedTreeMap<String, Object> obj)
+//                        {
+//                            Log.v("DEBUG", obj.toString());
+//
+//                            var response = (LinkedTreeMap<String, Object>) obj.get("response");
+//
+//                            MainActivity.token = (String) response.get("token");
+//                            MainActivity.refresh = (String) response.get("refresh");
+//                        }
+//
+//                        @Override
+//                        public void funcBad(LinkedTreeMap<String, Object> obj)
+//                        {
+//                            Log.v("DEBUG", obj.toString());
+//                        }
+//
+//                        @Override
+//                        public void fail(Throwable obj)
+//                        {
+//                            Log.v("DEBUG", obj.toString());
+//                        }
+//                    }, MainActivity.refresh, MainActivity.token);
+//                }
+//                catch (InterruptedException e)
+//                {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     public interface Callback

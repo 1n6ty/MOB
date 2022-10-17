@@ -26,7 +26,7 @@ import com.example.mobv2.databinding.FragmentCommentsBinding;
 import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.Image;
 import com.example.mobv2.models.PostImpl;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.utils.SimpleTextWatcher;
@@ -35,8 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
-        implements HasToolbar
+public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> implements HavingToolbar
 {
     private CommentsFragmentViewModel viewModel;
 
@@ -115,9 +114,9 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 //        itemPost.appreciationUpButton.setOnClickListener(view -> onAppreciationUpClick(view, position));
 //        itemPost.appreciationsCountView.setText(String.valueOf(post.getAppreciationsCount()));
 //        itemPost.appreciationDownButton.setOnClickListener(this::onAppreciationDownClick);
-        itemPost.appreciationUpButton.setSelected(false);
+        itemPost.rateUpButton.setSelected(false);
 //        itemPost.appreciationUpButton.getDrawable().setTint(0);
-        itemPost.appreciationDownButton.setSelected(false);
+        itemPost.rateDownButton.setSelected(false);
 //        itemPost.appreciationDownButton.getDrawable().setTint(0);
 //        if (post.getAppreciated() == 1)
 //        {
@@ -147,9 +146,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     private void onShowReactionsViewClick(View view)
     {
-        view.setVisibility(view.getVisibility() == View.GONE
-                ? View.VISIBLE
-                : View.GONE);
+        view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     private void initPostContent(@NonNull Pair<TextView, RecyclerView> content)
@@ -173,8 +170,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
                     images.add(new Image("", url, Image.IMAGE_ONLINE));
                 }
                 ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3),
-                        StaggeredGridLayoutManager.VERTICAL));
+                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
                 content.second.setAdapter(adapter);
                 break;
         }
@@ -241,8 +237,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         var post = viewModel.getPostItem()
                             .getPost();
         var messageText = messageView.getText();
-        mainActivity.mobServerAPI.commentPost(new CommentCallback(mainActivity, this::createCommentByIdAndAddToPosts),
-                messageText.toString(), post.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.commentPost(new CommentCallback(mainActivity, this::createCommentByIdAndAddToPosts), messageText.toString(), post.getId(), MainActivity.token);
     }
 
     private void createCommentByIdAndAddToPosts(String commentId)
@@ -251,9 +246,9 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
                             .getPost();
         Editable messageText = messageView.getText();
 
-        CommentImpl comment =
+        var comment =
                 CommentImpl.createNewComment(commentId, post.getUser(), messageText.toString());
-        commentsAdapter.addComment(comment);
+        commentsAdapter.addElement(comment);
         post.getCommentsIds()
             .add(commentId);
 

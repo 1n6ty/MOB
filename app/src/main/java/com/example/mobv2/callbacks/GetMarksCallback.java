@@ -11,10 +11,10 @@ import serverapi.MOBServerAPI;
 public class GetMarksCallback implements MOBServerAPI.MOBAPICallback
 {
     private final MainActivity mainActivity;
-    private final MapAdapter.Callback callback;
+    private final MapAdapter.MarkersOkCallback callback;
 
     public GetMarksCallback(MainActivity mainActivity,
-                            MapAdapter.Callback callback)
+                            MapAdapter.MarkersOkCallback callback)
     {
         this.mainActivity = mainActivity;
         this.callback = callback;

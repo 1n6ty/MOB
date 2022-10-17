@@ -27,7 +27,7 @@ public class CommentCallback implements MOBServerAPI.MOBAPICallback
 
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-        String commentId = String.valueOf((((Double) response.get("comment_id"))).intValue());
+        String commentId = String.valueOf((((Double) response.get("id"))).intValue());
 
         callback.createCommentByIdAndAddToPosts(commentId);
     }

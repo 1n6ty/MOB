@@ -92,7 +92,7 @@
                             app:srcCompat="@drawable/ic_add" />
 
                         <TextView
-                            android:id="@+id/appreciations_count_view"
+                            android:id="@+id/rates_count_view"
                             style="@style/appreciationsTextStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"

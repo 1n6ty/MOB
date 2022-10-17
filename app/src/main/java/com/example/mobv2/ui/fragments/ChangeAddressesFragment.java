@@ -1,7 +1,9 @@
 package com.example.mobv2.ui.fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -12,19 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.AddressesAdapter;
-import com.example.mobv2.callbacks.GetAddressesCallback;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
 import com.example.mobv2.models.AddressImpl;
-import com.example.mobv2.models.abstractions.Address;
-import com.example.mobv2.ui.abstractions.HasToolbar;
-import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;
 
+import localdatabase.daos.AddressDao;
+
 public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddressesBinding>
-        implements HasToolbar
+        implements HavingToolbar
 {
+    private AddressDao addressDao;
+
     private Toolbar toolbar;
     private RecyclerView addressesRecyclerView;
     private ImageView noAddressesView;
@@ -33,6 +36,19 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
     public ChangeAddressesFragment()
     {
         super(R.layout.fragment_change_addresses);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState)
+    {
+        var view = super.onCreateView(inflater, container, savedInstanceState);
+
+        addressDao = mainActivity.appDatabase.addressDao();
+
+        return view;
     }
 
     @Override
@@ -60,16 +76,10 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
 
         addressesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         addressesRecyclerView.setAdapter(addressAdapter);
-        noAddressesView.setVisibility(View.VISIBLE);
 
-        mainActivity.mobServerAPI.me(new GetAddressesCallback(mainActivity, this::parseAddressesFromMapListAndAddToAddresses), MainActivity.token);
-    }
-
-    private void parseAddressesFromMapListAndAddToAddresses(List<LinkedTreeMap<String, Object>> mapList)
-    {
-        for (LinkedTreeMap<String, Object> item : mapList)
+        List<AddressImpl> addresses = addressDao.getAll();
+        for (AddressImpl address : addresses)
         {
-            Address address = new AddressImpl.AddressBuilder().parseFromMap(item);
             addressAdapter.addAddress(address);
         }
 
@@ -78,6 +88,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
                 : View.INVISIBLE);
     }
 
+    @Deprecated
     public interface Callback
     {
         void parseAddressesFromMapListAndAddToAddresses(List<LinkedTreeMap<String, Object>> mapList);

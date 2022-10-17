@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -25,6 +24,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public class MOBServerAPI
@@ -34,11 +34,11 @@ public class MOBServerAPI
 
     public interface MOBAPICallback
     {
-        void funcOk(LinkedTreeMap<String, Object> obj);
+        public void funcOk(LinkedTreeMap<String, Object> obj);
 
-        void funcBad(LinkedTreeMap<String, Object> obj);
+        public void funcBad(LinkedTreeMap<String, Object> obj);
 
-        void fail(Throwable obj);
+        public void fail(Throwable obj);
     }
 
     private Callback<LinkedTreeMap<String, Object>> createResponseCallback(MOBAPICallback obj)
@@ -245,6 +245,14 @@ public class MOBServerAPI
                                                           @Field("street") String street,
                                                           @Field("house") String house,
                                                           @Header("Authorization") String token);
+
+        @POST("urbaAPI/address/join/{id}/")
+        Call<LinkedTreeMap<String, Object>> joinAddress(@Path("id") String address_id,
+                                                        @Header("Authorization") String token);
+
+        @POST("urbaAPI/address/leave/{id}/")
+        Call<LinkedTreeMap<String, Object>> leaveAddress(@Path("id") String address_id,
+                                                         @Header("Authorization") String token);
     }
 
     public void refreshToken(MOBAPICallback obj,
@@ -306,15 +314,15 @@ public class MOBServerAPI
                      String title,
                      double markX,
                      double markY,
-                     List<String> imgPaths,
+                     String[] imgPaths,
                      String token)
     {
         if (imgPaths != null)
         {
-            MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.size()];
-            for (int i = 0; i < imgPaths.size(); i++)
+            MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.length];
+            for (int i = 0; i < imgPaths.length; i++)
             {
-                File file = new File(imgPaths.get(i));
+                File file = new File(imgPaths[i]);
                 imgs[i] =
                         MultipartBody.Part.createFormData("images", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
             }
@@ -500,6 +508,22 @@ public class MOBServerAPI
     {
         Call<LinkedTreeMap<String, Object>> call =
                 MOBAPI.createAddress(country, city, street, house, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+
+    public void joinAddress(MOBAPICallback obj,
+                            String address_id,
+                            String token)
+    {
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.joinAddress(address_id, token);
+        call.enqueue(createResponseCallback(obj));
+    }
+
+    public void leaveAddress(MOBAPICallback obj,
+                             String address_id,
+                             String token)
+    {
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.leaveAddress(address_id, token);
         call.enqueue(createResponseCallback(obj));
     }
 }

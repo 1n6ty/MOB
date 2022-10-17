@@ -9,10 +9,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentMapFeaturesBinding;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 
 public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding>
-        implements HasToolbar
+        implements HavingToolbar
 {
     private Toolbar toolbar;
 

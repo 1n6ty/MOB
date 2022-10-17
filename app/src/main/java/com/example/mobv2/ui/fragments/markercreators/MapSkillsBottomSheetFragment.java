@@ -16,13 +16,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.databinding.FragmentMapSkillsBottomSheetBinding;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
-        implements HasToolbar
+        implements HavingToolbar
 {
     private OnDestroyViewListener onDestroyViewListener;
 

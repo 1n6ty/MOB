@@ -1,5 +1,8 @@
 package com.example.mobv2.models;
 
+import androidx.annotation.NonNull;
+
+import com.example.mobv2.utils.abstractions.Comparable;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
@@ -7,7 +10,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MarkerInfo
+public class MarkerInfo implements Comparable<MarkerInfo>
 {
     public static final int ADDRESS_MARKER = 0, SUB_ADDRESS_MARKER = 1;
     private static final String TITLE_DEFAULT = "The mark";
@@ -18,9 +21,19 @@ public class MarkerInfo
     private LatLng position;
     private Object tag;
 
-    private final int markerType;
-    private final Map<String, Object> metadata;
+    private int markerType;
+    private Map<String, Object> metadata;
     private boolean clicked;
+
+    public MarkerInfo()
+    {
+    }
+
+    public MarkerInfo(LatLng position,
+                      int markerType)
+    {
+        this(TITLE_DEFAULT, position, markerType);
+    }
 
     public MarkerInfo(String title,
                       LatLng position,
@@ -34,13 +47,20 @@ public class MarkerInfo
         tag = null;
     }
 
+    @Override
+    public boolean compareById(MarkerInfo markerInfo)
+    {
+        return id.equals(markerInfo.getId());
+    }
+
     public static class MarkerInfoBuilder implements ParsableFromMap<MarkerInfo>
     {
         private String title;
         private LatLng position;
 
+        @NonNull
         @Override
-        public MarkerInfo parseFromMap(Map<String, Object> map)
+        public MarkerInfo parseFromMap(@NonNull Map<String, Object> map)
         {
             setTitleByDefault();
             parsePositionFromMap(map);

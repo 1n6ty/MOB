@@ -3,28 +3,30 @@ package localdatabase.daos;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.List;
+import com.example.mobv2.models.UserImpl;
 
-import localdatabase.models.UserEntity;
-
+/*
+ * UserDatabase have to store only one user
+ */
 @Dao
 public interface UserDao
 {
-    @Query("SELECT * FROM userentity")
-    List<UserEntity> getAll();
+    @Query("SELECT * FROM userimpl")
+    UserImpl getOne();
 
-    @Query("SELECT * FROM userentity WHERE userid = :id")
-    UserEntity getById(String id);
-
-    @Insert
-    void insert(UserEntity user);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(UserImpl user);
 
     @Update
-    void update(UserEntity user);
+    void update(UserImpl user);
 
     @Delete
-    void delete(UserEntity user);
+    void delete(UserImpl user);
+
+    @Query("SELECT userid FROM userimpl")
+    String getId();
 }

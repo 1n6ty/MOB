@@ -1,5 +1,6 @@
 package com.example.mobv2.ui.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 
@@ -10,15 +11,17 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
-import com.example.mobv2.ui.abstractions.HasToolbar;
-import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.models.UserImpl;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
-        implements HasToolbar
+        implements HavingToolbar
 {
+    private UserImpl user;
+
     private Toolbar toolbar;
 
     public EditProfileFragment()
@@ -31,6 +34,9 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        user = mainActivity.appDatabase.userDao()
+                                       .getOne();
 
         initToolbar();
 
@@ -46,8 +52,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         URL url;
         try
         {
-            url = new URL("http://192.168.0.104:8000" + mainActivity.getPrivatePreferences()
-                                                                    .getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+            url = new URL("http://192.168.0.104:8000" + user.getAvatarUrl());
         }
         catch (MalformedURLException e)
         {
@@ -58,8 +63,15 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
              .load(url)
              .into(binding.avatarView);
 
-        super.initToolbar(toolbar, mainActivity.getPrivatePreferences()
-                                               .getString(MainActivity.USER_FULLNAME_KEY, ""));
+        AsyncTask.execute(() -> super.initToolbar(toolbar, user.getFullName()));
+    }
+
+    @Override
+    public void update()
+    {
+        super.update();
+        user = mainActivity.appDatabase.userDao()
+                                       .getOne();
     }
 
     private void initSettingsPhoneNumberView()
@@ -67,8 +79,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         binding.settingsPhoneNumberView.setOnClickListener(view ->
         {
         });
-        binding.phoneNumberView.setText(mainActivity.getPrivatePreferences()
-                                                    .getString(MainActivity.USER_PHONE_NUMBER_KEY, ""));
+        AsyncTask.execute(() -> binding.phoneNumberView.setText(user.getPhoneNumber()));
     }
 
     private void initSettingsNicknameView()
@@ -76,8 +87,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         binding.settingsNicknameView.setOnClickListener(view ->
         {
         });
-        binding.nicknameView.setText(mainActivity.getPrivatePreferences()
-                                                 .getString(MainActivity.USER_NICKNAME_KEY, ""));
+        AsyncTask.execute(() -> binding.nicknameView.setText(user.getNickName()));
     }
 
     private void initSettingsAddressesView()

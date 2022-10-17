@@ -3,8 +3,10 @@ package com.example.mobv2.utils;
 import android.database.Observable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.mobv2.adapters.abstractions.AdapterHelper;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -111,7 +113,7 @@ public class MapView
             onAdapterChanged();
             adapter.registerAdapterDataObserver(observer);
 
-            adapter.onCreate(googleMap);
+            adapter.onCreate(this);
         }
     }
 
@@ -124,11 +126,79 @@ public class MapView
         }
     }
 
+    @Nullable
+    public Marker addMarker(@NonNull MarkerOptions options)
+    {
+        return googleMap.addMarker(options);
+    }
+
+    public void animateCamera(@NonNull CameraUpdate update)
+    {
+        googleMap.animateCamera(update);
+    }
+
+    public void animateCamera(@NonNull CameraUpdate update,
+                              @Nullable GoogleMap.CancelableCallback callback)
+    {
+        googleMap.animateCamera(update, callback);
+    }
+
+    public void animateCamera(@NonNull CameraUpdate update,
+                              int durationMs,
+                              @Nullable GoogleMap.CancelableCallback callback)
+    {
+        googleMap.animateCamera(update, durationMs, callback);
+    }
+
+    public void clear()
+    {
+        googleMap.clear();
+    }
+
+    public void moveCamera(@NonNull CameraUpdate update)
+    {
+        googleMap.moveCamera(update);
+    }
+
+    public void setOnMapClickListener(@NonNull MapView.OnMapClickListener listener)
+    {
+        googleMap.setOnMapClickListener(listener);
+    }
+
+    public void setOnMapLongClickListener(@NonNull MapView.OnMapLongClickListener listener)
+    {
+        googleMap.setOnMapLongClickListener(listener);
+    }
+
+    public void setOnMarkerClickListener(@NonNull MapView.OnMarkerClickListener listener)
+    {
+        googleMap.setOnMarkerClickListener(marker ->
+        {
+            listener.onMarkerClick(markers.indexOf(marker));
+            return true;
+        });
+    }
+
+    public interface OnMapClickListener extends GoogleMap.OnMapClickListener
+    {
+        void onMapClick(@NonNull LatLng latLng);
+    }
+
+    public interface OnMapLongClickListener extends GoogleMap.OnMapLongClickListener
+    {
+        void onMapLongClick(@NonNull LatLng latLng);
+    }
+
+    public interface OnMarkerClickListener
+    {
+        void onMarkerClick(int position);
+    }
+
     public static abstract class Adapter
     {
         private final AdapterDataObservable observable = new AdapterDataObservable();
 
-        public abstract void onCreate(GoogleMap googleMap);
+        public abstract void onCreate(MapView mapView);
 
         public abstract void onBindMarker(Marker marker,
                                           int position);

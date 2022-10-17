@@ -9,10 +9,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentLanguageBinding;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 
 public class LanguageFragment extends BaseFragment<FragmentLanguageBinding>
-        implements HasToolbar
+        implements HavingToolbar
 {
     private Toolbar toolbar;
 

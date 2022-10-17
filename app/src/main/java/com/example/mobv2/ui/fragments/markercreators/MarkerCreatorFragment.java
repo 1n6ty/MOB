@@ -20,7 +20,7 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.ImagesAdapter;
 import com.example.mobv2.databinding.FragmentMarkerCreatorBinding;
 import com.example.mobv2.models.Image;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -31,7 +31,7 @@ import java.util.List;
 import serverapi.MOBServerAPI;
 
 public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBinding>
-        implements HasToolbar, ActivityResultCallback<List<Uri>>
+        implements HavingToolbar, ActivityResultCallback<List<Uri>>
 {
     private final ActivityResultLauncher<String> launcher =
             registerForActivityResult(new ActivityResultContracts.GetMultipleContents(), this);
@@ -127,7 +127,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
                                     .toString();
         String title = markerTitleView.getText()
                                       .toString();
-        mainActivity.mobServerAPI.post(callback, text, title, latLng.latitude, latLng.longitude, imagePaths, MainActivity.token);
+        mainActivity.mobServerAPI.post(callback, text, title, latLng.latitude, latLng.longitude, imagePaths.toArray(new String[0]), MainActivity.token);
 
         mainActivity.toPreviousFragment();
     }

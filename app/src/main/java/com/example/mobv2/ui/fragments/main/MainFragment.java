@@ -1,12 +1,13 @@
 package com.example.mobv2.ui.fragments.main;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,7 +24,9 @@ import com.example.mobv2.adapters.MapAdapter;
 import com.example.mobv2.adapters.PostsAdapter;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.FragmentMainBinding;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.models.AddressImpl;
+import com.example.mobv2.models.UserImpl;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
@@ -38,11 +41,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
-        implements HasToolbar
+        implements HavingToolbar, Toolbar.OnMenuItemClickListener
 {
-    private SharedPreferences preferences;
-
     private MainFragmentViewModel viewModel;
+    private UserImpl user;
+    private AddressImpl address;
 
     private Toolbar toolbar;
     private NavDrawer navDrawer;
@@ -65,9 +68,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                              @Nullable Bundle savedInstanceState)
     {
         var view = super.onCreateView(inflater, container, savedInstanceState);
-        preferences = mainActivity.getPrivatePreferences();
 
         initViewModel();
+        initUserAndAddress();
         binding.setBindingContext(viewModel);
 
         return view;
@@ -90,8 +93,12 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public void update()
     {
         super.update();
-        viewModel.setFullname(preferences.getString(MainActivity.USER_FULLNAME_KEY, ""));
-        viewModel.setAddress(preferences.getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
+        initUserAndAddress();
+        AsyncTask.execute(() ->
+        {
+            viewModel.setFullname(user.getFullName());
+            viewModel.setAddress(address == null ? "No selected address" : address.toString());
+        });
 
         if (viewModel.isAddressChanged())
         {
@@ -104,10 +111,20 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         }
     }
 
+    private void initUserAndAddress()
+    {
+        user = mainActivity.appDatabase.userDao()
+                                       .getOne();
+        address = mainActivity.appDatabase.addressDao()
+                                          .getCurrent();
+    }
+
+    @Deprecated
     private void setAddressInToken()
     {
-        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
-                preferences.getString(MainActivity.ADDRESS_ID_KEY, ""), MainActivity.token);
+        if (address != null)
+            mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
+                    address.getId(), MainActivity.token);
     }
 
     private void initViewModel()
@@ -122,13 +139,15 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         navDrawer = new NavDrawer(mainActivity);
 
-        viewModel.setFullname(preferences.getString(MainActivity.USER_FULLNAME_KEY, ""));
-        viewModel.setAddress(preferences.getString(MainActivity.ADDRESS_FULL_KEY, "No selected address"));
+        AsyncTask.execute(() ->
+        {
+            viewModel.setFullname(user.getFullName());
+            viewModel.setAddress(address == null ? "No selected address" : address.toString());
+        });
         URL url;
         try
         {
-            url =
-                    new URL("http://192.168.0.104:8000" + preferences.getString(MainActivity.USER_AVATAR_URL_KEY, ""));
+            url = new URL("http://192.168.0.104:8000" + user.getAvatarUrl());
         }
         catch (MalformedURLException e)
         {
@@ -179,24 +198,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                                                 .getHeight() / 6);
         sheetBehavior.setHalfExpandedRatio(0.5f);
 
-        postsToolbar.setOnMenuItemClickListener(item ->
-        {
-            PostsAdapter postsAdapter = (PostsAdapter) postsRecyclerView.getAdapter();
-            if (postsAdapter == null) return false;
-            switch (item.getItemId())
-            {
-                case R.id.menu_posts_reverse:
-                    return postsAdapter.reverse();
-                case R.id.menu_sort_by_appreciations:
-                    return postsAdapter.sortByAppreciations();
-                case R.id.menu_sort_by_date:
-                    return postsAdapter.sortByDate();
-                case R.id.menu_sort_by_comments:
-                    return postsAdapter.sortByComments();
-                default:
-                    return false;
-            }
-        });
+        postsToolbar.setOnMenuItemClickListener(this);
     }
 
     private void onMapReady(@NonNull GoogleMap googleMap)
@@ -205,5 +207,25 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         mapAdapter =
                 new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
         mapView.setAdapter(mapAdapter);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item)
+    {
+        PostsAdapter postsAdapter = (PostsAdapter) postsRecyclerView.getAdapter();
+        if (postsAdapter == null) return false;
+        switch (item.getItemId())
+        {
+            case R.id.menu_posts_reverse:
+                return postsAdapter.reverse();
+            case R.id.menu_sort_by_appreciations:
+                return postsAdapter.sortByAppreciations();
+            case R.id.menu_sort_by_date:
+                return postsAdapter.sortByDate();
+            case R.id.menu_sort_by_comments:
+                return postsAdapter.sortByComments();
+            default:
+                return false;
+        }
     }
 }

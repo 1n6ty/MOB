@@ -2,21 +2,25 @@ package com.example.mobv2.callbacks;
 
 import android.util.Log;
 
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.mobv2.adapters.PostsAdapter;
-import com.example.mobv2.models.PostImpl;
+import com.example.mobv2.adapters.MapAdapter;
+import com.example.mobv2.ui.activities.MainActivity;
 import com.google.gson.internal.LinkedTreeMap;
 
 import serverapi.MOBServerAPI;
 
 public class GetPostCallback implements MOBServerAPI.MOBAPICallback
 {
-    private final RecyclerView postsRecycler;
+    private final MainActivity mainActivity;
+    private final MapAdapter.PostOkCallback callback;
+    private final MapAdapter.PostFailCallback badCallback;
 
-    public GetPostCallback(RecyclerView postsRecycler)
+    public GetPostCallback(MainActivity mainActivity,
+                           MapAdapter.PostOkCallback callback,
+                           MapAdapter.PostFailCallback badCallback)
     {
-        this.postsRecycler = postsRecycler;
+        this.mainActivity = mainActivity;
+        this.callback = callback;
+        this.badCallback = badCallback;
     }
 
     @Override
@@ -26,10 +30,7 @@ public class GetPostCallback implements MOBServerAPI.MOBAPICallback
 
         var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
-        PostImpl post = new PostImpl.PostBuilder().parseFromMap(response);
-        var postsAdapter = (PostsAdapter) postsRecycler.getAdapter();
-        postsAdapter.addPost(post);
-        postsRecycler.scrollToPosition(0);
+        callback.parsePostFromMapAndAddToPosts(response);
     }
 
     @Override
@@ -42,5 +43,7 @@ public class GetPostCallback implements MOBServerAPI.MOBAPICallback
     public void fail(Throwable obj)
     {
         Log.v("DEBUG", obj.toString());
+
+        badCallback.onDisconnect();
     }
 }

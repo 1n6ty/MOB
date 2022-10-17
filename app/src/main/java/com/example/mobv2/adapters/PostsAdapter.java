@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
+import com.example.mobv2.adapters.abstractions.Addable;
+import com.example.mobv2.adapters.abstractions.Reversable;
+import com.example.mobv2.adapters.abstractions.SortableByUserWills;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.Image;
@@ -40,19 +43,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import localdatabase.daos.UserDao;
+
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
+        implements Reversable, SortableByUserWills, Addable<PostImpl>
 {
+    private final UserDao userDao;
+
     private final MainActivity mainActivity;
     private final MapAdapter.MapAdapterCallback callback;
 
     private final List<PostImpl> posts;
 
-    // TODO destroy the mapAdapter from this side
     public PostsAdapter(MainActivity mainActivity,
                         MapAdapter.MapAdapterCallback callback)
     {
         this.mainActivity = mainActivity;
         this.callback = callback;
+
+        userDao = mainActivity.appDatabase.userDao();
 
         posts = new ArrayList<>();
     }
@@ -91,7 +100,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         var user = post.getUser();
 
         holder.setCommentsCount(post.getCommentsCount());
-        holder.setAppreciationsCount(post.getAppreciationsCount());
+        holder.setAppreciationsCount(post.getRatesCount());
 
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
 
@@ -100,6 +109,26 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(post.getDate()));
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
+
+        holder.ratesGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(RadioGroup group,
+                                         int checkedId)
+            {
+//                if (group.getCheckedRadioButtonId() == checkedId)
+//                    group.clearCheck();
+
+                switch (checkedId)
+                {
+                    case R.id.rate_up_button:
+                    case R.id.rate_down_button:
+                        Toast.makeText(mainActivity, "" + checkedId, Toast.LENGTH_SHORT)
+                             .show();
+                        break;
+                }
+            }
+        });
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
 
@@ -115,9 +144,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     private void onShowReactionsViewClick(View view)
     {
-        view.setVisibility(view.getVisibility() == View.GONE
-                ? View.VISIBLE
-                : View.GONE);
+        view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     private void onCommentViewClick(View view,
@@ -125,13 +152,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                                     ReactionsPostAdapter reactionsAdapter)
     {
         var postItem = new PostItem(post, reactionsAdapter);
-        var viewModel =
-                new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
+        var viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
         viewModel.setPostItem(postItem);
         mainActivity.goToFragment(new CommentsFragment());
     }
 
-    public void addPost(PostImpl post)
+    @Override
+    public void addElement(@NonNull PostImpl post)
     {
         Date date = post.getDate();
         if (posts.isEmpty() || date.compareTo(posts.get(posts.size() - 1)
@@ -156,6 +183,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         }
     }
 
+    @Override
     public boolean reverse()
     {
         Collections.reverse(posts);
@@ -163,6 +191,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         return true;
     }
 
+    @Override
     public boolean sortByAppreciations()
     {
         Collections.sort(posts, (post, nextPost) ->
@@ -177,6 +206,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         return true;
     }
 
+    @Override
     public boolean sortByDate()
     {
         Collections.sort(posts, (post, nextPost) -> (nextPost.getDate()
@@ -185,6 +215,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         return true;
     }
 
+    @Override
     public boolean sortByComments()
     {
         Collections.sort(posts, (post, nextPost) -> Integer.compare(nextPost.getCommentsIds()
@@ -210,31 +241,18 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                           @NonNull PopupMenu popupMenu,
                           int position)
     {
+        var menu = popupMenu.getMenu();
         var post = posts.get(position);
         var user = post.getUser();
-        var userId = mainActivity.getPrivatePreferences()
-                                 .getString(MainActivity.USER_ID_KEY, "");
-        var menu = popupMenu.getMenu();
 
-        boolean isCreator = user.getId()
-                                .equals(userId);// if the user is a post's creator
+        boolean isCreator = user.compareById(userDao.getOne());  // if the user is a post's creator
         menu.findItem(R.id.menu_edit_post)
             .setVisible(isCreator);
         menu.findItem(R.id.menu_delete_post)
             .setVisible(isCreator);
 
-        switch (post.getType())
-        {
-            case PostImpl.POST_ONLY_TEXT:
-            case PostImpl.POST_FULL:
-                menu.findItem(R.id.menu_copy_post)
-                    .setVisible(true);
-                break;
-            case PostImpl.POST_ONLY_IMAGES:
-                menu.findItem(R.id.menu_copy_post)
-                    .setVisible(false);
-                break;
-        }
+        menu.findItem(R.id.menu_copy_post)
+            .setVisible(post.getType() == PostImpl.POST_ONLY_TEXT || post.getType() == PostImpl.POST_FULL);
 
         popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
 
@@ -246,8 +264,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         for (int id : menuIds)
         {
             menu.findItem(id)
-                .setOnMenuItemClickListener(item -> reactionsAdapter.addReaction(item.getTitle()
-                                                                                     .toString()));
+                .setOnMenuItemClickListener(item ->
+                {
+                    reactionsAdapter.addElement(item.getTitle()
+                                                    .toString());
+                    return true;
+                });
         }
     }
 
@@ -264,9 +286,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
                 return editPost(position);
             case R.id.menu_delete_post:
                 return deletePost(position);
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private void initContent(@NonNull Pair<TextView, RecyclerView> content,
@@ -353,9 +375,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         private final TextView fullNameView;
         private final TextView dateView;
         private final Pair<TextView, RecyclerView> content;
-        private final RadioButton appreciationUpView;
-        private final TextView appreciationsCountView;
-        private final RadioButton appreciationDownView;
+        private final RadioGroup ratesGroup;
+        private final TextView ratesCountView;
         private final View showReactionsView;
         private final RecyclerView reactionsRecyclerView;
         private final LinearLayout showCommentsView;
@@ -371,9 +392,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             fullNameView = binding.fullNameView;
             dateView = binding.dateView;
             content = new Pair<>(binding.postTextView, binding.postImagesRecyclerView);
-            appreciationUpView = binding.appreciationUpButton;
-            appreciationsCountView = binding.appreciationsCountView;
-            appreciationDownView = binding.appreciationDownButton;
+            ratesGroup = binding.ratesGroup;
+            ratesCountView = binding.ratesCountView;
             showReactionsView = binding.showReactionsView;
             reactionsRecyclerView = binding.reactionsRecyclerView;
             showCommentsView = binding.showCommentsView;

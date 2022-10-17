@@ -12,12 +12,12 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentImageViewerBinding;
 import com.example.mobv2.models.Image;
-import com.example.mobv2.ui.abstractions.HasToolbar;
+import com.example.mobv2.ui.abstractions.HavingToolbar;
 
 import java.util.List;
 
 public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding>
-        implements HasToolbar
+        implements HavingToolbar
 {
     private Toolbar toolbar;
 

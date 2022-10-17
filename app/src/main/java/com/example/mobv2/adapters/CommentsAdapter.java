@@ -20,11 +20,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.adapters.abstractions.Addable;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
-import com.example.mobv2.models.abstractions.Comment;
-import com.example.mobv2.models.abstractions.Takable;
+import com.example.mobv2.models.abstractions.HavingCommentsIds;
 import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -34,27 +34,34 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
+import localdatabase.daos.UserDao;
 import serverapi.MOBServerAPI;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
+        implements Addable<CommentImpl>
 {
-    private final MainActivity mainActivity;
-    private final Takable takable;
+    private final UserDao userDao;
 
-    private final List<Comment> comments;
+    private final MainActivity mainActivity;
+    private final HavingCommentsIds havingCommentsIds;
+
+    private final List<CommentImpl> comments;
 
     private int lastIndex = 0;
 
     public CommentsAdapter(MainActivity mainActivity,
-                           Takable takable)
+                           HavingCommentsIds havingCommentsIds)
     {
         this.mainActivity = mainActivity;
-        this.takable = takable;
+        this.havingCommentsIds = havingCommentsIds;
         this.comments = new ArrayList<>();
 
-        var commentsIds = takable.getCommentsIds();
-        for (int i = 0; i < 4; i++)
+        userDao = mainActivity.appDatabase.userDao();
+
+        var commentsIds = havingCommentsIds.getCommentsIds();
+        for (int i = 0; i < Math.min(commentsIds.size(), 4); i++)
         {
             mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
             {
@@ -66,7 +73,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                     var response = (LinkedTreeMap<String, Object>) obj.get("response");
 
                     CommentImpl comment = new CommentImpl.CommentBuilder().parseFromMap(response);
-                    addComment(comment);
+                    addElement(comment);
 
                     lastIndex++;
                 }
@@ -86,7 +93,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         }
     }
 
-    @Override
+    /*@Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView)
     {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
@@ -113,7 +120,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
                 if (lastIndex < getItemCount() && (totalItemCount - visibleItemCount <= firstVisibleItem))
                 {
-                    var commentsIds = takable.getCommentsIds();
+                    var commentsIds = havingCommentsIds.getCommentsIds();
                     mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
                     {
                         @Override
@@ -125,7 +132,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
                             CommentImpl comment =
                                     new CommentImpl.CommentBuilder().parseFromMap(response);
-                            addComment(comment);
+                            addElement(comment);
                         }
 
                         @Override
@@ -143,7 +150,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 }
             }
         });
-    }
+    }*/
 
     @NonNull
     @Override
@@ -159,7 +166,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void onBindViewHolder(@NonNull CommentViewHolder holder,
                                  int position)
     {
-        Comment comment = comments.get(position);
+        CommentImpl comment = comments.get(position);
         User user = comment.getUser();
 
         MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
@@ -168,7 +175,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         holder.commentTextView.setText(comment.getText());
 
-        holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy").format(comment.getDate()));
+        holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(comment.getDate()));
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
@@ -194,10 +201,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
-    public void addComment(Comment comment)
+    @Override
+    public void addElement(@NonNull CommentImpl comment)
     {
         Date date = comment.getDate();
-
         if (comments.isEmpty() || date.compareTo(comments.get(comments.size() - 1)
                                                          .getDate()) < 0)
         {
@@ -216,7 +223,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                     notifyItemInserted(i);
                     break;
                 }
-
             }
         }
     }
@@ -240,11 +246,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var menu = popupMenu.getMenu();
         var comment = comments.get(position);
         var user = comment.getUser();
-        var userId = mainActivity.getPrivatePreferences()
-                                 .getString(MainActivity.USER_ID_KEY, "");
 
-        boolean isCreator = user.getId()
-                                .equals(userId);// if the user is a post's creator
+        boolean isCreator = user.compareById(userDao.getOne());  // if the user is a post's creator
         menu.findItem(R.id.menu_edit_post)
             .setVisible(isCreator);
         menu.findItem(R.id.menu_delete_post)
@@ -260,8 +263,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         for (int id : menuIds)
         {
             menu.findItem(id)
-                .setOnMenuItemClickListener(item -> reactionsAdapter.addReaction(item.getTitle()
-                                                                                     .toString()));
+                .setOnMenuItemClickListener(item ->
+                {
+                    reactionsAdapter.addElement(item.getTitle()
+                                                    .toString());
+                    return true;
+                });
         }
     }
 
@@ -278,9 +285,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 return editComment(position);
             case R.id.menu_delete_post:
                 return deleteComment(position);
+            default:
+                return false;
         }
-
-        return false;
     }
 
     private boolean copyComment(int position)
@@ -317,8 +324,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         comments.remove(position);
         notifyItemRemoved(position);
 
-        takable.getCommentsIds()
-               .remove(comment.getId());
+        havingCommentsIds.getCommentsIds()
+                         .remove(comment.getId());
 
         mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);
 
@@ -341,7 +348,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         private final TextView commentTextView;
         private final TextView dateView;
         private final ImageView appreciationUpView;
-        private final TextView appreciationsCountView;
+        private final TextView ratesCountView;
         private final ImageView appreciationDownView;
         private final ImageView showReactionsView;
         private final RecyclerView reactionsRecyclerView;
@@ -358,7 +365,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             commentTextView = binding.commentTextView;
             dateView = binding.commentDateView;
             appreciationUpView = binding.appreciationUpView;
-            appreciationsCountView = binding.appreciationsCountView;
+            ratesCountView = binding.ratesCountView;
             appreciationDownView = binding.appreciationDownView;
             showReactionsView = binding.showReactionsView;
             reactionsRecyclerView = binding.reactionsRecyclerView;
