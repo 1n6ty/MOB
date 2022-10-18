@@ -212,6 +212,7 @@ public class MapAdapter extends MapView.Adapter
         markerCreatorViewModel.setAddress(address);
     }
 
+    @Deprecated
     private Address getAddressByLatLng(@NonNull LatLng latLng)
     {
         Address address = null;
@@ -342,6 +343,7 @@ public class MapAdapter extends MapView.Adapter
                         .setVisible(isAddressMarker);
     }
 
+    @Deprecated
     private LatLng getLatLngByAddress(Address address)
     {
         LatLng latLng = null;
