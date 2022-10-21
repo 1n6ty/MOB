@@ -66,7 +66,7 @@
                         style="@style/settingsItemStyle">
 
                         <TextView
-                            android:id="@+id/phone_number_view"
+                            android:id="@+id/login_view"
                             style="@style/settingsItemHeaderTextStyle"
                             tools:text="+78005553535" />
 

@@ -25,7 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import localdatabase.typeconverters.DateConverter;
-import localdatabase.typeconverters.ListOfStringsConverter;
+import localdatabase.typeconverters.StringListConverter;
 import localdatabase.typeconverters.ReactionsConverter;
 
 @Entity
@@ -45,15 +45,15 @@ public class PostImpl implements Post, HavingCommentsIds
     private Date date;
     private String title;
     private String text;
-    @TypeConverters(ListOfStringsConverter.class)
+    @TypeConverters(StringListConverter.class)
     private List<String> images;
     @TypeConverters(ReactionsConverter.class)
     private List<Reaction> reactions;
-    @TypeConverters(ListOfStringsConverter.class)
+    @TypeConverters(StringListConverter.class)
     private List<String> commentsIds;
-    @TypeConverters(ListOfStringsConverter.class)
+    @TypeConverters(StringListConverter.class)
     private List<String> positiveRates;
-    @TypeConverters(ListOfStringsConverter.class)
+    @TypeConverters(StringListConverter.class)
     private List<String> negativeRates;
 
     @Ignore

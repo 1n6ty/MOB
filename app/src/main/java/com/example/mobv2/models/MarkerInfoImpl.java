@@ -1,8 +1,13 @@
 package com.example.mobv2.models;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
-import com.example.mobv2.utils.abstractions.Comparable;
+import com.example.mobv2.models.abstractions.MarkerInfo;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
@@ -10,62 +15,89 @@ import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MarkerInfo implements Comparable<MarkerInfo>
+import localdatabase.typeconverters.LatLngConverter;
+import localdatabase.typeconverters.MapConverter;
+
+@Entity
+public class MarkerInfoImpl implements MarkerInfo
 {
+    @Ignore
     public static final int ADDRESS_MARKER = 0, SUB_ADDRESS_MARKER = 1;
+    @Ignore
     private static final String TITLE_DEFAULT = "The mark";
 
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "markerinfoid")
     private String id;
 
     private String title;
+    @TypeConverters(LatLngConverter.class)
     private LatLng position;
-    private Object tag;
 
     private int markerType;
+    @TypeConverters(MapConverter.class)
     private Map<String, Object> metadata;
+
+    @Ignore
     private boolean clicked;
 
-    public MarkerInfo()
+    @Ignore
+    public MarkerInfoImpl()
     {
     }
 
-    public MarkerInfo(LatLng position,
-                      int markerType)
+    @Ignore
+    public MarkerInfoImpl(LatLng position,
+                          int markerType)
     {
         this(TITLE_DEFAULT, position, markerType);
     }
 
-    public MarkerInfo(String title,
-                      LatLng position,
-                      int markerType)
+    @Ignore
+    public MarkerInfoImpl(String title,
+                          LatLng position,
+                          int markerType)
     {
         this.title = title;
         this.position = position;
         this.markerType = markerType;
 
         metadata = new HashMap<>();
-        tag = null;
+    }
+
+    public MarkerInfoImpl(String title,
+                          LatLng position,
+                          int markerType,
+                          Map<String, Object> metadata)
+    {
+        this.title = title;
+        this.position = position;
+        this.markerType = markerType;
+        this.metadata = metadata;
     }
 
     @Override
     public boolean compareById(MarkerInfo markerInfo)
     {
+        if (markerInfo == null) return false;
+
         return id.equals(markerInfo.getId());
     }
 
-    public static class MarkerInfoBuilder implements ParsableFromMap<MarkerInfo>
+    public static class MarkerInfoBuilder implements ParsableFromMap<MarkerInfoImpl>
     {
         private String title;
         private LatLng position;
 
         @NonNull
         @Override
-        public MarkerInfo parseFromMap(@NonNull Map<String, Object> map)
+        public MarkerInfoImpl parseFromMap(@NonNull Map<String, Object> map)
         {
             setTitleByDefault();
             parsePositionFromMap(map);
 
-            return new MarkerInfo(title, position, SUB_ADDRESS_MARKER);
+            return new MarkerInfoImpl(title, position, SUB_ADDRESS_MARKER);
         }
 
         private void setTitleByDefault()
@@ -100,11 +132,6 @@ public class MarkerInfo implements Comparable<MarkerInfo>
     public LatLng getPosition()
     {
         return position;
-    }
-
-    public Object getTag()
-    {
-        return tag;
     }
 
     public int getMarkerType()

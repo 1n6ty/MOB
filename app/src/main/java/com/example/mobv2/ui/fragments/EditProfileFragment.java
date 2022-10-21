@@ -79,7 +79,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         binding.settingsPhoneNumberView.setOnClickListener(view ->
         {
         });
-        AsyncTask.execute(() -> binding.phoneNumberView.setText(user.getPhoneNumber()));
+        AsyncTask.execute(() -> binding.loginView.setText(user.getPhoneNumber()));
     }
 
     private void initSettingsNicknameView()

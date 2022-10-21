@@ -21,7 +21,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/error_phone_number_view"
+                    android:id="@+id/error_login_view"
                     style="@style/incorrectInputTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
                     android:visibility="invisible" />
 
                 <EditText
-                    android:id="@+id/phone_number_view"
+                    android:id="@+id/login_view"
                     style="@style/authPasswordTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

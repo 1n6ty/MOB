@@ -19,7 +19,4 @@ public interface User extends Comparable<User>
     String getEmail();
 
     String getPhoneNumber();
-
-    @Override
-    boolean compareById(User user);
 }

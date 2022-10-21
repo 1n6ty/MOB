@@ -1,40 +1,27 @@
-package com.example.mobv2.callbacks;
+package com.example.mobv2.callbacks
 
-import android.util.Log;
+import android.util.Log
+import com.example.mobv2.ui.activities.MainActivity
+import com.google.gson.internal.LinkedTreeMap
+import serverapi.MOBServerAPI.MOBAPICallback
 
-import com.example.mobv2.ui.activities.MainActivity;
-import com.google.gson.internal.LinkedTreeMap;
-
-import serverapi.MOBServerAPI;
-
-public class SetAddressCallback implements MOBServerAPI.MOBAPICallback
+class SetAddressCallback(private val mainActivity: MainActivity) : MOBAPICallback
 {
-    private final MainActivity mainActivity;
-
-    public SetAddressCallback(MainActivity mainActivity)
+    override fun funcOk(obj: LinkedTreeMap<String, Any>)
     {
-        this.mainActivity = mainActivity;
+        Log.v("DEBUG", obj.toString())
+        val response = obj["response"] as LinkedTreeMap<String, String>?
+
+        MainActivity.token = response!!["token"]
     }
 
-    @Override
-    public void funcOk(LinkedTreeMap<String, Object> obj)
+    override fun funcBad(obj: LinkedTreeMap<String, Any>)
     {
-        Log.v("DEBUG", obj.toString());
-
-        var response = (LinkedTreeMap<String, String>) obj.get("response");
-
-        MainActivity.token = response.get("token");
+        Log.v("DEBUG", obj.toString())
     }
 
-    @Override
-    public void funcBad(LinkedTreeMap<String, Object> obj)
+    override fun fail(obj: Throwable)
     {
-        Log.v("DEBUG", obj.toString());
-    }
-
-    @Override
-    public void fail(Throwable obj)
-    {
-        Log.v("DEBUG", obj.toString());
+        Log.v("DEBUG", obj.toString())
     }
 }

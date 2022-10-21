@@ -17,7 +17,6 @@ import com.example.mobv2.adapters.AddressesAdapter;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
 import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
-import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;
 
@@ -80,17 +79,11 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         List<AddressImpl> addresses = addressDao.getAll();
         for (AddressImpl address : addresses)
         {
-            addressAdapter.addAddress(address);
+            addressAdapter.addElement(address);
         }
 
         noAddressesView.setVisibility(addressAdapter.getItemCount() < 1
                 ? View.VISIBLE
                 : View.INVISIBLE);
-    }
-
-    @Deprecated
-    public interface Callback
-    {
-        void parseAddressesFromMapListAndAddToAddresses(List<LinkedTreeMap<String, Object>> mapList);
     }
 }

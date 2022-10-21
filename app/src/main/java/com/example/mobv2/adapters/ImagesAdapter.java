@@ -59,11 +59,6 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         }
     }
 
-//    public void addImage()
-//    {
-//
-//    }
-
     @Override
     public int getItemCount()
     {

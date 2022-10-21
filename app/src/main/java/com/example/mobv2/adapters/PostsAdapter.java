@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import com.example.mobv2.adapters.abstractions.Addable;
 import com.example.mobv2.adapters.abstractions.Reversable;
 import com.example.mobv2.adapters.abstractions.SortableByUserWills;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
+import com.example.mobv2.callbacks.abstractions.MapAdapterCallback;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.Image;
 import com.example.mobv2.models.PostImpl;
@@ -43,24 +45,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import localdatabase.daos.PostDao;
 import localdatabase.daos.UserDao;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
         implements Reversable, SortableByUserWills, Addable<PostImpl>
 {
+    private final PostDao postDao;
     private final UserDao userDao;
 
     private final MainActivity mainActivity;
-    private final MapAdapter.MapAdapterCallback callback;
+    private final MapAdapterCallback callback;
 
     private final List<PostImpl> posts;
 
     public PostsAdapter(MainActivity mainActivity,
-                        MapAdapter.MapAdapterCallback callback)
+                        MapAdapterCallback callback)
     {
         this.mainActivity = mainActivity;
         this.callback = callback;
 
+        postDao = mainActivity.appDatabase.postDao();
         userDao = mainActivity.appDatabase.userDao();
 
         posts = new ArrayList<>();
@@ -110,24 +115,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
-        holder.ratesGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        holder.rateUpButton.setOnClickListener(view ->
         {
-            @Override
-            public void onCheckedChanged(RadioGroup group,
-                                         int checkedId)
-            {
-//                if (group.getCheckedRadioButtonId() == checkedId)
-//                    group.clearCheck();
-
-                switch (checkedId)
-                {
-                    case R.id.rate_up_button:
-                    case R.id.rate_down_button:
-                        Toast.makeText(mainActivity, "" + checkedId, Toast.LENGTH_SHORT)
-                             .show();
-                        break;
-                }
-            }
+            if (holder.ratesGroup.getCheckedRadioButtonId() == view.getId())
+                holder.ratesGroup.clearCheck();
+        });
+        holder.rateDownButton.setOnClickListener(view ->
+        {
+            if (holder.ratesGroup.getCheckedRadioButtonId() == view.getId())
+                holder.ratesGroup.clearCheck();
         });
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
@@ -140,6 +136,108 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
 
         holder.showCommentsView.setOnClickListener(view -> onCommentViewClick(view, post, reactionsAdapter));
+    }
+
+    private void onItemViewClick(View view,
+                                 int position)
+    {
+        var contextThemeWrapper =
+                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+        var popupMenu = new PopupMenu(contextThemeWrapper, view);
+        popupMenu.inflate(R.menu.menu_post);
+
+        initMenu(view, popupMenu, position);
+        popupMenu.show();
+    }
+
+    private void initMenu(View view,
+                          @NonNull PopupMenu popupMenu,
+                          int position)
+    {
+        var menu = popupMenu.getMenu();
+        var post = posts.get(position);
+        var user = post.getUser();
+
+        boolean isCreator = user.compareById(userDao.getOne());  // if the user is a post's creator
+        menu.findItem(R.id.menu_edit_post)
+            .setVisible(isCreator);
+        menu.findItem(R.id.menu_delete_post)
+            .setVisible(isCreator);
+
+        menu.findItem(R.id.menu_copy_post)
+            .setVisible(post.getType() == PostImpl.POST_ONLY_TEXT || post.getType() == PostImpl.POST_FULL);
+
+        popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
+
+        int[] menuIds =
+                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
+
+        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_recycler_view);
+        var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
+        for (int id : menuIds)
+        {
+            menu.findItem(id)
+                .setOnMenuItemClickListener(item ->
+                {
+                    String emojiItem = item.getTitle()
+                                           .toString();
+                   /* for (Reaction reaction : post.getReactions())
+                    {
+                        String emoji = reaction.getEmoji();
+                        if (emoji.equals(emojiItem))
+                        {
+
+                        }
+                    }*/
+                    reactionsAdapter.addElement(emojiItem);
+                    return true;
+                });
+        }
+    }
+
+    private boolean onMenuItemClick(MenuItem item,
+                                    int position)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_copy_post:
+                return copyPost(position);
+            case R.id.menu_forward_post:
+                return forwardPost(position);
+            case R.id.menu_edit_post:
+                return editPost(position);
+            case R.id.menu_delete_post:
+                return deletePost(position);
+            default:
+                return false;
+        }
+    }
+
+    private void initContent(@NonNull Pair<TextView, RecyclerView> content,
+                             int position)
+    {
+        var post = posts.get(position);
+
+        content.first.setText(post.getText());
+
+        switch (post.getType())
+        {
+            case PostImpl.POST_ONLY_TEXT:
+                content.second.setVisibility(View.GONE);
+                break;
+            case PostImpl.POST_ONLY_IMAGES:
+                content.first.setVisibility(View.GONE);
+            case PostImpl.POST_FULL:
+                List<Image> images = new ArrayList<>();
+                for (String url : post.getImages())
+                {
+                    images.add(new Image("", url, Image.IMAGE_ONLINE));
+                }
+                ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
+                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
+                content.second.setAdapter(adapter);
+                break;
+        }
     }
 
     private void onShowReactionsViewClick(View view)
@@ -225,99 +323,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         return true;
     }
 
-    private void onItemViewClick(View view,
-                                 int position)
-    {
-        var contextThemeWrapper =
-                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
-        var popupMenu = new PopupMenu(contextThemeWrapper, view);
-        popupMenu.inflate(R.menu.menu_post);
-
-        initMenu(view, popupMenu, position);
-        popupMenu.show();
-    }
-
-    private void initMenu(View view,
-                          @NonNull PopupMenu popupMenu,
-                          int position)
-    {
-        var menu = popupMenu.getMenu();
-        var post = posts.get(position);
-        var user = post.getUser();
-
-        boolean isCreator = user.compareById(userDao.getOne());  // if the user is a post's creator
-        menu.findItem(R.id.menu_edit_post)
-            .setVisible(isCreator);
-        menu.findItem(R.id.menu_delete_post)
-            .setVisible(isCreator);
-
-        menu.findItem(R.id.menu_copy_post)
-            .setVisible(post.getType() == PostImpl.POST_ONLY_TEXT || post.getType() == PostImpl.POST_FULL);
-
-        popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
-
-        int[] menuIds =
-                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
-
-        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_recycler_view);
-        var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
-        for (int id : menuIds)
-        {
-            menu.findItem(id)
-                .setOnMenuItemClickListener(item ->
-                {
-                    reactionsAdapter.addElement(item.getTitle()
-                                                    .toString());
-                    return true;
-                });
-        }
-    }
-
-    private boolean onMenuItemClick(MenuItem item,
-                                    int position)
-    {
-        switch (item.getItemId())
-        {
-            case R.id.menu_copy_post:
-                return copyPost(position);
-            case R.id.menu_forward_post:
-                return forwardPost(position);
-            case R.id.menu_edit_post:
-                return editPost(position);
-            case R.id.menu_delete_post:
-                return deletePost(position);
-            default:
-                return false;
-        }
-    }
-
-    private void initContent(@NonNull Pair<TextView, RecyclerView> content,
-                             int position)
-    {
-        var post = posts.get(position);
-
-        content.first.setText(post.getText());
-
-        switch (post.getType())
-        {
-            case PostImpl.POST_ONLY_TEXT:
-                content.second.setVisibility(View.GONE);
-                break;
-            case PostImpl.POST_ONLY_IMAGES:
-                content.first.setVisibility(View.GONE);
-            case PostImpl.POST_FULL:
-                List<Image> images = new ArrayList<>();
-                for (String url : post.getImages())
-                {
-                    images.add(new Image("", url, Image.IMAGE_ONLINE));
-                }
-                ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
-                content.second.setAdapter(adapter);
-                break;
-        }
-    }
-
     private boolean copyPost(int position)
     {
         var post = posts.get(position);
@@ -376,7 +381,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         private final TextView dateView;
         private final Pair<TextView, RecyclerView> content;
         private final RadioGroup ratesGroup;
+        private final RadioButton rateUpButton;
         private final TextView ratesCountView;
+        private final RadioButton rateDownButton;
         private final View showReactionsView;
         private final RecyclerView reactionsRecyclerView;
         private final LinearLayout showCommentsView;
@@ -393,7 +400,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             dateView = binding.dateView;
             content = new Pair<>(binding.postTextView, binding.postImagesRecyclerView);
             ratesGroup = binding.ratesGroup;
+            rateUpButton = binding.rateUpButton;
             ratesCountView = binding.ratesCountView;
+            rateDownButton = binding.rateDownButton;
             showReactionsView = binding.showReactionsView;
             reactionsRecyclerView = binding.reactionsRecyclerView;
             showCommentsView = binding.showCommentsView;

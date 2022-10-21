@@ -1,28 +1,23 @@
-package com.example.mobv2.callbacks;
+package com.example.mobv2.callbacks
 
-import android.util.Log;
+import android.util.Log
+import serverapi.MOBServerAPI.MOBAPICallback
+import com.google.gson.internal.LinkedTreeMap
 
-import com.google.gson.internal.LinkedTreeMap;
-
-import serverapi.MOBServerAPI;
-
-public class MOBAPICallbackImpl implements MOBServerAPI.MOBAPICallback
+class MOBAPICallbackImpl : MOBAPICallback
 {
-    @Override
-    public void funcOk(LinkedTreeMap<String, Object> obj)
+    override fun funcOk(obj: LinkedTreeMap<String, Any>)
     {
-        Log.v("DEBUG", obj.toString());
+        Log.v("DEBUG", obj.toString())
     }
 
-    @Override
-    public void funcBad(LinkedTreeMap<String, Object> obj)
+    override fun funcBad(obj: LinkedTreeMap<String, Any>)
     {
-        Log.v("DEBUG", obj.toString());
+        Log.v("DEBUG", obj.toString())
     }
 
-    @Override
-    public void fail(Throwable obj)
+    override fun fail(obj: Throwable)
     {
-        Log.v("DEBUG", obj.toString());
+        Log.v("DEBUG", obj.toString())
     }
 }

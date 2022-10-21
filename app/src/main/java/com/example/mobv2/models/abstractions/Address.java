@@ -1,6 +1,7 @@
 package com.example.mobv2.models.abstractions;
 
 import com.example.mobv2.utils.abstractions.Comparable;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public interface Address extends Comparable<Address>
 
     void setCurrent(boolean current);
 
-    @Override
-    boolean compareById(Address address);
+    LatLng getPosition();
+
+    void setPosition(LatLng position);
 }

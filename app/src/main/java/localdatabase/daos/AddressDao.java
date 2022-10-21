@@ -26,10 +26,10 @@ public interface AddressDao
     @Query("SELECT addressid FROM addressimpl WHERE current")
     String getCurrentId();
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(AddressImpl address);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     void update(AddressImpl address);
 
     @Delete

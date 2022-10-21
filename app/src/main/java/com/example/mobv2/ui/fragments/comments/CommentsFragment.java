@@ -22,6 +22,7 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.CommentsAdapter;
 import com.example.mobv2.adapters.ImagesAdapter;
 import com.example.mobv2.callbacks.CommentCallback;
+import com.example.mobv2.callbacks.abstractions.CommentOkCallback;
 import com.example.mobv2.databinding.FragmentCommentsBinding;
 import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.Image;
@@ -35,7 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> implements HavingToolbar
+public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> implements HavingToolbar, CommentOkCallback
 {
     private CommentsFragmentViewModel viewModel;
 
@@ -237,10 +238,13 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         var post = viewModel.getPostItem()
                             .getPost();
         var messageText = messageView.getText();
-        mainActivity.mobServerAPI.commentPost(new CommentCallback(mainActivity, this::createCommentByIdAndAddToPosts), messageText.toString(), post.getId(), MainActivity.token);
+        CommentCallback callback = new CommentCallback(mainActivity);
+        callback.setOkCallback(this::createCommentByIdAndAddToPosts);
+        mainActivity.mobServerAPI.commentPost(callback, messageText.toString(), post.getId(), MainActivity.token);
     }
 
-    private void createCommentByIdAndAddToPosts(String commentId)
+    @Override
+    public void createCommentByIdAndAddToPosts(String commentId)
     {
         var post = viewModel.getPostItem()
                             .getPost();
@@ -253,10 +257,5 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
             .add(commentId);
 
         messageText.clear();
-    }
-
-    public interface Callback
-    {
-        void createCommentByIdAndAddToPosts(String commentId);
     }
 }

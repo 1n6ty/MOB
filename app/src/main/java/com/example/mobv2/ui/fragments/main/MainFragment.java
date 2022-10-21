@@ -1,6 +1,5 @@
 package com.example.mobv2.ui.fragments.main;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -34,6 +33,7 @@ import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.utils.MapView;
 import com.example.mobv2.utils.SimpleTarget;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -41,7 +41,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
-        implements HavingToolbar, Toolbar.OnMenuItemClickListener
+        implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback
 {
     private MainFragmentViewModel viewModel;
     private UserImpl user;
@@ -76,6 +76,19 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         return view;
     }
 
+    private void initViewModel()
+    {
+        viewModel = new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
+    }
+
+    private void initUserAndAddress()
+    {
+        user = mainActivity.appDatabase.userDao()
+                                       .getOne();
+        address = mainActivity.appDatabase.addressDao()
+                                          .getCurrent();
+    }
+
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
@@ -87,49 +100,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         initMap();
         initBottomSheet();
         setAddressInToken();
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-        initUserAndAddress();
-        AsyncTask.execute(() ->
-        {
-            viewModel.setFullname(user.getFullName());
-            viewModel.setAddress(address == null ? "No selected address" : address.toString());
-        });
-
-        if (viewModel.isAddressChanged())
-        {
-            mapAdapter.onDestroy();
-
-            initMap();
-            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-
-            viewModel.setAddressChanged(false);
-        }
-    }
-
-    private void initUserAndAddress()
-    {
-        user = mainActivity.appDatabase.userDao()
-                                       .getOne();
-        address = mainActivity.appDatabase.addressDao()
-                                          .getCurrent();
-    }
-
-    @Deprecated
-    private void setAddressInToken()
-    {
-        if (address != null)
-            mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
-                    address.getId(), MainActivity.token);
-    }
-
-    private void initViewModel()
-    {
-        viewModel = new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
     }
 
     public void initToolbar()
@@ -182,7 +152,15 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         }
     }
 
-    @SuppressLint("NonConstantResourceId")
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap)
+    {
+        mapView = new MapView(googleMap);
+        mapAdapter =
+                new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
+        mapView.setAdapter(mapAdapter);
+    }
+
     private void initBottomSheet()
     {
         postsToolbar = binding.postsToolbar;
@@ -198,15 +176,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                                                 .getHeight() / 6);
         sheetBehavior.setHalfExpandedRatio(0.5f);
 
-        postsToolbar.setOnMenuItemClickListener(this);
-    }
-
-    private void onMapReady(@NonNull GoogleMap googleMap)
-    {
-        mapView = new MapView(googleMap);
-        mapAdapter =
-                new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
-        mapView.setAdapter(mapAdapter);
+        postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     @Override
@@ -226,6 +196,36 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                 return postsAdapter.sortByComments();
             default:
                 return false;
+        }
+    }
+
+    @Deprecated
+    private void setAddressInToken()
+    {
+        if (address != null)
+            mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
+                    address.getId(), MainActivity.token);
+    }
+
+    @Override
+    public void update()
+    {
+        super.update();
+        initUserAndAddress();
+        AsyncTask.execute(() ->
+        {
+            viewModel.setFullname(user.getFullName());
+            viewModel.setAddress(address == null ? "No selected address" : address.toString());
+        });
+
+        if (viewModel.isAddressChanged())
+        {
+            mapAdapter.onDestroy();
+
+            initMap();
+            sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            viewModel.setAddressChanged(false);
         }
     }
 }

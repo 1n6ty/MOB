@@ -9,17 +9,20 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.example.mobv2.models.abstractions.Address;
+import com.example.mobv2.utils.abstractions.Comparable;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import localdatabase.typeconverters.ListOfStringsConverter;
+import localdatabase.typeconverters.LatLngConverter;
+import localdatabase.typeconverters.StringListConverter;
 
 @Entity
-public class AddressImpl implements Address
+public class AddressImpl implements Address, Comparable<Address>
 {
     public static final String WITHOUT_ID = "-1";
 
@@ -30,12 +33,15 @@ public class AddressImpl implements Address
 
     @Embedded
     private UserImpl owner;
-    @TypeConverters(ListOfStringsConverter.class)
+    @TypeConverters(StringListConverter.class)
     private List<String> userIds;
     private String country;
     private String city;
     private String street;
     private String house;
+
+    @TypeConverters(LatLngConverter.class)
+    private LatLng position;
 
     private boolean current;
 
@@ -72,6 +78,8 @@ public class AddressImpl implements Address
     @Override
     public boolean compareById(Address address)
     {
+        if (address == null) return false;
+
         return id.equals(address.getId());
     }
 
@@ -192,6 +200,16 @@ public class AddressImpl implements Address
     public List<String> getUserIds()
     {
         return userIds;
+    }
+
+    public LatLng getPosition()
+    {
+        return position;
+    }
+
+    public void setPosition(LatLng position)
+    {
+        this.position = position;
     }
 
     @Override

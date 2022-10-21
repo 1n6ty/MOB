@@ -83,7 +83,6 @@ public class MapView
                 {
                     markers.get(positionStart)
                            .remove();
-                    adapter.bindMarker(findMarker(positionStart), positionStart);
                     return;
                 }
 
@@ -91,7 +90,6 @@ public class MapView
                 {
                     markers.get(i)
                            .remove();
-                    adapter.bindMarker(findMarker(i), i);
                 }
             }
         });

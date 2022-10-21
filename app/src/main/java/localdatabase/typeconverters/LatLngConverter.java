@@ -2,23 +2,23 @@ package localdatabase.typeconverters;
 
 import androidx.room.TypeConverter;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.List;
 
-public class ListOfStringsConverter
+public class LatLngConverter
 {
     @TypeConverter
-    public String stringFromListOfString(List<String> commentsIds)
+    public String stringFromPosition(LatLng position)
     {
-        return commentsIds == null ? null : JsonParser.toJson(commentsIds);
+        return position == null ? null : JsonParser.toJson(position);
     }
 
     @TypeConverter
-    public List<String> listOfStringsFromString(String data)
+    public LatLng positionFromString(String data)
     {
-        Type type = new TypeToken<List<String>>()
+        Type type = new TypeToken<LatLng>()
         {
         }.getType();
         return data == null ? null : JsonParser.fromJson(data, type);

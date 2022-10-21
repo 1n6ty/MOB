@@ -45,6 +45,8 @@ public class UserImpl implements User
     @Override
     public boolean compareById(User user)
     {
+        if (user == null) return false;
+
         return id.equals(user.getId());
     }
 

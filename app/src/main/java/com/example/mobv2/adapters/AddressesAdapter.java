@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
+import com.example.mobv2.adapters.abstractions.Addable;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.models.AddressImpl;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import localdatabase.daos.AddressDao;
 
-public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder>
+public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder> implements Addable<AddressImpl>
 {
     private final AddressDao addressDao;
 
@@ -87,6 +88,11 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         notifyItemChanged(position);
     }
 
+    private boolean checkIfAddressEqualsClickedAddress(AddressImpl address)
+    {
+        return address.compareById(getClickedAddress());
+    }
+
     private void deselectClickedAddress()
     {
         AddressImpl clickedAddress = getClickedAddress();
@@ -109,19 +115,14 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         for (int i = 0; i < addresses.size(); i++)
         {
             AddressImpl address = addresses.get(i);
-            if (address.isCurrent())
-                return address;
+            if (address.isCurrent()) return address;
         }
 
         return new AddressImpl();
     }
 
-    private boolean checkIfAddressEqualsClickedAddress(AddressImpl address)
-    {
-        return address.compareById(getClickedAddress());
-    }
-
-    public void addAddress(AddressImpl address)
+    @Override
+    public void addElement(@NonNull AddressImpl address)
     {
         try
         {
