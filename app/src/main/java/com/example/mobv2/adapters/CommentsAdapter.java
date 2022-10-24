@@ -186,6 +186,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         holder.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
 
+        holder.showCommentsButton.setVisibility(comment.getCommentsCount()
+                                                       .get() > 0 ? View.VISIBLE : View.GONE);
         holder.showCommentsButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -247,7 +249,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var comment = comments.get(position);
         var user = comment.getUser();
 
-        boolean isCreator = user.compareById(userDao.getOne());  // if the user is a post's creator
+        boolean isCreator = user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
         menu.findItem(R.id.menu_edit_post)
             .setVisible(isCreator);
         menu.findItem(R.id.menu_delete_post)

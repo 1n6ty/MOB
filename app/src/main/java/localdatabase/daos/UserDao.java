@@ -9,24 +9,29 @@ import androidx.room.Update;
 
 import com.example.mobv2.models.UserImpl;
 
-/*
- * UserDatabase have to store only one user
- */
+import java.util.List;
+
 @Dao
 public interface UserDao
 {
     @Query("SELECT * FROM userimpl")
-    UserImpl getOne();
+    List<UserImpl> getAll();
+
+    @Query("SELECT * FROM userimpl WHERE userid = :id")
+    UserImpl getById(String id);
+
+    @Query("SELECT * FROM userimpl WHERE usercurrent")
+    UserImpl getCurrentOne();
+
+    @Query("SELECT userid FROM userimpl WHERE usercurrent")
+    String getCurrentId();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(UserImpl user);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     void update(UserImpl user);
 
     @Delete
     void delete(UserImpl user);
-
-    @Query("SELECT userid FROM userimpl")
-    String getId();
 }

@@ -13,4 +13,9 @@ public class ThemedActivity extends AppCompatActivity
         var successful = getTheme().resolveAttribute(resId, typedValue, true);
         return successful ? typedValue.resourceId : 0;
     }
+
+    public int getAttributeColor(@AttrRes int resId)
+    {
+        return getResources().getColor(getAttribute(resId));
+    }
 }

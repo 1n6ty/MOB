@@ -29,8 +29,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import localdatabase.daos.AddressDao;
+import localdatabase.daos.UserDao;
+
 public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements AuthOkCallback
 {
+    private AddressDao addressDao;
+    private UserDao userDao;
+
     private EditText passwordView;
     private EditText loginView;
     private TextView errorLoginView;
@@ -46,6 +52,9 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        addressDao = mainActivity.appDatabase.addressDao();
+        userDao = mainActivity.appDatabase.userDao();
 
         initPhoneView();
         initPasswordView();
@@ -107,71 +116,41 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         MainActivity.token = (String) map.get("token");
         MainActivity.refresh = (String) map.get("refresh");
 
-        UserImpl user =
-                new UserImpl.UserBuilder().parseFromMap((Map<String, Object>) map.get("user"));
+        var user = new UserImpl.UserBuilder().parseFromMap((Map<String, Object>) map.get("user"));
 
-        AsyncTask.execute(() -> mainActivity.appDatabase.userDao()
-                                                        .insert(user));
-
-        var addressesMapList = (List<Map<String, Object>>) map.get("addresses");
         AsyncTask.execute(() ->
         {
-            for (Map<String, Object> addressMap : addressesMapList)
+            List<AddressImpl> addresses = addressDao.getAll();
+            if (!user.compareById(userDao.getCurrentOne()))
             {
-                AddressImpl address = new AddressImpl.AddressBuilder().parseFromMap(addressMap);
-                address.setPosition(getLatLngByAddress(address));
-                var currentAddress = mainActivity.appDatabase.addressDao().getCurrent();
-                if (address.compareById(currentAddress))
+                for (AddressImpl address : addresses)
+                    addressDao.delete(address);
+            }
+
+            user.setCurrent(true);
+            userDao.insert(user);
+
+            Object addressesObject = map.get("addresses");
+            if (!addressesObject.equals("none"))
+            {
+                var addressesMapList = (List<Map<String, Object>>) addressesObject;
+
+                for (Map<String, Object> addressMap : addressesMapList)
                 {
-                    address.setCurrent(currentAddress.isCurrent());
+                    AddressImpl address = new AddressImpl.AddressBuilder().parseFromMap(addressMap);
+                    address.setPosition(getLatLngByAddress(address));
+                    var currentAddress = addressDao.getCurrentOne();
+                    if (address.compareById(currentAddress))
+                    {
+                        address.setCurrent(currentAddress.isCurrent());
+                    }
+
+                    addressDao.insert(address);
                 }
-
-
-                mainActivity.appDatabase.addressDao()
-                                        .insert(address);
             }
         });
 
-//        AsyncTask.execute(() ->
-//        {
-//            while (!Thread.interrupted())
-//            {
-//                try
-//                {
-//                    Thread.sleep(6000);
-//
-//                    mainActivity.mobServerAPI.refreshToken(new MOBServerAPI.MOBAPICallback()
-//                    {
-//                        @Override
-//                        public void funcOk(LinkedTreeMap<String, Object> obj)
-//                        {
-//                            Log.v("DEBUG", obj.toString());
-//
-//                            var response = (LinkedTreeMap<String, Object>) obj.get("response");
-//
-//                            MainActivity.token = (String) response.get("token");
-//                            MainActivity.refresh = (String) response.get("refresh");
-//                        }
-//
-//                        @Override
-//                        public void funcBad(LinkedTreeMap<String, Object> obj)
-//                        {
-//                            Log.v("DEBUG", obj.toString());
-//                        }
-//
-//                        @Override
-//                        public void fail(Throwable obj)
-//                        {
-//                            Log.v("DEBUG", obj.toString());
-//                        }
-//                    }, MainActivity.refresh, MainActivity.token);
-//                }
-//                catch (InterruptedException e)
-//                {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        mainActivity.startRefreshingToken();
     }
 
     private LatLng getLatLngByAddress(Address address)

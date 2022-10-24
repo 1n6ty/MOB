@@ -19,4 +19,8 @@ public interface User extends Comparable<User>
     String getEmail();
 
     String getPhoneNumber();
+
+    boolean isCurrent();
+
+    void setCurrent(boolean current);
 }

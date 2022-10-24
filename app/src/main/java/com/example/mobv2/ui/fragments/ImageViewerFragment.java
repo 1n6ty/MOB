@@ -41,10 +41,11 @@ public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding
         initImageView();
     }
 
-    @Override
-    protected void updateWindow()
+    public void initToolbar()
     {
-        super.updateWindow(View.SYSTEM_UI_FLAG_VISIBLE, getResources().getColor(R.color.black));
+        toolbar = binding.toolbar;
+        super.initToolbar(toolbar, images.get(0)
+                                         .getName());
     }
 
     private void initImageView()
@@ -63,10 +64,9 @@ public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding
 
     }
 
-    public void initToolbar()
+    @Override
+    protected void updateWindow()
     {
-        toolbar = binding.toolbar;
-        super.initToolbar(toolbar, images.get(0)
-                                         .getName());
+        super.updateWindow(View.SYSTEM_UI_FLAG_VISIBLE, getResources().getColor(R.color.black));
     }
 }

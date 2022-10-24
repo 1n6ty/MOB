@@ -6,7 +6,6 @@
     <string name="app_name">MOB</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_settings">Settings</string>
 
     <!--  nav drawer header  -->
     <string name="sample_fullname">Lary Davise</string>
@@ -38,8 +37,7 @@
     <string name="menu_log_out">Log out</string>
 
     <!--  auth fragment  -->
-    <string name="auth_desc">You do not need to enter your phone number. It happens automatically.</string>
-    <string name="auth_phone_hint">Enter your phone number</string>
+    <string name="auth_phone_hint">Enter your login</string>
     <string name="auth_password_hint">Enter your password</string>
     <string name="auth_button">Next -&gt;</string>
 

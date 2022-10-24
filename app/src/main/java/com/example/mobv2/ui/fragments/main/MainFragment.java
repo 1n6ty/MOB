@@ -16,36 +16,33 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.MapAdapter;
 import com.example.mobv2.adapters.PostsAdapter;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.FragmentMainBinding;
-import com.example.mobv2.models.AddressImpl;
-import com.example.mobv2.models.UserImpl;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.utils.MapView;
-import com.example.mobv2.utils.SimpleTarget;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import localdatabase.daos.AddressDao;
+import localdatabase.daos.UserDao;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
         implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback
 {
     private MainFragmentViewModel viewModel;
-    private UserImpl user;
-    private AddressImpl address;
+    private UserDao userDao;
+    private AddressDao addressDao;
 
     private Toolbar toolbar;
     private NavDrawer navDrawer;
@@ -69,8 +66,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         var view = super.onCreateView(inflater, container, savedInstanceState);
 
-        initViewModel();
         initUserAndAddress();
+
+        initViewModel();
         binding.setBindingContext(viewModel);
 
         return view;
@@ -83,10 +81,8 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void initUserAndAddress()
     {
-        user = mainActivity.appDatabase.userDao()
-                                       .getOne();
-        address = mainActivity.appDatabase.addressDao()
-                                          .getCurrent();
+        userDao = mainActivity.appDatabase.userDao();
+        addressDao = mainActivity.appDatabase.addressDao();
     }
 
     @Override
@@ -111,35 +107,32 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         AsyncTask.execute(() ->
         {
+            var user = userDao.getCurrentOne();
+            var address = addressDao.getCurrentOne();
+
             viewModel.setFullname(user.getFullName());
             viewModel.setAddress(address == null ? "No selected address" : address.toString());
-        });
-        URL url;
-        try
-        {
-            url = new URL("http://192.168.0.104:8000" + user.getAvatarUrl());
-        }
-        catch (MalformedURLException e)
-        {
-            return;
-        }
 
-        Glide.with(this)
-             .asBitmap()
-             .load(url)
-             .into(new SimpleTarget()
-             {
-                 @Override
-                 public void onResourceReady(@NonNull Bitmap resource,
-                                             @Nullable Transition<? super Bitmap> transition)
-                 {
-                     int size = ((Float) mainActivity.getResources()
-                                                     .getDimension(R.dimen.icon_size)).intValue();
-                     Bitmap bitmap = Bitmap.createScaledBitmap(resource, size, size, false);
-                     Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-                     toolbar.setNavigationIcon(drawable);
-                 }
-             });
+            MainActivity.loadImageInView(user.getAvatarUrl(), getView(), new CustomTarget<Bitmap>()
+            {
+                @Override
+                public void onResourceReady(@NonNull Bitmap resource,
+                                            @Nullable Transition<? super Bitmap> transition)
+                {
+                    int size = ((Float) mainActivity.getResources()
+                                                    .getDimension(R.dimen.icon_size)).intValue();
+                    Bitmap bitmap = Bitmap.createScaledBitmap(resource, size, size, false);
+                    Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                    toolbar.setNavigationIcon(drawable);
+                }
+
+                @Override
+                public void onLoadCleared(@Nullable Drawable placeholder)
+                {
+
+                }
+            });
+        });
     }
 
     private void initMap()
@@ -202,6 +195,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     @Deprecated
     private void setAddressInToken()
     {
+        var address = addressDao.getCurrentOne();
         if (address != null)
             mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
                     address.getId(), MainActivity.token);
@@ -211,9 +205,12 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public void update()
     {
         super.update();
-        initUserAndAddress();
+
         AsyncTask.execute(() ->
         {
+            var user = userDao.getCurrentOne();
+            var address = addressDao.getCurrentOne();
+
             viewModel.setFullname(user.getFullName());
             viewModel.setAddress(address == null ? "No selected address" : address.toString());
         });
@@ -227,5 +224,15 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
             viewModel.setAddressChanged(false);
         }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        var user = userDao.getCurrentOne();
+        user.setCurrent(false);
+        userDao.update(user);
     }
 }

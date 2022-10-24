@@ -20,10 +20,10 @@ public interface AddressDao
     @Query("SELECT * FROM addressimpl WHERE addressid = :id")
     AddressImpl getById(String id);
 
-    @Query("SELECT * FROM addressimpl WHERE current")
-    AddressImpl getCurrent();
+    @Query("SELECT * FROM addressimpl WHERE addresscurrent")
+    AddressImpl getCurrentOne();
 
-    @Query("SELECT addressid FROM addressimpl WHERE current")
+    @Query("SELECT addressid FROM addressimpl WHERE addresscurrent")
     String getCurrentId();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

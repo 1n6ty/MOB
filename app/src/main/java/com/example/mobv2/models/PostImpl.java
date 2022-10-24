@@ -81,17 +81,19 @@ public class PostImpl implements Post, HavingCommentsIds
         this.date = date;
         this.text = text;
         this.images = images;
+        this.reactions = reactions;
 
         if (images == null || images.isEmpty()) type = POST_ONLY_TEXT;
         else if (text == null || text.isEmpty()) type = POST_ONLY_IMAGES;
         else type = POST_FULL;
 
-        this.reactions = reactions;
         this.commentsIds = new MyObservableArrayList<>(commentsIds);
         this.positiveRates = new MyObservableArrayList<>(positiveRates);
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
         commentsCount = new ObservableInt(commentsIds.size());
+
+        // TODO FIX IT PLEASE
         ((MyObservableArrayList<String>) this.commentsIds)
                 .setOnListChangedCallback(new Operation(commentsCount, 1, -1));
 
@@ -276,7 +278,7 @@ public class PostImpl implements Post, HavingCommentsIds
         return type;
     }
 
-    private static class Operation implements MyObservableArrayList.OnListChangedCallback<String>
+    public static class Operation implements MyObservableArrayList.OnListChangedCallback<String>
     {
         private final ObservableInt observableInt;
         private final int firstOperand;

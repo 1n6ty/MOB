@@ -1,14 +1,17 @@
 package com.example.mobv2.models;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableInt;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.example.mobv2.models.abstractions.Comment;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
+import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -21,8 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import localdatabase.typeconverters.DateConverter;
-import localdatabase.typeconverters.StringListConverter;
 import localdatabase.typeconverters.ReactionsConverter;
+import localdatabase.typeconverters.StringListConverter;
 
 @Entity
 public class CommentImpl implements Comment, HavingCommentsIds
@@ -46,6 +49,11 @@ public class CommentImpl implements Comment, HavingCommentsIds
     @TypeConverters(StringListConverter.class)
     private List<String> negativeRates;
 
+    @Ignore
+    private final ObservableInt commentsCount;
+    @Ignore
+    private final ObservableInt ratesCount;
+
     public CommentImpl(String id,
                        UserImpl user,
                        Date date,
@@ -60,9 +68,23 @@ public class CommentImpl implements Comment, HavingCommentsIds
         this.date = date;
         this.text = text;
         this.reactions = reactions;
-        this.commentsIds = commentsIds;
-        this.positiveRates = positiveRates;
-        this.negativeRates = negativeRates;
+
+        this.commentsIds = new MyObservableArrayList<>(commentsIds);
+        this.positiveRates = new MyObservableArrayList<>(positiveRates);
+        this.negativeRates = new MyObservableArrayList<>(negativeRates);
+
+        commentsCount = new ObservableInt(commentsIds.size());
+
+        // TODO FIX IT PLEASE
+        ((MyObservableArrayList<String>) this.commentsIds)
+                .setOnListChangedCallback(new PostImpl.Operation(commentsCount, 1, -1));
+
+        ratesCount = new ObservableInt(positiveRates.size() - negativeRates.size());
+        ((MyObservableArrayList<String>) this.positiveRates)
+                .setOnListChangedCallback(new PostImpl.Operation(ratesCount, 1, -1));
+
+        ((MyObservableArrayList<String>) this.negativeRates)
+                .setOnListChangedCallback(new PostImpl.Operation(ratesCount, -1, 1));
     }
 
     public static CommentImpl createNewComment(String id,
@@ -212,5 +234,15 @@ public class CommentImpl implements Comment, HavingCommentsIds
     public List<String> getNegativeRates()
     {
         return negativeRates;
+    }
+
+    public ObservableInt getCommentsCount()
+    {
+        return commentsCount;
+    }
+
+    public ObservableInt getRatesCount()
+    {
+        return ratesCount;
     }
 }

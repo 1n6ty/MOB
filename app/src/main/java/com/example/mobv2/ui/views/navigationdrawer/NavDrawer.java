@@ -11,7 +11,6 @@ import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.NavHeaderMainBinding;
 import com.example.mobv2.models.MenuItemMetadatum;
@@ -23,9 +22,6 @@ import com.example.mobv2.ui.fragments.MapFeaturesFragment;
 import com.example.mobv2.ui.fragments.NotificationAndSoundFragment;
 import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
 import com.google.android.material.navigation.NavigationView;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class NavDrawer implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -43,8 +39,9 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     {
         this.mainActivity = mainActivity;
 
-        user = mainActivity.appDatabase.userDao()
-                                       .getOne();
+        UserImpl currentUser = mainActivity.appDatabase.userDao()
+                                                      .getCurrentOne();
+        user = currentUser != null ? currentUser : new UserImpl();
 
         drawerLayout = mainActivity.findViewById(R.id.drawer_layout);
 
@@ -56,7 +53,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     private void initNavigationView()
     {
         navigationView = mainActivity.findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 
         headerView = navigationView.getHeaderView(0);
 
@@ -66,22 +63,31 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         binding.setBindingContext(mainFragmentViewModel);
     }
 
-    private void updateHeaderView()
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-        URL url;
-        try
+        NavDrawerViewModel viewModel =
+                new ViewModelProvider(mainActivity).get(NavDrawerViewModel.class);
+        MenuItemMetadatum metadatum = viewModel.getMenuItemHash(item);
+
+        switch (metadatum.itemType)
         {
-            url = new URL("http://192.168.0.104:8000" + user.getAvatarUrl());
-        }
-        catch (MalformedURLException e)
-        {
-            return;
+            case MenuItemMetadatum.ITEM_FRAGMENT:
+            case MenuItemMetadatum.ITEM_SITE:
+                metadatum.listener.onClick();
+                break;
         }
 
+        close();
+
+        return true;
+    }
+
+    private void updateHeaderView()
+    {
         ImageView avatarView = headerView.findViewById(R.id.avatar_view);
-        Glide.with(mainActivity)
-             .load(url)
-             .into(avatarView);
+
+        MainActivity.loadImageInView(user.getAvatarUrl(), navigationView, avatarView);
     }
 
     private void initNavigationMenu()
@@ -144,26 +150,6 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         );
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item)
-    {
-        NavDrawerViewModel viewModel =
-                new ViewModelProvider(mainActivity).get(NavDrawerViewModel.class);
-        MenuItemMetadatum metadatum = viewModel.getMenuItemHash(item);
-
-        switch (metadatum.itemType)
-        {
-            case MenuItemMetadatum.ITEM_FRAGMENT:
-            case MenuItemMetadatum.ITEM_SITE:
-                metadatum.listener.onClick();
-                break;
-        }
-
-        close();
-
-        return true;
-    }
-
 
     private void addNavigationMenuItem(Menu menu,
                                        int groupId,
@@ -190,7 +176,6 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
         viewModel.putMenuItemHash(menuItem, menuItemMetadatum);
     }
-
 
     public boolean isOpen()
     {

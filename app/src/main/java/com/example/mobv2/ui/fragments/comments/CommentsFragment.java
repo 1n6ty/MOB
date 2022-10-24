@@ -79,12 +79,6 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         initSendButton();
     }
 
-    @Override
-    public void onDestroyView()
-    {
-        super.onDestroyView();
-    }
-
     private void initViewModel()
     {
         viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
@@ -211,14 +205,14 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
                 {
                     sendButton.setEnabled(false);
                     sendButton.getDrawable()
-                              .setTint(getResources().getColor(R.color.gray_200));
+                              .setTint(mainActivity.getAttributeColor(R.attr.colorHelpButtonIcon));
                 }
 
                 else
                 {
                     sendButton.setEnabled(true);
                     sendButton.getDrawable()
-                              .setTint(getResources().getColor(mainActivity.getAttribute(android.R.attr.colorAccent)));
+                              .setTint(mainActivity.getAttributeColor(android.R.attr.colorAccent));
                 }
             }
         });
@@ -229,7 +223,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         sendButton = binding.sendButton;
         sendButton.setEnabled(false);
         sendButton.getDrawable()
-                  .setTint(getResources().getColor(R.color.gray_200));
+                  .setTint(mainActivity.getAttributeColor(R.attr.colorHelpButtonIcon));
         sendButton.setOnClickListener(this::onSendButtonClick);
     }
 

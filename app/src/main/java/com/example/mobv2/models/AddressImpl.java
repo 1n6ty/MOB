@@ -43,6 +43,7 @@ public class AddressImpl implements Address, Comparable<Address>
     @TypeConverters(LatLngConverter.class)
     private LatLng position;
 
+    @ColumnInfo(name = "addresscurrent")
     private boolean current;
 
     @Ignore

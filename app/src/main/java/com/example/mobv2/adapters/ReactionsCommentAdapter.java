@@ -55,7 +55,7 @@ public class ReactionsCommentAdapter extends RecyclerView.Adapter<ReactionsComme
     {
         Reaction reaction = reactions.get(holder.getAdapterPosition());
         List<String> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
-        String userId = userDao.getId();
+        String userId = userDao.getCurrentId();
 
         holder.getReaction()
               .setText(reaction.getEmoji());
@@ -93,7 +93,7 @@ public class ReactionsCommentAdapter extends RecyclerView.Adapter<ReactionsComme
         }
 
         List<String> userIdsWhoLiked = new ArrayList<>();
-        String userId = userDao.getId();
+        String userId = userDao.getCurrentId();
         userIdsWhoLiked.add(userId);
 
         //TODO change
@@ -108,7 +108,7 @@ public class ReactionsCommentAdapter extends RecyclerView.Adapter<ReactionsComme
 
         Reaction reaction = reactions.get(position);
 
-        String userId = userDao.getId();
+        String userId = userDao.getCurrentId();
         List<String> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
         String emoji = reaction.getEmoji();
         if (reaction.isChecked())

@@ -13,19 +13,25 @@ import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
 import com.example.mobv2.R;
+import com.example.mobv2.callbacks.RefreshTokenCallback;
+import com.example.mobv2.callbacks.abstractions.RefreshTokenOkCallback;
 import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.fragments.main.MainFragment;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import localdatabase.ApplicationDatabase;
 import serverapi.MOBServerAPI;
 
-public class MainActivity extends ThemedActivity
+public class MainActivity extends ThemedActivity implements RefreshTokenOkCallback
 {
     private static final String ip = "http://192.168.0.104:8000";
 
@@ -164,5 +170,51 @@ public class MainActivity extends ThemedActivity
         Glide.with(withView)
              .load(url)
              .into(intoView);
+    }
+
+    public static <T extends Target> void loadImageInView(String path,
+                                                          View withView,
+                                                          T customTarget)
+    {
+        URL url;
+        try
+        {
+            url = new URL(ip + path);
+        }
+        catch (MalformedURLException e)
+        {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        Glide.with(withView)
+             .asBitmap()
+             .load(url)
+             .into(customTarget);
+    }
+
+    public void startRefreshingToken()
+    {
+        final int minutes = 8;
+
+        var timer = new Timer(true);
+        timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                RefreshTokenCallback refreshTokenCallback =
+                        new RefreshTokenCallback(MainActivity.this);
+                refreshTokenCallback.setOkCallback(MainActivity.this::refreshToken);
+                mobServerAPI.refreshToken(refreshTokenCallback, MainActivity.refresh, MainActivity.token);
+            }
+        }, minutes * 60 * 1000, minutes * 60 * 1000);
+    }
+
+    @Override
+    public void refreshToken(LinkedTreeMap<String, Object> map)
+    {
+        MainActivity.token = (String) map.get("token");
+        MainActivity.refresh = (String) map.get("refresh");
     }
 }

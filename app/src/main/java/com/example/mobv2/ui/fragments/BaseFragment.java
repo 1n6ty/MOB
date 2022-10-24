@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
@@ -48,6 +49,7 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
         return binding.getRoot();
     }
 
+    @CallSuper
     public void update()
     {
         updateWindow();

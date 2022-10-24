@@ -8,14 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
 import com.example.mobv2.models.UserImpl;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
-
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.example.mobv2.ui.activities.MainActivity;
 
 public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
         implements HavingToolbar
@@ -36,7 +33,7 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         super.onViewCreated(view, savedInstanceState);
 
         user = mainActivity.appDatabase.userDao()
-                                       .getOne();
+                                       .getCurrentOne();
 
         initToolbar();
 
@@ -49,29 +46,9 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     {
         toolbar = binding.toolbar;
 
-        URL url;
-        try
-        {
-            url = new URL("http://192.168.0.104:8000" + user.getAvatarUrl());
-        }
-        catch (MalformedURLException e)
-        {
-            return;
-        }
-
-        Glide.with(this)
-             .load(url)
-             .into(binding.avatarView);
+        MainActivity.loadImageInView(user.getAvatarUrl(), getView(), binding.avatarView);
 
         AsyncTask.execute(() -> super.initToolbar(toolbar, user.getFullName()));
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-        user = mainActivity.appDatabase.userDao()
-                                       .getOne();
     }
 
     private void initSettingsPhoneNumberView()
@@ -93,5 +70,13 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     private void initSettingsAddressesView()
     {
         binding.settingsAddressesView.setOnClickListener(view -> mainActivity.goToFragment(new ChangeAddressesFragment()));
+    }
+
+    @Override
+    public void update()
+    {
+        super.update();
+        user = mainActivity.appDatabase.userDao()
+                                       .getCurrentOne();
     }
 }

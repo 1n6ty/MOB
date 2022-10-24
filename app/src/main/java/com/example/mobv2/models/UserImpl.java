@@ -3,6 +3,7 @@ package com.example.mobv2.models;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.example.mobv2.models.abstractions.User;
@@ -24,6 +25,14 @@ public class UserImpl implements User
     private String surname;
     private String email;
     private String phoneNumber;
+
+    @ColumnInfo(name = "usercurrent")
+    private boolean current;
+
+    @Ignore
+    public UserImpl()
+    {
+    }
 
     public UserImpl(String id,
                     String avatarUrl,
@@ -154,5 +163,17 @@ public class UserImpl implements User
     public String getPhoneNumber()
     {
         return phoneNumber;
+    }
+
+    @Override
+    public boolean isCurrent()
+    {
+        return current;
+    }
+
+    @Override
+    public void setCurrent(boolean current)
+    {
+        this.current = current;
     }
 }

@@ -117,7 +117,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/post_images_recycler_view">
 
-                <RadioGroup
+                <LinearLayout
                     android:id="@+id/rates_group"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -127,14 +127,16 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <RadioButton
+                    <ImageButton
                         android:id="@+id/rate_up_button"
+                        style="@style/postButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginRight="@dimen/vertical_small_margin"
-                        android:button="@drawable/ic_add"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp" />
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/foreground_button_rate_up_selector" />
 
                     <TextView
                         android:id="@+id/rates_count_view"
@@ -145,14 +147,16 @@
                         android:text="@{Integer.toString(appreciationsCount)}"
                         tools:text="@string/menu_reaction_count" />
 
-                    <RadioButton
+                    <ImageButton
                         android:id="@+id/rate_down_button"
+                        style="@style/postButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:button="@drawable/ic_remove"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp" />
-                </RadioGroup>
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/foreground_button_rate_down_selector" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

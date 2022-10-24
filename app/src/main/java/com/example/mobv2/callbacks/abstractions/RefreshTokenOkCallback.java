@@ -3,7 +3,7 @@ package com.example.mobv2.callbacks.abstractions;
 import com.google.gson.internal.LinkedTreeMap;
 
 @FunctionalInterface
-public interface GetPostOkCallback
+public interface RefreshTokenOkCallback
 {
-    void parsePostFromMapAndAddToPosts(LinkedTreeMap<String, Object> map);
+    void refreshToken(LinkedTreeMap<String, Object> map);
 }

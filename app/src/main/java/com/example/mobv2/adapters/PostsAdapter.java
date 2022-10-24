@@ -8,9 +8,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,15 +54,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     private final UserDao userDao;
 
     private final MainActivity mainActivity;
-    private final MapAdapterCallback callback;
+    private MapAdapterCallback callback;
 
     private final List<PostImpl> posts;
 
-    public PostsAdapter(MainActivity mainActivity,
-                        MapAdapterCallback callback)
+    public PostsAdapter(MainActivity mainActivity)
     {
         this.mainActivity = mainActivity;
-        this.callback = callback;
 
         postDao = mainActivity.appDatabase.postDao();
         userDao = mainActivity.appDatabase.userDao();
@@ -103,6 +100,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     {
         var post = posts.get(position);
         var user = post.getUser();
+        String postId = post.getId();
+        String userId = userDao.getCurrentId();
 
         holder.setCommentsCount(post.getCommentsCount());
         holder.setAppreciationsCount(post.getRatesCount());
@@ -115,23 +114,25 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
-        holder.rateUpButton.setOnClickListener(view ->
+        if (post.getPositiveRates()
+                .contains(userId))
         {
-            if (holder.ratesGroup.getCheckedRadioButtonId() == view.getId())
-                holder.ratesGroup.clearCheck();
-        });
-        holder.rateDownButton.setOnClickListener(view ->
+            holder.rateUpButton.setSelected(true);
+        }
+        else if (post.getNegativeRates()
+                     .contains(userId))
         {
-            if (holder.ratesGroup.getCheckedRadioButtonId() == view.getId())
-                holder.ratesGroup.clearCheck();
-        });
+            holder.rateDownButton.setSelected(true);
+        }
+
+        holder.rateUpButton.setOnClickListener(view -> onRateUpButtonClick(view, holder.itemView, holder.getAdapterPosition()));
+        holder.rateDownButton.setOnClickListener(view -> onRateDownButtonClick(view, holder.itemView, holder.getAdapterPosition()));
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
 
-        initContent(holder.content, position);
+        initContent(holder.content, holder.getAdapterPosition());
 
-        var reactionsAdapter =
-                new ReactionsPostAdapter(mainActivity, post.getReactions(), post.getId());
+        var reactionsAdapter = new ReactionsPostAdapter(mainActivity, post.getReactions(), postId);
         holder.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
 
@@ -158,7 +159,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         var post = posts.get(position);
         var user = post.getUser();
 
-        boolean isCreator = user.compareById(userDao.getOne());  // if the user is a post's creator
+        boolean isCreator = user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
         menu.findItem(R.id.menu_edit_post)
             .setVisible(isCreator);
         menu.findItem(R.id.menu_delete_post)
@@ -211,6 +212,60 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             default:
                 return false;
         }
+    }
+
+    private void onRateUpButtonClick(View view,
+                                     View rootView,
+                                     int position)
+    {
+        onRateButtonClick(view, rootView);
+        var post = posts.get(position);
+        removeRateFromFirstRatesAndAddRateToSecondRates(post.getNegativeRates(), post.getPositiveRates());
+
+        mainActivity.mobServerAPI.postInc(new MOBAPICallbackImpl(), post.getId(), MainActivity.token);
+    }
+
+    private void onRateDownButtonClick(View view,
+                                       View rootView,
+                                       int position)
+    {
+        onRateButtonClick(view, rootView);
+        var post = posts.get(position);
+        removeRateFromFirstRatesAndAddRateToSecondRates(post.getPositiveRates(), post.getNegativeRates());
+
+        mainActivity.mobServerAPI.postDec(new MOBAPICallbackImpl(), post.getId(), MainActivity.token);
+    }
+
+    private void onRateButtonClick(View view,
+                                   View rootView)
+    {
+        var rateButton = (ImageButton) view;
+
+        if (rateButton.isSelected())
+        {
+            rateButton.setSelected(false);
+        }
+        else
+        {
+            deselectRateButtons(rootView);
+            rateButton.setSelected(true);
+        }
+    }
+
+    private void deselectRateButtons(View rootView)
+    {
+        rootView.findViewById(R.id.rate_up_button)
+                .setSelected(false);
+        rootView.findViewById(R.id.rate_down_button)
+                .setSelected(false);
+    }
+
+    private void removeRateFromFirstRatesAndAddRateToSecondRates(List<String> firstRates,
+                                                                 List<String> secondRates)
+    {
+        String userId = userDao.getCurrentId();
+        firstRates.remove(userId);
+        if (!secondRates.remove(userId)) secondRates.add(userId);
     }
 
     private void initContent(@NonNull Pair<TextView, RecyclerView> content,
@@ -353,8 +408,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     private boolean deletePost(int position)
     {
         PostImpl post = posts.get(position);
-
-        callback.removeMarkerByPostId(post.getId());
+        if (callback != null) callback.removeMarkerByPostId(post.getId());
         posts.remove(post);
         notifyItemRemoved(position);
 
@@ -364,6 +418,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
              .show();
 
         return true;
+
+    }
+
+    public void setMapAdapterCallback(MapAdapterCallback callback)
+    {
+        this.callback = callback;
     }
 
     @Override
@@ -380,10 +440,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         private final TextView fullNameView;
         private final TextView dateView;
         private final Pair<TextView, RecyclerView> content;
-        private final RadioGroup ratesGroup;
-        private final RadioButton rateUpButton;
+        private final ImageButton rateUpButton;
         private final TextView ratesCountView;
-        private final RadioButton rateDownButton;
+        private final ImageButton rateDownButton;
         private final View showReactionsView;
         private final RecyclerView reactionsRecyclerView;
         private final LinearLayout showCommentsView;
@@ -399,7 +458,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             fullNameView = binding.fullNameView;
             dateView = binding.dateView;
             content = new Pair<>(binding.postTextView, binding.postImagesRecyclerView);
-            ratesGroup = binding.ratesGroup;
             rateUpButton = binding.rateUpButton;
             ratesCountView = binding.ratesCountView;
             rateDownButton = binding.rateDownButton;
