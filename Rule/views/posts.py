@@ -286,8 +286,11 @@ def postInc(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        post.rate['p'] = list(chain(filter(lambda e: e != user.id, post.rate['p']), [user.id]))
-        post.rate['m'] = list(filter(lambda e: e != user.id, post.rate['m']))
+        if user.id in post.rate['p']:
+            post.rate['p'] = list(filter(lambda e: e != user.id, post.rate['p']))
+        else:
+            post.rate['p'] = list(chain(filter(lambda e: e != user.id, post.rate['p']), [user.id]))
+            post.rate['m'] = list(filter(lambda e: e != user.id, post.rate['m']))
         post.save()
 
         return JsonResponse({
@@ -347,8 +350,11 @@ def postDec(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        post.rate['m'] = list(chain(filter(lambda e: e != user.id, post.rate['m']), [user.id]))
-        post.rate['p'] = list(filter(lambda e: e != user.id, post.rate['p']))
+        if user.id in post.rate['m']:
+            post.rate['m'] = list(filter(lambda e: e != user.id, post.rate['m']))
+        else:
+            post.rate['m'] = list(chain(filter(lambda e: e != user.id, post.rate['m']), [user.id]))
+            post.rate['p'] = list(filter(lambda e: e != user.id, post.rate['p']))
         post.save()
 
         return JsonResponse({

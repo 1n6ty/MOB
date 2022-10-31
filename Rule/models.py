@@ -1,3 +1,4 @@
+from email.policy import default
 import django.utils.timezone as time
 from django.db import models
 
@@ -27,7 +28,7 @@ class PostWithMark(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     content = models.TextField(default='', blank=True)
     images = models.JSONField(default=dict([("images", list())]), blank=True)
-    date = models.DateField(default=time.now())
+    date = models.DateTimeField(default=time.now())
     mark = models.JSONField(default=dict([('x', -1), ('y', -1)]))
     title = models.CharField(max_length=255, default="")
     rate = models.JSONField(default=dict([('p', list()), ('m', list())]))
@@ -37,7 +38,7 @@ class PostWithMark(models.Model):
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     content = models.TextField()
-    date = models.DateField(default=time.now())
+    date = models.DateTimeField(default=time.now())
     rate = models.JSONField(default=dict([('p', list()), ('m', list())]))
     comments = models.ManyToManyField('Comment', blank=True)
     reactions = models.JSONField(default=dict(), blank=True)

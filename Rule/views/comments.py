@@ -198,8 +198,11 @@ def commentInc(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        comment.rate['p'] = list(chain(filter(lambda e: e != user.id, comment.rate['p']), [user.id]))
-        comment.rate['m'] = list(filter(lambda e: e != user.id, comment.rate['m']))
+        if user.id in comment.rate['p']:
+            comment.rate['p'] = list(filter(lambda e: e != user.id, comment.rate['p']))
+        else:
+            comment.rate['p'] = list(chain(filter(lambda e: e != user.id, comment.rate['p']), [user.id]))
+            comment.rate['m'] = list(filter(lambda e: e != user.id, comment.rate['m']))
         comment.save()
 
         return JsonResponse({
@@ -259,8 +262,11 @@ def commentDec(req):
                 'msg': "token_corrupted"
             }, status = 403)
         
-        comment.rate['m'] = list(chain(filter(lambda e: e != user.id, comment.rate['m']), [user.id]))
-        comment.rate['p'] = list(filter(lambda e: e != user.id, comment.rate['p']))
+        if user.id in comment.rate['m']:
+            comment.rate['m'] = list(filter(lambda e: e != user.id, comment.rate['m']))
+        else:
+            comment.rate['m'] = list(chain(filter(lambda e: e != user.id, comment.rate['m']), [user.id]))
+            comment.rate['p'] = list(filter(lambda e: e != user.id, comment.rate['p']))
         comment.save()
         
         return JsonResponse({
@@ -303,7 +309,7 @@ def comment(req):
             return JsonResponse({
                 'msg': "no_such_address"
             }, status = 404)
-        parent = address.comments.filter(id = parent_id).all() if removeCommas(parent_litera) == 'c' else address.posts.filter(id = parent_id).all()
+        parent = address.comments.filter(id = parent_id).all() if parent_litera == 'c' else address.posts.filter(id = parent_id).all()
         if parent.count() > 0:
             parent = parent[0]
         else:

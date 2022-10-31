@@ -182,7 +182,7 @@ public class MOBServerAPI {
 
     public void refreshToken(MOBAPICallback obj,
                              String token, String refreshToken){
-        Call<LinkedTreeMap<String, Object>> refreshCall = MOBAPI.refresh(token, refreshToken);
+        Call<LinkedTreeMap<String, Object>> refreshCall = MOBAPI.refresh(refreshToken, token);
         refreshCall.enqueue(createResponseCallback(obj));
     }
     public void auth(MOBAPICallback obj,

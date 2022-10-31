@@ -29,7 +29,7 @@ SECRET_KEY = SECRET_KEY
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.0.180'
+    '192.168.139.78'
 ]
 
 
