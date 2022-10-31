@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.Addable;
+import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.models.AddressImpl;
@@ -22,7 +22,7 @@ import java.util.List;
 
 import localdatabase.daos.AddressDao;
 
-public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder> implements Addable<AddressImpl>
+public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder> implements AbleToAdd<AddressImpl>
 {
     private final AddressDao addressDao;
 

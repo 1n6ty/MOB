@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.Addable;
+import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.callbacks.CreatePostCallback;
 import com.example.mobv2.callbacks.GetMarkersCallback;
 import com.example.mobv2.callbacks.GetPostCallback;
@@ -22,7 +22,6 @@ import com.example.mobv2.callbacks.abstractions.MapAdapterCallback;
 import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.models.MarkerInfoImpl;
 import com.example.mobv2.models.PostImpl;
-import com.example.mobv2.models.abstractions.Address;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.markercreators.MapSkillsBottomSheetFragment;
 import com.example.mobv2.ui.fragments.markercreators.MarkerCreatorViewModel;
@@ -47,7 +46,7 @@ import localdatabase.daos.AddressDao;
 import localdatabase.daos.MarkerInfoDao;
 import localdatabase.daos.PostDao;
 
-public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImpl>, MapAdapterCallback, CreatePostOkCallback, GetPostOkCallback, GetMarkersOkCallback
+public class MapAdapter extends MapView.Adapter implements AbleToAdd<MarkerInfoImpl>, MapAdapterCallback, CreatePostOkCallback, GetPostOkCallback, GetMarkersOkCallback
 {
     public static final int ZOOM = 16;
     public static final Locale LOCALE = Locale.ENGLISH;
@@ -75,8 +74,8 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
                         {R.drawable.ic_marker_24dp, R.drawable.ic_marker_36dp}};
 
         addressDao = mainActivity.appDatabase.addressDao();
-        postDao = mainActivity.appDatabase.postDao();
         markerInfoDao = mainActivity.appDatabase.markerInfoDao();
+        postDao = mainActivity.appDatabase.postDao();
     }
 
     @Override
@@ -117,16 +116,19 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
     {
         MarkerInfoImpl markerInfo = markerInfoList.get(position);
 
-        if (checkIfClickedMarkerInfoEqualsTo(markerInfo)) return;
+        if (checkIfClickedMarkerInfoEqualsTo(markerInfo))
+        {
+            return;
+        }
 
         deselectClickedMarkerInfo();
 
         animateCameraTo(markerInfo.getPosition());
 
-        bufferMarkerInfo = markerInfo;
         markerInfo.setClicked(true);
+        bufferMarkerInfo = markerInfo;
         refreshPostsRecycler();
-        refreshPosts();
+        refreshPostsFragment();
         notifyItemChanged(position);
     }
 
@@ -137,6 +139,8 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
 
     private void onMapLongClick(@NonNull LatLng latLng)
     {
+        onDeselectClickedMarkerInfo();
+
         initMarkerCreatorViewModel(latLng);
 
         var pointerMarker =
@@ -174,18 +178,18 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
         createPostCallback.setOkCallback(this::parsePostIdFromMapAndAddUsingPositionToMarkerInfoList);
         markerCreatorViewModel.setCallback(createPostCallback);
 
-        Address address = getOtherAddressByLatLng(latLng);
+        AddressImpl address = getOtherAddressByLatLng(latLng);
 
         markerCreatorViewModel.setAddress(address);
     }
 
     @Override
     public void parsePostIdFromMapAndAddUsingPositionToMarkerInfoList(LinkedTreeMap<String, Object> map,
-                                                                      LatLng position)
+                                                                      LatLng latLng)
     {
         int postId = ((Double) map.get("id")).intValue();
-        double x = position.latitude;
-        double y = position.longitude;
+        double x = latLng.latitude;
+        double y = latLng.longitude;
         var markerInfo = new MarkerInfoImpl(new LatLng(x, y), MarkerInfoImpl.SUB_ADDRESS_MARKER);
         markerInfo.getMetadata()
                   .put("post_id", postId);
@@ -193,7 +197,7 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
         addElement(markerInfo);
     }
 
-    private Address getOtherAddressByLatLng(@NonNull LatLng latLng)
+    private AddressImpl getOtherAddressByLatLng(@NonNull LatLng latLng)
     {
         try
         {
@@ -226,8 +230,7 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
 
     public void onMapClick()
     {
-        markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        deselectClickedMarkerInfo();
+        onDeselectClickedMarkerInfo();
     }
 
     @Override
@@ -305,8 +308,9 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
         callback.setOkCallback(this::parsePostFromMapAndAddToPosts);
         callback.setFailCallback(() ->
         {
+            PostImpl post = postDao.getById(postId);
             markersAdapterHelper.getPostsAdapter()
-                                .addElement(postDao.getById(postId));
+                                .addElement(post);
             markersAdapterHelper.postsRecyclerView.scrollToPosition(0);
         });
         mainActivity.mobServerAPI.getPost(callback, postId, MainActivity.token);
@@ -315,16 +319,15 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
     @Override
     public void parsePostFromMapAndAddToPosts(LinkedTreeMap<String, Object> map)
     {
-        PostImpl post = new PostImpl.PostBuilder().parseFromMap(map);
+        var post = new PostImpl.PostBuilder().parseFromMap(map);
         postDao.insert(post);
-
         markersAdapterHelper.getPostsAdapter()
                             .addElement(post);
 
         markersAdapterHelper.postsRecyclerView.scrollToPosition(0);
     }
 
-    private void refreshPosts()
+    private void refreshPostsFragment()
     {
         markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
 
@@ -353,15 +356,19 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
             Map<String, Object> metadata = markerInfo.getMetadata();
             if (markerInfo.getMarkerType() == MarkerInfoImpl.SUB_ADDRESS_MARKER && (String.valueOf(metadata.get("post_id"))).equals(postId))
             {
-                deselectClickedMarkerInfo();
+                markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
                 markerInfoList.remove(markerInfo);
                 notifyItemRemoved(i);
-
-                markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 return;
             }
         }
+    }
+
+    private void onDeselectClickedMarkerInfo()
+    {
+        deselectClickedMarkerInfo();
+        markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     public void onDestroy()
@@ -391,7 +398,10 @@ public class MapAdapter extends MapView.Adapter implements Addable<MarkerInfoImp
         for (int i = 0; i < markerInfoList.size(); i++)
         {
             MarkerInfoImpl markerInfo = markerInfoList.get(i);
-            if (markerInfo.isClicked()) return markerInfo;
+            if (markerInfo.isClicked())
+            {
+                return markerInfo;
+            }
         }
 
         return new MarkerInfoImpl();

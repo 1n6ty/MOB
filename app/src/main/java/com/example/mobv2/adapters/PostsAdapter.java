@@ -23,9 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.Addable;
-import com.example.mobv2.adapters.abstractions.Reversable;
-import com.example.mobv2.adapters.abstractions.SortableByUserWills;
+import com.example.mobv2.adapters.abstractions.AbleToAdd;
+import com.example.mobv2.adapters.abstractions.AbleToReverse;
+import com.example.mobv2.adapters.abstractions.AbleToSortByUserWills;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.callbacks.abstractions.MapAdapterCallback;
 import com.example.mobv2.databinding.ItemPostBinding;
@@ -48,7 +48,7 @@ import localdatabase.daos.PostDao;
 import localdatabase.daos.UserDao;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
-        implements Reversable, SortableByUserWills, Addable<PostImpl>
+        implements AbleToReverse, AbleToSortByUserWills, AbleToAdd<PostImpl>
 {
     private final PostDao postDao;
     private final UserDao userDao;
@@ -98,6 +98,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public void onBindViewHolder(@NonNull PostViewHolder holder,
                                  int position)
     {
+        View parentView = holder.itemView;
+
         var post = posts.get(position);
         var user = post.getUser();
         String postId = post.getId();
@@ -106,13 +108,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.setCommentsCount(post.getCommentsCount());
         holder.setAppreciationsCount(post.getRatesCount());
 
-        MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
+        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, holder.avatarView);
 
         holder.fullNameView.setText(user.getFullName());
 
         holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(post.getDate()));
 
-        holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
+        parentView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
         if (post.getPositiveRates()
                 .contains(userId))
@@ -125,10 +127,49 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             holder.rateDownButton.setSelected(true);
         }
 
-        holder.rateUpButton.setOnClickListener(view -> onRateUpButtonClick(view, holder.itemView, holder.getAdapterPosition()));
-        holder.rateDownButton.setOnClickListener(view -> onRateDownButtonClick(view, holder.itemView, holder.getAdapterPosition()));
+        holder.rateUpButton.setOnClickListener(view -> onRateUpButtonClick(view, parentView, holder.getAdapterPosition()));
+        holder.rateDownButton.setOnClickListener(view -> onRateDownButtonClick(view, parentView, holder.getAdapterPosition()));
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
+        holder.showReactionsView.setOnLongClickListener(view ->
+        {
+            final int[] menuIds =
+                    {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
+
+            var contextThemeWrapper =
+                    new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+            var popupMenu = new PopupMenu(contextThemeWrapper, view);
+            popupMenu.inflate(R.menu.menu_reactions);
+
+            popupMenu.show();
+
+            var menu = popupMenu.getMenu();
+
+            var reactionsView =
+                    (RecyclerView) parentView.findViewById(R.id.reactions_recycler_view);
+            var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
+            for (int id : menuIds)
+            {
+                menu.findItem(id)
+                    .setOnMenuItemClickListener(item ->
+                    {
+                        String emojiItem = item.getTitle()
+                                               .toString();
+                   /* for (Reaction reaction : post.getReactions())
+                    {
+                        String emoji = reaction.getEmoji();
+                        if (emoji.equals(emojiItem))
+                        {
+
+                        }
+                    }*/
+                        reactionsAdapter.addElement(emojiItem);
+                        return true;
+                    });
+            }
+
+            return true;
+        });
 
         initContent(holder.content, holder.getAdapterPosition());
 
@@ -147,19 +188,19 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
         popupMenu.inflate(R.menu.menu_post);
 
-        initMenu(view, popupMenu, position);
+        initMenu(popupMenu, position);
         popupMenu.show();
     }
 
-    private void initMenu(View view,
-                          @NonNull PopupMenu popupMenu,
+    private void initMenu(@NonNull PopupMenu popupMenu,
                           int position)
     {
         var menu = popupMenu.getMenu();
         var post = posts.get(position);
         var user = post.getUser();
 
-        boolean isCreator = user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
+        boolean isCreator =
+                user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
         menu.findItem(R.id.menu_edit_post)
             .setVisible(isCreator);
         menu.findItem(R.id.menu_delete_post)
@@ -169,31 +210,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             .setVisible(post.getType() == PostImpl.POST_ONLY_TEXT || post.getType() == PostImpl.POST_FULL);
 
         popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
-
-        int[] menuIds =
-                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
-
-        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_recycler_view);
-        var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
-        for (int id : menuIds)
-        {
-            menu.findItem(id)
-                .setOnMenuItemClickListener(item ->
-                {
-                    String emojiItem = item.getTitle()
-                                           .toString();
-                   /* for (Reaction reaction : post.getReactions())
-                    {
-                        String emoji = reaction.getEmoji();
-                        if (emoji.equals(emojiItem))
-                        {
-
-                        }
-                    }*/
-                    reactionsAdapter.addElement(emojiItem);
-                    return true;
-                });
-        }
     }
 
     private boolean onMenuItemClick(MenuItem item,

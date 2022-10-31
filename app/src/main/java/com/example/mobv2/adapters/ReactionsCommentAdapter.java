@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.Addable;
+import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.adapters.abstractions.ReactionsAdapter;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.models.Reaction;
@@ -20,7 +20,7 @@ import java.util.List;
 import localdatabase.daos.UserDao;
 
 public class ReactionsCommentAdapter extends RecyclerView.Adapter<ReactionsCommentAdapter.ReactionViewHolder>
-        implements ReactionsAdapter, Addable<String>
+        implements ReactionsAdapter, AbleToAdd<String>
 {
     private final UserDao userDao;
 

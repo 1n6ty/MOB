@@ -81,7 +81,7 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
-                            android:id="@+id/appreciation_up_view"
+                            android:id="@+id/rate_up_view"
                             style="@style/postButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -100,7 +100,7 @@
                             tools:text="100" />
 
                         <ImageView
-                            android:id="@+id/appreciation_down_view"
+                            android:id="@+id/rate_down_view"
                             style="@style/postButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -114,6 +114,7 @@
                         android:id="@+id/show_reactions_view"
                         style="@style/postButtonStyle"
                         android:layout_width="wrap_content"
+                        app:tint="?colorHelpButtonIcon"
                         android:layout_height="match_parent"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_constraintBottom_toBottomOf="parent"

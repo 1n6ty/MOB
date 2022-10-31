@@ -9,7 +9,7 @@ import com.google.gson.internal.LinkedTreeMap
 import serverapi.MOBServerAPI.MOBAPICallback
 
 class CreatePostCallback(private val mainActivity: MainActivity,
-                         private val position: LatLng) : MOBAPICallback,
+                         private val latLng: LatLng) : MOBAPICallback,
     HasOkStateCallback<CreatePostOkCallback>
 {
     private var okCallback: CreatePostOkCallback? = null
@@ -18,7 +18,7 @@ class CreatePostCallback(private val mainActivity: MainActivity,
         Log.v("DEBUG", obj.toString())
         val response = obj["response"] as LinkedTreeMap<String, Any>?
 
-        okCallback?.parsePostIdFromMapAndAddUsingPositionToMarkerInfoList(response, position)
+        okCallback?.parsePostIdFromMapAndAddUsingPositionToMarkerInfoList(response, latLng)
     }
 
     override fun funcBad(obj: LinkedTreeMap<String, Any>)

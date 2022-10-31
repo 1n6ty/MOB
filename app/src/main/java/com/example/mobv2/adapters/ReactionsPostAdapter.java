@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.Addable;
+import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.adapters.abstractions.ReactionsAdapter;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.models.Reaction;
@@ -20,7 +20,7 @@ import java.util.List;
 import localdatabase.daos.UserDao;
 
 public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdapter.ReactionViewHolder>
-        implements ReactionsAdapter, Addable<String>
+        implements ReactionsAdapter, AbleToAdd<String>
 {
     private final UserDao userDao;
 
@@ -97,7 +97,9 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
         userIdsWhoLiked.add(userId);
 
         //TODO change
-        reactions.add(new Reaction(emoji, userIdsWhoLiked, true));
+        Reaction reaction = new Reaction(emoji, userIdsWhoLiked);
+        reaction.setChecked(true);
+        reactions.add(reaction);
         mainActivity.mobServerAPI.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         notifyItemInserted(reactions.size() - 1);
     }
@@ -107,20 +109,20 @@ public class ReactionsPostAdapter extends RecyclerView.Adapter<ReactionsPostAdap
         // half-measure
 
         Reaction reaction = reactions.get(position);
-
-        String userId = userDao.getCurrentId();
         List<String> userIdsWhoLiked = reaction.getUserIdsWhoLiked();
+        String userId = userDao.getCurrentId();
+
         String emoji = reaction.getEmoji();
         if (reaction.isChecked())
         {
-            reaction.setChecked(false);
             userIdsWhoLiked.remove(userId);
+            reaction.setChecked(false);
             mainActivity.mobServerAPI.postUnreact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         }
         else
         {
-            reaction.setChecked(true);
             userIdsWhoLiked.add(userId);
+            reaction.setChecked(true);
             mainActivity.mobServerAPI.postReact(new MOBAPICallbackImpl(), postId, emoji, MainActivity.token);
         }
 

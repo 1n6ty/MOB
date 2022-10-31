@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.abstractions.Addable;
+import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
@@ -40,7 +40,7 @@ import localdatabase.daos.UserDao;
 import serverapi.MOBServerAPI;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
-        implements Addable<CommentImpl>
+        implements AbleToAdd<CommentImpl>
 {
     private final UserDao userDao;
 
@@ -166,10 +166,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void onBindViewHolder(@NonNull CommentViewHolder holder,
                                  int position)
     {
+        View parentView = holder.itemView;
+
         CommentImpl comment = comments.get(position);
         User user = comment.getUser();
 
-        MainActivity.loadImageInView(user.getAvatarUrl(), holder.itemView, holder.avatarView);
+        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, holder.avatarView);
 
         holder.fullNameView.setText(user.getFullName());
 
@@ -177,9 +179,39 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(comment.getDate()));
 
-        holder.itemView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
+        parentView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
+        holder.showReactionsView.setOnLongClickListener(view ->
+        {
+            final int[] menuIds =
+                    {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
+
+            var contextThemeWrapper =
+                    new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+            var popupMenu = new PopupMenu(contextThemeWrapper, view);
+            popupMenu.inflate(R.menu.menu_reactions);
+
+            popupMenu.show();
+
+            var menu = popupMenu.getMenu();
+
+            var reactionsView =
+                    (RecyclerView) parentView.findViewById(R.id.reactions_recycler_view);
+            var reactionsAdapter = (ReactionsCommentAdapter) reactionsView.getAdapter();
+            for (int id : menuIds)
+            {
+                menu.findItem(id)
+                    .setOnMenuItemClickListener(item ->
+                    {
+                        reactionsAdapter.addElement(item.getTitle()
+                                                        .toString());
+                        return true;
+                    });
+            }
+
+            return true;
+        });
 
         var reactionsAdapter =
                 new ReactionsCommentAdapter(mainActivity, comment.getReactions(), comment.getId());
@@ -237,41 +269,25 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
         popupMenu.inflate(R.menu.menu_post);
 
-        initMenu(view, popupMenu, position);
+        initMenu(popupMenu, position);
         popupMenu.show();
     }
 
-    private void initMenu(View view,
-                          @NonNull PopupMenu popupMenu,
+    private void initMenu(@NonNull PopupMenu popupMenu,
                           int position)
     {
         var menu = popupMenu.getMenu();
         var comment = comments.get(position);
         var user = comment.getUser();
 
-        boolean isCreator = user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
+        boolean isCreator =
+                user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
         menu.findItem(R.id.menu_edit_post)
             .setVisible(isCreator);
         menu.findItem(R.id.menu_delete_post)
             .setVisible(isCreator);
 
         popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
-
-        int[] menuIds =
-                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
-
-        var reactionsView = (RecyclerView) view.findViewById(R.id.reactions_recycler_view);
-        var reactionsAdapter = (ReactionsCommentAdapter) reactionsView.getAdapter();
-        for (int id : menuIds)
-        {
-            menu.findItem(id)
-                .setOnMenuItemClickListener(item ->
-                {
-                    reactionsAdapter.addElement(item.getTitle()
-                                                    .toString());
-                    return true;
-                });
-        }
     }
 
     private boolean onMenuItemClick(MenuItem item,
