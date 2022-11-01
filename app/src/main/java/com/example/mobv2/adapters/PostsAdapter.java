@@ -20,16 +20,15 @@ import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.adapters.abstractions.AbleToReverse;
 import com.example.mobv2.adapters.abstractions.AbleToSortByUserWills;
+import com.example.mobv2.adapters.abstractions.ForPostsAndCommentsAdapters;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.callbacks.abstractions.MapAdapterCallback;
 import com.example.mobv2.databinding.ItemPostBinding;
-import com.example.mobv2.models.Image;
 import com.example.mobv2.models.PostImpl;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.comments.CommentsFragment;
@@ -131,53 +130,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         holder.rateDownButton.setOnClickListener(view -> onRateDownButtonClick(view, parentView, holder.getAdapterPosition()));
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
-        holder.showReactionsView.setOnLongClickListener(view ->
-        {
-            final int[] menuIds =
-                    {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
+        holder.showReactionsView.setOnLongClickListener(view -> ForPostsAndCommentsAdapters.onShowReactionsViewLongClick(mainActivity, view));
 
-            var contextThemeWrapper =
-                    new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
-            var popupMenu = new PopupMenu(contextThemeWrapper, view);
-            popupMenu.inflate(R.menu.menu_reactions);
-
-            popupMenu.show();
-
-            var menu = popupMenu.getMenu();
-
-            var reactionsView =
-                    (RecyclerView) parentView.findViewById(R.id.reactions_recycler_view);
-            var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
-            for (int id : menuIds)
-            {
-                menu.findItem(id)
-                    .setOnMenuItemClickListener(item ->
-                    {
-                        String emojiItem = item.getTitle()
-                                               .toString();
-                   /* for (Reaction reaction : post.getReactions())
-                    {
-                        String emoji = reaction.getEmoji();
-                        if (emoji.equals(emojiItem))
-                        {
-
-                        }
-                    }*/
-                        reactionsAdapter.addElement(emojiItem);
-                        return true;
-                    });
-            }
-
-            return true;
-        });
-
-        initContent(holder.content, holder.getAdapterPosition());
+        ForPostsAndCommentsAdapters.initPostContent(mainActivity, holder.content, post);
 
         var reactionsAdapter = new ReactionsPostAdapter(mainActivity, post.getReactions(), postId);
         holder.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
 
-        holder.showCommentsView.setOnClickListener(view -> onCommentViewClick(view, post, reactionsAdapter));
+        holder.showCommentsView.setOnClickListener(view -> onCommentViewClick(view, holder.getAdapterPosition()));
     }
 
     private void onItemViewClick(View view,
@@ -284,42 +245,17 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         if (!secondRates.remove(userId)) secondRates.add(userId);
     }
 
-    private void initContent(@NonNull Pair<TextView, RecyclerView> content,
-                             int position)
-    {
-        var post = posts.get(position);
-
-        content.first.setText(post.getText());
-
-        switch (post.getType())
-        {
-            case PostImpl.POST_ONLY_TEXT:
-                content.second.setVisibility(View.GONE);
-                break;
-            case PostImpl.POST_ONLY_IMAGES:
-                content.first.setVisibility(View.GONE);
-            case PostImpl.POST_FULL:
-                List<Image> images = new ArrayList<>();
-                for (String url : post.getImages())
-                {
-                    images.add(new Image("", url, Image.IMAGE_ONLINE));
-                }
-                ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                content.second.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
-                content.second.setAdapter(adapter);
-                break;
-        }
-    }
-
     private void onShowReactionsViewClick(View view)
     {
         view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     private void onCommentViewClick(View view,
-                                    PostImpl post,
-                                    ReactionsPostAdapter reactionsAdapter)
+                                    int position)
     {
+        var post = posts.get(position);
+
+        var reactionsAdapter = new ReactionsPostAdapter(mainActivity, post.getReactions(), post.getId());
         var postItem = new PostItem(post, reactionsAdapter);
         var viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
         viewModel.setPostItem(postItem);
