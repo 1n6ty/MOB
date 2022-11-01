@@ -3,6 +3,7 @@ package com.example.mobv2.ui.activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -156,16 +157,8 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                                        View withView,
                                        ImageView intoView)
     {
-        URL url;
-        try
-        {
-            url = new URL(ip + path);
-        }
-        catch (MalformedURLException e)
-        {
-            System.out.println(e.getMessage());
-            return;
-        }
+        URL url = getUrl(path);
+        if (url == null) return;
 
         Glide.with(withView)
              .load(url)
@@ -176,21 +169,26 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                                                           View withView,
                                                           T customTarget)
     {
-        URL url;
-        try
-        {
-            url = new URL(ip + path);
-        }
-        catch (MalformedURLException e)
-        {
-            System.out.println(e.getMessage());
-            return;
-        }
+        URL url = getUrl(path);
+        if (url == null) return;
 
         Glide.with(withView)
              .asBitmap()
              .load(url)
              .into(customTarget);
+    }
+
+    private static URL getUrl(String path)
+    {
+        try
+        {
+            return new URL(ip + path);
+        }
+        catch (MalformedURLException e)
+        {
+            Log.e("GetUrlError", e.getMessage());
+            return null;
+        }
     }
 
     public void startRefreshingToken()
