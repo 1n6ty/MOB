@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
+import com.example.mobv2.adapters.abstractions.ForPostsAndCommentsAdapters;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
@@ -182,36 +183,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         parentView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
-        holder.showReactionsView.setOnLongClickListener(view ->
-        {
-            final int[] menuIds =
-                    {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
-
-            var contextThemeWrapper =
-                    new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
-            var popupMenu = new PopupMenu(contextThemeWrapper, view);
-            popupMenu.inflate(R.menu.menu_reactions);
-
-            popupMenu.show();
-
-            var menu = popupMenu.getMenu();
-
-            var reactionsView =
-                    (RecyclerView) parentView.findViewById(R.id.reactions_recycler_view);
-            var reactionsAdapter = (ReactionsCommentAdapter) reactionsView.getAdapter();
-            for (int id : menuIds)
-            {
-                menu.findItem(id)
-                    .setOnMenuItemClickListener(item ->
-                    {
-                        reactionsAdapter.addElement(item.getTitle()
-                                                        .toString());
-                        return true;
-                    });
-            }
-
-            return true;
-        });
+        holder.showReactionsView.setOnLongClickListener(view -> ForPostsAndCommentsAdapters.onShowReactionsViewLongClick(mainActivity, view));
 
         var reactionsAdapter =
                 new ReactionsCommentAdapter(mainActivity, comment.getReactions(), comment.getId());
@@ -228,37 +200,6 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
             }
         });
-    }
-
-    private void onShowReactionsViewClick(View view)
-    {
-        view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void addElement(@NonNull CommentImpl comment)
-    {
-        Date date = comment.getDate();
-        if (comments.isEmpty() || date.compareTo(comments.get(comments.size() - 1)
-                                                         .getDate()) < 0)
-        {
-            comments.add(comment);
-            notifyItemInserted(comments.size() - 1);
-        }
-        else
-        {
-            for (int i = 0; i < comments.size(); i++)
-            {
-                Date currentDate = comments.get(i)
-                                           .getDate();
-                if (date.compareTo(currentDate) >= 0)
-                {
-                    comments.add(i, comment);
-                    notifyItemInserted(i);
-                    break;
-                }
-            }
-        }
     }
 
     private void onItemViewClick(View view,
@@ -305,6 +246,37 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                 return deleteComment(position);
             default:
                 return false;
+        }
+    }
+
+    private void onShowReactionsViewClick(View view)
+    {
+        view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void addElement(@NonNull CommentImpl comment)
+    {
+        Date date = comment.getDate();
+        if (comments.isEmpty() || date.compareTo(comments.get(comments.size() - 1)
+                                                         .getDate()) < 0)
+        {
+            comments.add(comment);
+            notifyItemInserted(comments.size() - 1);
+        }
+        else
+        {
+            for (int i = 0; i < comments.size(); i++)
+            {
+                Date currentDate = comments.get(i)
+                                           .getDate();
+                if (date.compareTo(currentDate) >= 0)
+                {
+                    comments.add(i, comment);
+                    notifyItemInserted(i);
+                    break;
+                }
+            }
         }
     }
 
@@ -365,9 +337,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         private final TextView fullNameView;
         private final TextView commentTextView;
         private final TextView dateView;
-        private final ImageView appreciationUpView;
+        private final ImageView rateUpView;
         private final TextView ratesCountView;
-        private final ImageView appreciationDownView;
+        private final ImageView rateDownView;
         private final ImageView showReactionsView;
         private final RecyclerView reactionsRecyclerView;
         private final Button showCommentsButton;
@@ -382,9 +354,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             fullNameView = binding.fullNameView;
             commentTextView = binding.commentTextView;
             dateView = binding.commentDateView;
-            appreciationUpView = binding.appreciationUpView;
+            rateUpView = binding.rateUpView;
             ratesCountView = binding.ratesCountView;
-            appreciationDownView = binding.appreciationDownView;
+            rateDownView = binding.rateDownView;
             showReactionsView = binding.showReactionsView;
             reactionsRecyclerView = binding.reactionsRecyclerView;
             showCommentsButton = binding.showCommentsButton;
