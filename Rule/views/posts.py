@@ -1,4 +1,5 @@
 from itertools import chain
+from datetime import datetime
 from MOB.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
 from Rule.views.views import isCorruptedToken, getDataFromToken, removeCommas, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
@@ -212,9 +213,9 @@ def createPost(req):
         try:
             markx = float(req.POST['markx'])
             marky = float(req.POST['marky'])
-            post = PostWithMark.objects.create(user = user, content = removeCommas(content), mark = {'x': markx, 'y': marky}, title = removeCommas(title))
+            post = PostWithMark.objects.create(user = user, content = removeCommas(content), mark = {'x': markx, 'y': marky}, title = removeCommas(title), date = datetime.now())
         except KeyError:
-            post = PostWithMark.objects.create(user = user, content = removeCommas(content), title = removeCommas(title))
+            post = PostWithMark.objects.create(user = user, content = removeCommas(content), title = removeCommas(title), date = datetime.now())
         
         idF = len([name for name in os.listdir(MEDIA_ROOT + '/posts/')])
         post.images["images"] = []

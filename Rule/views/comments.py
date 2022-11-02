@@ -1,4 +1,5 @@
 from itertools import chain
+from datetime import datetime
 from Rule.views.views import isCorruptedToken, getDataFromToken, removeCommas, sessionTimeExpired
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
@@ -328,7 +329,7 @@ def comment(req):
                 'msg': "token_corrupted"
             }, status = 403)
 
-        new_c = Comment(user=user, content=removeCommas(content))
+        new_c = Comment(user=user, content=removeCommas(content), date = datetime.now())
         new_c.save()
         parent.comments.add(new_c)
         parent.save()
