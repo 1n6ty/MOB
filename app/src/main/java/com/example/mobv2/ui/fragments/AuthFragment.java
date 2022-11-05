@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.MapAdapter;
+import com.example.mobv2.adapters.MarkersAdapter;
 import com.example.mobv2.callbacks.AuthCallback;
 import com.example.mobv2.callbacks.abstractions.AuthOkCallback;
 import com.example.mobv2.databinding.FragmentAuthBinding;
@@ -138,7 +138,8 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
                 for (Map<String, Object> addressMap : addressesMapList)
                 {
                     AddressImpl address = new AddressImpl.AddressBuilder().parseFromMap(addressMap);
-                    address.setPosition(getLatLngByAddress(address));
+                    LatLng latLng = getLatLngByAddress(address);
+                    address.setLatLng(latLng);
                     var currentAddress = addressDao.getCurrentOne();
                     if (address.compareById(currentAddress))
                     {
@@ -157,7 +158,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     {
         try
         {
-            Geocoder geocoder = new Geocoder(mainActivity, MapAdapter.LOCALE);
+            Geocoder geocoder = new Geocoder(mainActivity, MarkersAdapter.LOCALE);
             android.location.Address mapAddress =
                     geocoder.getFromLocationName(address.toString(), 1)
                             .get(0);

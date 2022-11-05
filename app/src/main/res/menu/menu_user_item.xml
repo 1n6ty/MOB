@@ -11,7 +11,12 @@
         android:title="@string/menu_forward_post"
         app:showAsAction="never" />
 
-    <!--  For post's creator  -->
+    <item
+        android:id="@+id/menu_goto_post"
+        android:title="@string/menu_goto_post"
+        app:showAsAction="never" />
+
+    <!--  For user item's creator  -->
     <item
         android:id="@+id/menu_edit_post"
         android:title="@string/menu_edit_post"

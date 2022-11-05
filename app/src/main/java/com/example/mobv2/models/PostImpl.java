@@ -1,7 +1,6 @@
 package com.example.mobv2.models;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.ObservableInt;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
@@ -10,8 +9,8 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import com.example.mobv2.models.abstractions.Post;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
+import com.example.mobv2.models.abstractions.Post;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
@@ -25,8 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import localdatabase.typeconverters.DateConverter;
-import localdatabase.typeconverters.StringListConverter;
 import localdatabase.typeconverters.ReactionsConverter;
+import localdatabase.typeconverters.StringListConverter;
 
 @Entity
 public class PostImpl implements Post, HavingCommentsIds
@@ -50,7 +49,7 @@ public class PostImpl implements Post, HavingCommentsIds
     @TypeConverters(ReactionsConverter.class)
     private List<Reaction> reactions;
     @TypeConverters(StringListConverter.class)
-    private List<String> commentsIds;
+    private List<String> commentIds;
     @TypeConverters(StringListConverter.class)
     private List<String> positiveRates;
     @TypeConverters(StringListConverter.class)
@@ -71,7 +70,7 @@ public class PostImpl implements Post, HavingCommentsIds
                     String text,
                     List<String> images,
                     List<Reaction> reactions,
-                    List<String> commentsIds,
+                    List<String> commentIds,
                     List<String> positiveRates,
                     List<String> negativeRates)
     {
@@ -87,14 +86,14 @@ public class PostImpl implements Post, HavingCommentsIds
         else if (text == null || text.isEmpty()) type = POST_ONLY_IMAGES;
         else type = POST_FULL;
 
-        this.commentsIds = new MyObservableArrayList<>(commentsIds);
+        this.commentIds = new MyObservableArrayList<>(commentIds);
         this.positiveRates = new MyObservableArrayList<>(positiveRates);
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
-        commentsCount = new ObservableInt(commentsIds.size());
+        commentsCount = new ObservableInt(commentIds.size());
 
         // TODO FIX IT PLEASE
-        ((MyObservableArrayList<String>) this.commentsIds)
+        ((MyObservableArrayList<String>) this.commentIds)
                 .setOnListChangedCallback(new Operation(commentsCount, 1, -1));
 
         ratesCount = new ObservableInt(positiveRates.size() - negativeRates.size());
@@ -246,9 +245,9 @@ public class PostImpl implements Post, HavingCommentsIds
     }
 
     @Override
-    public List<String> getCommentsIds()
+    public List<String> getCommentIds()
     {
-        return commentsIds;
+        return commentIds;
     }
 
     @Override
@@ -294,12 +293,6 @@ public class PostImpl implements Post, HavingCommentsIds
         }
 
         @Override
-        public void onAdded(String string)
-        {
-            observableInt.set(observableInt.get() + firstOperand);
-        }
-
-        @Override
         public void onAdded(int index,
                             String element)
         {
@@ -313,7 +306,8 @@ public class PostImpl implements Post, HavingCommentsIds
         }
 
         @Override
-        public void onRemoved(@Nullable Object o)
+        public void onRemoved(int index,
+                              Object o)
         {
             observableInt.set(observableInt.get() + secondOperand);
         }

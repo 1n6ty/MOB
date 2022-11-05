@@ -21,7 +21,7 @@ public interface Post
 
     List<Reaction> getReactions();
 
-    List<String> getCommentsIds();
+    List<String> getCommentIds();
 
     List<String> getPositiveRates();
 

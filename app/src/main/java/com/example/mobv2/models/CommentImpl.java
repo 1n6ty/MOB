@@ -43,7 +43,7 @@ public class CommentImpl implements Comment, HavingCommentsIds
     @TypeConverters(ReactionsConverter.class)
     private List<Reaction> reactions;
     @TypeConverters(StringListConverter.class)
-    private List<String> commentsIds;
+    private List<String> commentIds;
     @TypeConverters(StringListConverter.class)
     private List<String> positiveRates;
     @TypeConverters(StringListConverter.class)
@@ -59,7 +59,7 @@ public class CommentImpl implements Comment, HavingCommentsIds
                        Date date,
                        String text,
                        List<Reaction> reactions,
-                       List<String> commentsIds,
+                       List<String> commentIds,
                        List<String> positiveRates,
                        List<String> negativeRates)
     {
@@ -69,14 +69,14 @@ public class CommentImpl implements Comment, HavingCommentsIds
         this.text = text;
         this.reactions = reactions;
 
-        this.commentsIds = new MyObservableArrayList<>(commentsIds);
+        this.commentIds = new MyObservableArrayList<>(commentIds);
         this.positiveRates = new MyObservableArrayList<>(positiveRates);
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
-        commentsCount = new ObservableInt(commentsIds.size());
+        commentsCount = new ObservableInt(commentIds.size());
 
         // TODO FIX IT PLEASE
-        ((MyObservableArrayList<String>) this.commentsIds)
+        ((MyObservableArrayList<String>) this.commentIds)
                 .setOnListChangedCallback(new PostImpl.Operation(commentsCount, 1, -1));
 
         ratesCount = new ObservableInt(positiveRates.size() - negativeRates.size());
@@ -219,9 +219,9 @@ public class CommentImpl implements Comment, HavingCommentsIds
     }
 
     @Override
-    public List<String> getCommentsIds()
+    public List<String> getCommentIds()
     {
-        return commentsIds;
+        return commentIds;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.example.mobv2.callbacks.abstractions;
 
-@FunctionalInterface
 public interface MapAdapterCallback
 {
+    void goToMarkerByPostId(String postId);
     void removeMarkerByPostId(String postId);
 }

@@ -41,7 +41,7 @@ public class AddressImpl implements Address, Comparable<Address>
     private String house;
 
     @TypeConverters(LatLngConverter.class)
-    private LatLng position;
+    private LatLng latLng;
 
     @ColumnInfo(name = "addresscurrent")
     private boolean current;
@@ -203,14 +203,14 @@ public class AddressImpl implements Address, Comparable<Address>
         return userIds;
     }
 
-    public LatLng getPosition()
+    public LatLng getLatLng()
     {
-        return position;
+        return latLng;
     }
 
-    public void setPosition(LatLng position)
+    public void setLatLng(LatLng latLng)
     {
-        this.position = position;
+        this.latLng = latLng;
     }
 
     @Override

@@ -25,7 +25,8 @@ import java.util.List;
 public class ForPostsAndCommentsAdapters
 {
     public static boolean onShowReactionsViewLongClick(Context context,
-                                                       View view)
+                                                       View view,
+                                                       View parentView)
     {
         final int[] menuIds =
                 {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
@@ -39,10 +40,9 @@ public class ForPostsAndCommentsAdapters
 
         var menu = popupMenu.getMenu();
 
-        var reactionsView =
-                (RecyclerView) view.getRootView()
-                                   .findViewById(R.id.reactions_recycler_view);
-        var reactionsAdapter = (ReactionsPostAdapter) reactionsView.getAdapter();
+        var reactionsRecyclerView =
+                (RecyclerView) parentView.findViewById(R.id.reactions_recycler_view);
+        var reactionsAdapter = (ReactionsPostAdapter) reactionsRecyclerView.getAdapter();
         for (int id : menuIds)
         {
             menu.findItem(id)

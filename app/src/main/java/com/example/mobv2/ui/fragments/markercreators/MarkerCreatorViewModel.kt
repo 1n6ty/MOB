@@ -6,7 +6,6 @@ import com.google.android.gms.maps.model.LatLng
 import serverapi.MOBServerAPI.MOBAPICallback
 
 class MarkerCreatorViewModel : ObservableViewModel() {
-    lateinit var latLng: LatLng
     lateinit var callback: MOBAPICallback
     lateinit var address: AddressImpl
 }

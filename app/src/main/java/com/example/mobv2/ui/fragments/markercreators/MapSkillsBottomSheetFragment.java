@@ -78,8 +78,9 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
                                                 .getSecondary();
         toolbar.setTitle(secondaryAddressTitle);
 
-        LatLng latLng = viewModel.getLatLng();
-        String coordinatesSubtitle = latLng.latitude + " : " + latLng.longitude;
+        LatLng position = viewModel.getAddress()
+                                   .getLatLng();
+        String coordinatesSubtitle = position.latitude + " : " + position.longitude;
         toolbar.setSubtitle(coordinatesSubtitle);
         toolbar.setOnClickListener(this::onToolbarClick);
     }

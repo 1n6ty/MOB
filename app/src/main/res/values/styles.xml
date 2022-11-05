@@ -139,7 +139,7 @@
         <item name="android:textSize">@dimen/pre_medium_text_size</item>
     </style>
 
-    <style name="appreciationsTextStyle">
+    <style name="ratesTextStyle">
         <item name="android:textColor">?colorTertiaryText</item>
         <item name="android:textSize">@dimen/pre_medium_text_size</item>
         <item name="android:gravity">center</item>

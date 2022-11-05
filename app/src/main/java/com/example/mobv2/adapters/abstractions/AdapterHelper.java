@@ -1,6 +1,6 @@
 package com.example.mobv2.adapters.abstractions;
 
-import com.google.android.gms.maps.model.Marker;
+import com.example.mobv2.ui.views.MarkerView;
 
 public class AdapterHelper
 {
@@ -31,7 +31,7 @@ public class AdapterHelper
 
     public interface Callback
     {
-        Marker findMarker(int position);
+        MarkerView findMarkerView(int position);
 
         void onItemRangeChanged(int positionStart,
                                 int itemCount);

@@ -12,11 +12,12 @@ import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import localdatabase.typeconverters.LatLngConverter;
-import localdatabase.typeconverters.MapConverter;
+import localdatabase.typeconverters.StringListConverter;
 
 @Entity
 public class MarkerInfoImpl implements MarkerInfo
@@ -33,11 +34,11 @@ public class MarkerInfoImpl implements MarkerInfo
 
     private String title;
     @TypeConverters(LatLngConverter.class)
-    private LatLng position;
+    private LatLng latLng;
 
     private int markerType;
-    @TypeConverters(MapConverter.class)
-    private Map<String, Object> metadata;
+    @TypeConverters(StringListConverter.class)
+    private List<String> postIds;
 
     @Ignore
     private boolean clicked;
@@ -48,33 +49,33 @@ public class MarkerInfoImpl implements MarkerInfo
     }
 
     @Ignore
-    public MarkerInfoImpl(LatLng position,
+    public MarkerInfoImpl(LatLng latLng,
                           int markerType)
     {
-        this(TITLE_DEFAULT, position, markerType);
+        this(TITLE_DEFAULT, latLng, markerType);
     }
 
     @Ignore
     public MarkerInfoImpl(String title,
-                          LatLng position,
+                          LatLng latLng,
                           int markerType)
     {
         this.title = title;
-        this.position = position;
+        this.latLng = latLng;
         this.markerType = markerType;
 
-        metadata = new HashMap<>();
+        postIds = new ArrayList<>();
     }
 
     public MarkerInfoImpl(String title,
-                          LatLng position,
+                          LatLng latLng,
                           int markerType,
-                          Map<String, Object> metadata)
+                          List<String> postIds)
     {
         this.title = title;
-        this.position = position;
+        this.latLng = latLng;
         this.markerType = markerType;
-        this.metadata = metadata;
+        this.postIds = postIds;
     }
 
     @Override
@@ -129,9 +130,9 @@ public class MarkerInfoImpl implements MarkerInfo
         return title;
     }
 
-    public LatLng getPosition()
+    public LatLng getLatLng()
     {
-        return position;
+        return latLng;
     }
 
     public int getMarkerType()
@@ -139,9 +140,9 @@ public class MarkerInfoImpl implements MarkerInfo
         return markerType;
     }
 
-    public Map<String, Object> getMetadata()
+    public List<String> getPostIds()
     {
-        return metadata;
+        return postIds;
     }
 
     public boolean isClicked()

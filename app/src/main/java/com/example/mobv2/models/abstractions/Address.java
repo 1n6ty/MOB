@@ -29,7 +29,7 @@ public interface Address extends Comparable<Address>
 
     void setCurrent(boolean current);
 
-    LatLng getPosition();
+    LatLng getLatLng();
 
-    void setPosition(LatLng position);
+    void setLatLng(LatLng latLng);
 }

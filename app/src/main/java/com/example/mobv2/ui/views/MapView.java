@@ -1,4 +1,4 @@
-package com.example.mobv2.utils;
+package com.example.mobv2.ui.views;
 
 import android.database.Observable;
 
@@ -23,7 +23,7 @@ public class MapView
     private final GoogleMap googleMap;
     private Adapter adapter;
     private final AdapterHelper adapterHelper;
-    private final List<Marker> markers = new ArrayList<>();
+    private final List<MarkerView> markerViews = new ArrayList<>();
 
     private final MapViewDataObserver observer = new MapViewDataObserver();
 
@@ -34,9 +34,9 @@ public class MapView
         adapterHelper = new AdapterHelper(new AdapterHelper.Callback()
         {
             @Override
-            public Marker findMarker(int position)
+            public MarkerView findMarkerView(int position)
             {
-                return markers.get(position);
+                return markerViews.get(position);
             }
 
             @Override
@@ -45,13 +45,13 @@ public class MapView
             {
                 if (itemCount == 1)
                 {
-                    adapter.bindMarker(findMarker(positionStart), positionStart);
+                    adapter.bindMarker(findMarkerView(positionStart), positionStart);
                     return;
                 }
 
                 for (int i = positionStart; i < itemCount; i++)
                 {
-                    adapter.bindMarker(findMarker(positionStart), i);
+                    adapter.bindMarker(findMarkerView(positionStart), i);
                 }
             }
 
@@ -61,17 +61,19 @@ public class MapView
             {
                 if (itemCount == 1)
                 {
-                    Marker marker = googleMap.addMarker(MARKER_OPTIONS_DEFAULT);
-                    markers.add(marker);
-                    adapter.bindMarker(findMarker(positionStart), positionStart);
+                    MarkerView markerView =
+                            new MarkerView(googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
+                    markerViews.add(markerView);
+                    adapter.bindMarker(findMarkerView(positionStart), positionStart);
                     return;
                 }
 
                 for (int i = positionStart; i < itemCount; i++)
                 {
-                    Marker marker = googleMap.addMarker(MARKER_OPTIONS_DEFAULT);
-                    markers.add(marker);
-                    adapter.bindMarker(findMarker(i), i);
+                    MarkerView markerView =
+                            new MarkerView(googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
+                    markerViews.add(markerView);
+                    adapter.bindMarker(findMarkerView(i), i);
                 }
             }
 
@@ -81,17 +83,17 @@ public class MapView
             {
                 if (itemCount == 1)
                 {
-                    markers.get(positionStart)
-                           .remove();
-                    markers.remove(positionStart);
+                    markerViews.get(positionStart)
+                               .remove();
+                    markerViews.remove(positionStart);
                     return;
                 }
 
                 for (int i = positionStart; i < itemCount; i++)
                 {
-                    markers.get(i)
-                           .remove();
-                    markers.remove(i);
+                    markerViews.get(i)
+                               .remove();
+                    markerViews.remove(i);
                 }
             }
         });
@@ -112,6 +114,14 @@ public class MapView
         {
             onAdapterChanged();
             adapter.registerAdapterDataObserver(observer);
+            setOnMarkerClickListener(new OnMarkerClickListener()
+            {
+                @Override
+                public void onMarkerClick(MarkerView markerView)
+                {
+                    markerView.onClick();
+                }
+            });
 
             adapter.onCreate(this);
         }
@@ -121,8 +131,8 @@ public class MapView
     {
         for (int i = 0; i < adapter.getItemCount(); i++)
         {
-            Marker marker = googleMap.addMarker(MARKER_OPTIONS_DEFAULT);
-            markers.add(marker);
+            MarkerView markerView = new MarkerView(googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
+            markerViews.add(markerView);
         }
     }
 
@@ -170,11 +180,17 @@ public class MapView
         googleMap.setOnMapLongClickListener(listener);
     }
 
-    public void setOnMarkerClickListener(@NonNull MapView.OnMarkerClickListener listener)
+    protected void setOnMarkerClickListener(@NonNull MapView.OnMarkerClickListener listener)
     {
         googleMap.setOnMarkerClickListener(marker ->
         {
-            listener.onMarkerClick(markers.indexOf(marker));
+            for (MarkerView markerView: markerViews)
+            {
+                if (markerView.getId().equals(marker.getId()))
+                {
+                    listener.onMarkerClick(markerView);
+                }
+            }
             return true;
         });
     }
@@ -191,7 +207,7 @@ public class MapView
 
     public interface OnMarkerClickListener
     {
-        void onMarkerClick(int position);
+        void onMarkerClick(MarkerView markerView);
     }
 
     public static abstract class Adapter
@@ -200,13 +216,13 @@ public class MapView
 
         public abstract void onCreate(MapView mapView);
 
-        public abstract void onBindMarker(Marker marker,
-                                          int position);
+        public abstract void onBindMarkerView(MarkerView markerView,
+                                              int position);
 
-        public void bindMarker(Marker marker,
+        public void bindMarker(MarkerView markerView,
                                int position)
         {
-            onBindMarker(marker, position);
+            onBindMarkerView(markerView, position);
         }
 
         public abstract int getItemCount();

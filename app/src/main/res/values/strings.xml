@@ -44,6 +44,7 @@
     <!--  post menu item titles  -->
     <string name="menu_copy_post">Copy</string>
     <string name="menu_forward_post">Forward</string>
+    <string name="menu_goto_post">Go to post</string>
     <string name="menu_edit_post">Edit</string>
     <string name="menu_delete_post">Delete</string>
 

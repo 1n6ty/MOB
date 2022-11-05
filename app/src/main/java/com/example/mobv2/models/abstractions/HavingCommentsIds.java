@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface HavingCommentsIds
 {
-    List<String> getCommentsIds();
+    List<String> getCommentIds();
 }

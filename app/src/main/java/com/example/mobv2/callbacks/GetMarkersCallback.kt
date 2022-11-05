@@ -17,7 +17,7 @@ class GetMarkersCallback(private val mainActivity: MainActivity) : MOBAPICallbac
         Log.v("DEBUG", obj.toString())
         val response = obj["response"] as LinkedTreeMap<String, Any>?
 
-        okCallback?.parseMarkersFromMapAndAddToMarkerInfoList(response)
+        okCallback?.parseMarkerInfosFromMapAndAddToMarkerInfoList(response)
     }
 
     override fun funcBad(obj: LinkedTreeMap<String, Any>)

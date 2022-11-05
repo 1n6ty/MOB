@@ -21,13 +21,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
-import com.example.mobv2.adapters.abstractions.ForPostsAndCommentsAdapters;
 import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
 import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.utils.ForPostsAndCommentsAdapters;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -61,7 +61,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         userDao = mainActivity.appDatabase.userDao();
 
-        var commentsIds = havingCommentsIds.getCommentsIds();
+        var commentsIds = havingCommentsIds.getCommentIds();
         for (int i = 0; i < Math.min(commentsIds.size(), 4); i++)
         {
             mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
@@ -183,7 +183,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         parentView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
 
         holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
-        holder.showReactionsView.setOnLongClickListener(view -> ForPostsAndCommentsAdapters.onShowReactionsViewLongClick(mainActivity, view));
+        holder.showReactionsView.setOnLongClickListener(view -> ForPostsAndCommentsAdapters.onShowReactionsViewLongClick(mainActivity, view, parentView));
 
         var reactionsAdapter =
                 new ReactionsCommentAdapter(mainActivity, comment.getReactions(), comment.getId());
@@ -208,7 +208,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var contextThemeWrapper =
                 new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
-        popupMenu.inflate(R.menu.menu_post);
+        popupMenu.inflate(R.menu.menu_user_item);
 
         initMenu(popupMenu, position);
         popupMenu.show();
@@ -263,19 +263,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         {
             comments.add(comment);
             notifyItemInserted(comments.size() - 1);
+            return;
         }
-        else
+
+        for (int i = 0; i < comments.size(); i++)
         {
-            for (int i = 0; i < comments.size(); i++)
+            Date currentDate = comments.get(i)
+                                       .getDate();
+            if (date.compareTo(currentDate) >= 0)
             {
-                Date currentDate = comments.get(i)
-                                           .getDate();
-                if (date.compareTo(currentDate) >= 0)
-                {
-                    comments.add(i, comment);
-                    notifyItemInserted(i);
-                    break;
-                }
+                comments.add(i, comment);
+                notifyItemInserted(i);
+                break;
             }
         }
     }
@@ -314,7 +313,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         comments.remove(position);
         notifyItemRemoved(position);
 
-        havingCommentsIds.getCommentsIds()
+        havingCommentsIds.getCommentIds()
                          .remove(comment.getId());
 
         mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);

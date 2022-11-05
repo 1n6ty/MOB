@@ -3,7 +3,7 @@ package com.example.mobv2.models.abstractions;
 import com.example.mobv2.utils.abstractions.Comparable;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Map;
+import java.util.List;
 
 public interface MarkerInfo extends Comparable<MarkerInfo>
 {
@@ -13,11 +13,11 @@ public interface MarkerInfo extends Comparable<MarkerInfo>
 
     String getTitle();
 
-    LatLng getPosition();
+    LatLng getLatLng();
 
     int getMarkerType();
 
-    Map<String, Object> getMetadata();
+    List<String> getPostIds();
 
     boolean isClicked();
 

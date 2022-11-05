@@ -120,7 +120,8 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
 
     private void onConfirmAddingMarkerButtonClick(View view)
     {
-        LatLng latLng = viewModel.getLatLng();
+        LatLng latLng = viewModel.getAddress()
+                                 .getLatLng();
         MOBServerAPI.MOBAPICallback callback = viewModel.getCallback();
 
         String text = markerTextView.getText()

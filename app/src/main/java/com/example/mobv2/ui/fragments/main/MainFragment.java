@@ -19,26 +19,31 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.mobv2.R;
-import com.example.mobv2.adapters.MapAdapter;
+import com.example.mobv2.adapters.MarkersAdapter;
 import com.example.mobv2.adapters.PostsAdapter;
+import com.example.mobv2.callbacks.GetMarkersCallback;
 import com.example.mobv2.callbacks.SetAddressCallback;
+import com.example.mobv2.callbacks.abstractions.GetMarkersOkCallback;
 import com.example.mobv2.databinding.FragmentMainBinding;
+import com.example.mobv2.models.AddressImpl;
+import com.example.mobv2.models.MarkerInfoImpl;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
-import com.example.mobv2.utils.MapView;
+import com.example.mobv2.ui.views.MapView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.gson.internal.LinkedTreeMap;
 
 import localdatabase.daos.AddressDao;
 import localdatabase.daos.UserDao;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
-        implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback
+        implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback, GetMarkersOkCallback
 {
     private MainFragmentViewModel viewModel;
     private UserDao userDao;
@@ -51,7 +56,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private RecyclerView postsRecyclerView;
 
     private MapView mapView;
-    private MapAdapter mapAdapter;
+    private MarkersAdapter markersAdapter;
 
     public MainFragment()
     {
@@ -94,7 +99,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         initToolbar();
 
         initMap();
-        initBottomSheet();
         setAddressInToken();
     }
 
@@ -142,6 +146,8 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         if (mapFragment != null)
         {
             mapFragment.getMapAsync(this::onMapReady);
+
+            initBottomSheet();
         }
     }
 
@@ -149,15 +155,53 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public void onMapReady(@NonNull GoogleMap googleMap)
     {
         mapView = new MapView(googleMap);
-        mapAdapter =
-                new MapAdapter(mainActivity, new MapAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
-        mapView.setAdapter(mapAdapter);
+        markersAdapter =
+                new MarkersAdapter(mainActivity, new MarkersAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
+        mapView.setAdapter(markersAdapter);
+
+        fillMap();
+    }
+
+    private void fillMap()
+    {
+        AddressImpl currentAddress = addressDao.getCurrentOne();
+        if (currentAddress != null)
+        {
+            var addressString = currentAddress.toString();
+
+            if (addressString.isEmpty()) return;
+
+            // add address marker
+            markersAdapter.addElement(new MarkerInfoImpl(addressString, currentAddress.getLatLng(), MarkerInfoImpl.ADDRESS_MARKER));
+
+            // add other markers
+            var callback = new GetMarkersCallback(mainActivity);
+            callback.setOkCallback(this::parseMarkerInfosFromMapAndAddToMarkerInfoList);
+
+            mainActivity.mobServerAPI.getMarks(callback, MainActivity.token);
+            markersAdapter.animateCameraTo(currentAddress.getLatLng());
+        }
+    }
+
+    @Override
+    public void parseMarkerInfosFromMapAndAddToMarkerInfoList(LinkedTreeMap<String, Object> map)
+    {
+        for (var postId : map.keySet())
+        {
+            var markerMap = (LinkedTreeMap<String, Object>) map.get(postId);
+            var markerInfo = new MarkerInfoImpl.MarkerInfoBuilder().parseFromMap(markerMap);
+            markerInfo.getPostIds()
+                      .add(postId);
+
+            markersAdapter.addElement(markerInfo);
+        }
     }
 
     private void initBottomSheet()
     {
         postsToolbar = binding.postsToolbar;
         postsRecyclerView = binding.postsRecyclerView;
+        setPostsToolbarListeners();
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -170,6 +214,18 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior.setHalfExpandedRatio(0.5f);
 
         postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+    }
+
+    private void setPostsToolbarListeners()
+    {
+        postsToolbar.setNavigationOnClickListener(view -> markersAdapter.onMapClick());
+        postsToolbar.getMenu()
+                    .findItem(R.id.menu_posts_refresh)
+                    .setOnMenuItemClickListener(view ->
+                    {
+                        markersAdapter.refreshPostsRecycler();
+                        return true;
+                    });
     }
 
     @Override
@@ -217,7 +273,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         if (viewModel.isAddressChanged())
         {
-            mapAdapter.onDestroy();
+            markersAdapter.onDestroy();
 
             initMap();
             sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);

@@ -6,6 +6,6 @@ import com.google.gson.internal.LinkedTreeMap;
 @FunctionalInterface
 public interface CreatePostOkCallback
 {
-    void parsePostIdFromMapAndAddUsingPositionToMarkerInfoList(LinkedTreeMap<String, Object> map,
-                                                               LatLng position);
+    void parseCreatedMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(LinkedTreeMap<String, Object> map,
+                                                                       LatLng position);
 }
