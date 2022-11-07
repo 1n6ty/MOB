@@ -1,6 +1,5 @@
 package com.example.mobv2.adapters;
 
-import android.location.Geocoder;
 import android.view.Menu;
 import android.view.View;
 
@@ -30,7 +29,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -77,6 +75,12 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
             {
                 notifyItemRemoved(index);
             }
+
+            @Override
+            public void onClear()
+            {
+               notifyItemRangeRemoved(0, getItemCount());
+            }
         });
     }
 
@@ -96,12 +100,12 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
 
     public void onMapClick()
     {
-        onDeselectClickedMarkerInfo();
+        deselectClickedMarkerInfoAndHideBottom();
     }
 
     private void onMapLongClick(@NonNull LatLng latLng)
     {
-        onDeselectClickedMarkerInfo();
+        deselectClickedMarkerInfoAndHideBottom();
 
         initMarkerCreatorViewModel(latLng);
 
@@ -139,7 +143,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         createPostCallback.setOkCallback(this::parseCreatedMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList);
         markerCreatorViewModel.setCallback(createPostCallback);
 
-        AddressImpl address = getOtherAddressByLatLng(latLng);
+        AddressImpl address = mainActivity.getOtherAddressByLatLng(latLng);
 
         markerCreatorViewModel.setAddress(address);
     }
@@ -158,27 +162,6 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         addElement(markerInfo);
     }
 
-    private AddressImpl getOtherAddressByLatLng(@NonNull LatLng latLng)
-    {
-        try
-        {
-            Geocoder geocoder = new Geocoder(mainActivity, LOCALE);
-            android.location.Address mapAddress =
-                    geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                            .get(0);
-
-            AddressImpl rawAddress =
-                    AddressImpl.createRawAddress(mapAddress.getCountryName(), mapAddress.getLocality(), mapAddress.getThoroughfare(), mapAddress.getFeatureName());
-            rawAddress.setLatLng(latLng);
-            return rawAddress;
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     @Override
     public void onBindMarkerView(MarkerView markerView,
                                  int position)
@@ -186,16 +169,6 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         var markerInfoItem = markerInfoItemList.get(position);
 
         markerInfoItem.refreshItemBinding(markerView);
-    }
-
-    public void animateCameraTo(@NonNull LatLng latLng)
-    {
-        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM));
-    }
-
-    public void animateCameraTo(@NonNull LatLng latLng, GoogleMap.CancelableCallback callback)
-    {
-        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM), callback);
     }
 
     public void refreshPostsRecycler()
@@ -246,7 +219,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         markerInfoItemList.remove(markerInfoItem);
     }
 
-    private void onDeselectClickedMarkerInfo()
+    private void deselectClickedMarkerInfoAndHideBottom()
     {
         deselectClickedMarkerInfoItem();
         markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -255,7 +228,6 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     public void onDestroy()
     {
         deselectClickedMarkerInfoItem();
-        mapView.clear();
         markerInfoItemList.clear();
     }
 
@@ -272,11 +244,6 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
                 return;
             }
         }
-    }
-
-    public void setBufferMarkerInfoItem(MarkerInfoItem bufferMarkerInfoItem)
-    {
-        this.bufferMarkerInfoItem = bufferMarkerInfoItem;
     }
 
     public boolean checkIfClickedMarkerInfoEqualsTo(MarkerInfoItem markerInfoItem)
@@ -296,6 +263,26 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         }
 
         return new MarkerInfoItem(mainActivity, this, markersAdapterHelper.getPostsAdapter(), new MarkerInfoImpl());
+    }
+
+    public void animateCameraTo(@NonNull LatLng latLng)
+    {
+        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM));
+    }
+
+    public void animateCameraTo(@NonNull LatLng latLng, GoogleMap.CancelableCallback callback)
+    {
+        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM), callback);
+    }
+
+    public void setBufferMarkerInfoItem(MarkerInfoItem bufferMarkerInfoItem)
+    {
+        this.bufferMarkerInfoItem = bufferMarkerInfoItem;
+    }
+
+    public void scrollToStartPosition()
+    {
+        markersAdapterHelper.postsRecyclerView.scrollToPosition(0);
     }
 
     @Override

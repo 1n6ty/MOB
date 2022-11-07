@@ -1,7 +1,10 @@
 package com.example.mobv2.ui.activities;
 
+import static com.example.mobv2.adapters.MarkersAdapter.LOCALE;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,11 +22,14 @@ import com.example.mobv2.R;
 import com.example.mobv2.callbacks.RefreshTokenCallback;
 import com.example.mobv2.callbacks.abstractions.RefreshTokenOkCallback;
 import com.example.mobv2.databinding.ActivityMainBinding;
+import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.ui.fragments.AuthFragment;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.ui.fragments.main.MainFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
@@ -187,6 +193,27 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
         catch (MalformedURLException e)
         {
             Log.e("GetUrlError", e.getMessage());
+            return null;
+        }
+    }
+
+    public AddressImpl getOtherAddressByLatLng(@NonNull LatLng latLng)
+    {
+        try
+        {
+            Geocoder geocoder = new Geocoder(getApplicationContext(), LOCALE);
+            android.location.Address mapAddress =
+                    geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                            .get(0);
+
+            AddressImpl rawAddress =
+                    AddressImpl.createRawAddress(mapAddress.getCountryName(), mapAddress.getLocality(), mapAddress.getThoroughfare(), mapAddress.getFeatureName());
+            rawAddress.setLatLng(latLng);
+            return rawAddress;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
             return null;
         }
     }

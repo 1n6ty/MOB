@@ -51,9 +51,10 @@ public class PostItem implements Item<ItemPostBinding>
     private final MarkersAdapter markersAdapter;
     private final PostsAdapter postsAdapter;
     private final ReactionsPostAdapter reactionsAdapter;
-    private ItemPostBinding postBinding;
 
     public final PostItemHelper postItemHelper;
+
+    private ItemPostBinding postBinding;
     private Menu menu;
 
     public PostItem(MainActivity mainActivity,
@@ -133,14 +134,13 @@ public class PostItem implements Item<ItemPostBinding>
     {
         menu = popupMenu.getMenu();
         var user = postItemHelper.getUser();
-        int postType = postItemHelper.getType();
+        var postType = postItemHelper.getType();
 
-        boolean isCreator =
-                user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
-        switchMenuItemVisibility(R.id.menu_edit_post, isCreator);
-        switchMenuItemVisibility(R.id.menu_delete_post, isCreator);
+        boolean isCreator = user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
+        switchMenuItemVisibility(R.id.menu_edit, isCreator);
+        switchMenuItemVisibility(R.id.menu_delete, isCreator);
 
-        switchMenuItemVisibility(R.id.menu_copy_post, postType == PostImpl.POST_ONLY_TEXT || postType == PostImpl.POST_FULL);
+        switchMenuItemVisibility(R.id.menu_copy_text, postType == PostImpl.POST_ONLY_TEXT || postType == PostImpl.POST_FULL);
 
         popupMenu.setOnMenuItemClickListener(this::onMenuItemClick);
     }
@@ -149,15 +149,15 @@ public class PostItem implements Item<ItemPostBinding>
     {
         switch (item.getItemId())
         {
-            case R.id.menu_copy_post:
+            case R.id.menu_copy_text:
                 return postItemHelper.copyText();
-            case R.id.menu_forward_post:
+            case R.id.menu_forward:
                 return postItemHelper.forward();
             case R.id.menu_goto_post:
                 return postItemHelper.goTo();
-            case R.id.menu_edit_post:
+            case R.id.menu_edit:
                 return postItemHelper.edit();
-            case R.id.menu_delete_post:
+            case R.id.menu_delete:
                 return postItemHelper.delete();
             default:
                 return false;
@@ -404,42 +404,42 @@ public class PostItem implements Item<ItemPostBinding>
 
     public void hideCopyMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_copy_post, false);
+        switchMenuItemVisibility(R.id.menu_copy_text, false);
     }
 
     public void showCopyMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_copy_post, true);
+        switchMenuItemVisibility(R.id.menu_copy_text, true);
     }
 
     public void hideForwardMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_forward_post, false);
+        switchMenuItemVisibility(R.id.menu_forward, false);
     }
 
     public void showForwardMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_forward_post, true);
+        switchMenuItemVisibility(R.id.menu_forward, true);
     }
 
     public void hideEditMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_edit_post, false);
+        switchMenuItemVisibility(R.id.menu_edit, false);
     }
 
     public void showEditMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_edit_post, true);
+        switchMenuItemVisibility(R.id.menu_edit, true);
     }
 
     public void hideDeleteMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_delete_post, false);
+        switchMenuItemVisibility(R.id.menu_delete, false);
     }
 
     public void showDeleteMenuItem()
     {
-        switchMenuItemVisibility(R.id.menu_delete_post, true);
+        switchMenuItemVisibility(R.id.menu_delete, true);
     }
 
     private void switchMenuItemVisibility(int menuItemId,

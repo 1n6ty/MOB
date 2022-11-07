@@ -1,54 +1,34 @@
 package com.example.mobv2.adapters;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.ContextThemeWrapper;
-import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
-import com.example.mobv2.callbacks.MOBAPICallbackImpl;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
-import com.example.mobv2.models.abstractions.User;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.utils.ForPostsAndCommentsAdapters;
-import com.google.android.material.imageview.ShapeableImageView;
+import com.example.mobv2.ui.views.CommentItem;
+import com.example.mobv2.utils.MyObservableArrayList;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
-import localdatabase.daos.UserDao;
 import serverapi.MOBServerAPI;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
         implements AbleToAdd<CommentImpl>
 {
-    private final UserDao userDao;
-
     private final MainActivity mainActivity;
-    private final HavingCommentsIds havingCommentsIds;
 
-    private final List<CommentImpl> comments;
+    private final HavingCommentsIds havingCommentsIds;
+    private final MyObservableArrayList<CommentItem> commentItems;
 
     private int lastIndex = 0;
 
@@ -57,11 +37,36 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     {
         this.mainActivity = mainActivity;
         this.havingCommentsIds = havingCommentsIds;
-        this.comments = new ArrayList<>();
+        this.commentItems = new MyObservableArrayList<>();
+        commentItems.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<CommentItem>()
+        {
+            @Override
+            public void onAdded(int index,
+                                CommentItem element)
+            {
+                notifyItemInserted(index);
+            }
 
-        userDao = mainActivity.appDatabase.userDao();
+            @Override
+            public void onRemoved(int index)
+            {
+                notifyItemRemoved(index);
+            }
 
-        var commentsIds = havingCommentsIds.getCommentIds();
+            @Override
+            public void onRemoved(int index, Object o)
+            {
+                notifyItemRemoved(index);
+            }
+
+            @Override
+            public void onClear()
+            {
+                notifyItemRangeRemoved(0, getItemCount());
+            }
+        });
+
+        var commentsIds = this.havingCommentsIds.getCommentIds();
         for (int i = 0; i < Math.min(commentsIds.size(), 4); i++)
         {
             mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
@@ -167,198 +172,77 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void onBindViewHolder(@NonNull CommentViewHolder holder,
                                  int position)
     {
-        View parentView = holder.itemView;
+        var commentItem = commentItems.get(position);
 
-        CommentImpl comment = comments.get(position);
-        User user = comment.getUser();
-
-        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, holder.avatarView);
-
-        holder.fullNameView.setText(user.getFullName());
-
-        holder.commentTextView.setText(comment.getText());
-
-        holder.dateView.setText(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(comment.getDate()));
-
-        parentView.setOnClickListener(view -> onItemViewClick(view, holder.getAdapterPosition()));
-
-        holder.showReactionsView.setOnClickListener(view -> onShowReactionsViewClick(holder.reactionsRecyclerView));
-        holder.showReactionsView.setOnLongClickListener(view -> ForPostsAndCommentsAdapters.onShowReactionsViewLongClick(mainActivity, view, parentView));
-
-        var reactionsAdapter =
-                new ReactionsCommentAdapter(mainActivity, comment.getReactions(), comment.getId());
-        holder.reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        holder.reactionsRecyclerView.setAdapter(reactionsAdapter);
-
-        holder.showCommentsButton.setVisibility(comment.getCommentsCount()
-                                                       .get() > 0 ? View.VISIBLE : View.GONE);
-        holder.showCommentsButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-
-            }
-        });
-    }
-
-    private void onItemViewClick(View view,
-                                 int position)
-    {
-        var contextThemeWrapper =
-                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
-        var popupMenu = new PopupMenu(contextThemeWrapper, view);
-        popupMenu.inflate(R.menu.menu_user_item);
-
-        initMenu(popupMenu, position);
-        popupMenu.show();
-    }
-
-    private void initMenu(@NonNull PopupMenu popupMenu,
-                          int position)
-    {
-        var menu = popupMenu.getMenu();
-        var comment = comments.get(position);
-        var user = comment.getUser();
-
-        boolean isCreator =
-                user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
-        menu.findItem(R.id.menu_edit_post)
-            .setVisible(isCreator);
-        menu.findItem(R.id.menu_delete_post)
-            .setVisible(isCreator);
-
-        popupMenu.setOnMenuItemClickListener(item -> onMenuItemClick(item, position));
-    }
-
-    private boolean onMenuItemClick(MenuItem item,
-                                    int position)
-    {
-        switch (item.getItemId())
-        {
-            case R.id.menu_copy_post:
-                return copyComment(position);
-            case R.id.menu_forward_post:
-                return forwardComment(position);
-            case R.id.menu_edit_post:
-                return editComment(position);
-            case R.id.menu_delete_post:
-                return deleteComment(position);
-            default:
-                return false;
-        }
-    }
-
-    private void onShowReactionsViewClick(View view)
-    {
-        view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        commentItem.refreshItemBinding(holder.binding);
+        commentItem.commentItemHelper.setHavingCommentsIds(havingCommentsIds);
     }
 
     @Override
     public void addElement(@NonNull CommentImpl comment)
     {
         Date date = comment.getDate();
-        if (comments.isEmpty() || date.compareTo(comments.get(comments.size() - 1)
-                                                         .getDate()) < 0)
+        CommentItem commentItem = new CommentItem(mainActivity, this, comment);
+        if (commentItems.isEmpty() || date.compareTo(commentItems.get(commentItems.size() - 1).commentItemHelper.getDate()) < 0)
         {
-            comments.add(comment);
-            notifyItemInserted(comments.size() - 1);
+            commentItems.add(commentItem);
             return;
         }
 
-        for (int i = 0; i < comments.size(); i++)
+        for (int i = 0; i < commentItems.size(); i++)
         {
-            Date currentDate = comments.get(i)
-                                       .getDate();
+            Date currentDate = commentItems.get(i).commentItemHelper.getDate();
             if (date.compareTo(currentDate) >= 0)
             {
-                comments.add(i, comment);
-                notifyItemInserted(i);
+                commentItems.add(i, commentItem);
                 break;
             }
         }
     }
 
-    private boolean copyComment(int position)
+    public CommentItem addElementAndGet(@NonNull CommentImpl comment)
     {
-        var comment = comments.get(position);
+        Date date = comment.getDate();
+        CommentItem commentItem = new CommentItem(mainActivity, this, comment);
+        if (commentItems.isEmpty() || date.compareTo(commentItems.get(commentItems.size() - 1).commentItemHelper.getDate()) < 0)
+        {
+            commentItems.add(commentItem);
+            return commentItem;
+        }
 
-        var clipboard = (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-        var clip = ClipData.newPlainText("simple text", comment.getText());
-        clipboard.setPrimaryClip(clip);
+        for (int i = 0; i < commentItems.size(); i++)
+        {
+            Date currentDate = commentItems.get(i).commentItemHelper.getDate();
+            if (date.compareTo(currentDate) >= 0)
+            {
+                commentItems.add(i, commentItem);
+                return commentItem;
+            }
+        }
 
-        Toast.makeText(mainActivity, "Copied", Toast.LENGTH_LONG)
-             .show();
-        return true;
+        return null;
     }
 
-    private boolean forwardComment(int position)
+    public void deleteComment(CommentItem commentItem)
     {
-        Toast.makeText(mainActivity, "Forwarded", Toast.LENGTH_LONG)
-             .show();
-        return true;
-    }
-
-    private boolean editComment(int position)
-    {
-        Toast.makeText(mainActivity, "Edited", Toast.LENGTH_LONG)
-             .show();
-        return true;
-    }
-
-    private boolean deleteComment(int position)
-    {
-        var comment = comments.get(position);
-
-        comments.remove(position);
-        notifyItemRemoved(position);
-
-        havingCommentsIds.getCommentIds()
-                         .remove(comment.getId());
-
-        mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);
-
-        Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
-             .show();
-
-        return true;
+        commentItems.remove(commentItem);
     }
 
     @Override
     public int getItemCount()
     {
-        return comments.size();
+        return commentItems.size();
     }
 
-    protected static class CommentViewHolder extends RecyclerView.ViewHolder
+    public static class CommentViewHolder extends RecyclerView.ViewHolder
     {
-        private final ShapeableImageView avatarView;
-        private final TextView fullNameView;
-        private final TextView commentTextView;
-        private final TextView dateView;
-        private final ImageView rateUpView;
-        private final TextView ratesCountView;
-        private final ImageView rateDownView;
-        private final ImageView showReactionsView;
-        private final RecyclerView reactionsRecyclerView;
-        private final Button showCommentsButton;
+        private final ItemCommentBinding binding;
 
         public CommentViewHolder(@NonNull View itemView)
         {
             super(itemView);
 
-            ItemCommentBinding binding = ItemCommentBinding.bind(itemView);
-
-            avatarView = binding.avatarView;
-            fullNameView = binding.fullNameView;
-            commentTextView = binding.commentTextView;
-            dateView = binding.commentDateView;
-            rateUpView = binding.rateUpView;
-            ratesCountView = binding.ratesCountView;
-            rateDownView = binding.rateDownView;
-            showReactionsView = binding.showReactionsView;
-            reactionsRecyclerView = binding.reactionsRecyclerView;
-            showCommentsButton = binding.showCommentsButton;
+            binding = ItemCommentBinding.bind(itemView);
         }
     }
 }

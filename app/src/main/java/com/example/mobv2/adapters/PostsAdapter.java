@@ -58,6 +58,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             {
                 notifyItemRemoved(index);
             }
+
+            @Override
+            public void onClear()
+            {
+                notifyItemRangeRemoved(0, getItemCount());
+            }
         });
     }
 
@@ -100,9 +106,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public void addElement(@NonNull PostImpl post)
     {
         Date date = post.getDate();
+        PostItem postItem = new PostItem(mainActivity, markersAdapter, this, post);
         if (postItems.isEmpty() || date.compareTo(postItems.get(postItems.size() - 1).postItemHelper.getDate()) < 0)
         {
-            PostItem postItem = new PostItem(mainActivity,  markersAdapter,this, post);
             postItems.add(postItem);
             return;
         }
@@ -112,7 +118,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             Date currentDate = postItems.get(i).postItemHelper.getDate();
             if (date.compareTo(currentDate) >= 0)
             {
-                PostItem postItem = new PostItem(mainActivity, markersAdapter, this, post);
                 postItems.add(i, postItem);
                 break;
             }
@@ -122,9 +127,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public PostItem addElementAndGetItem(@NonNull PostImpl post)
     {
         Date date = post.getDate();
+        PostItem postItem = new PostItem(mainActivity, markersAdapter, this, post);
         if (postItems.isEmpty() || date.compareTo(postItems.get(postItems.size() - 1).postItemHelper.getDate()) < 0)
         {
-            PostItem postItem = new PostItem(mainActivity,  markersAdapter,this, post);
             postItems.add(postItem);
             return postItem;
         }
@@ -134,7 +139,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             Date currentDate = postItems.get(i).postItemHelper.getDate();
             if (date.compareTo(currentDate) >= 0)
             {
-                PostItem postItem = new PostItem(mainActivity, markersAdapter, this, post);
                 postItems.add(i, postItem);
                 return postItem;
             }
@@ -142,7 +146,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         return null;
     }
-
 
     @Override
     public boolean reverse()
@@ -201,9 +204,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     public void clear()
     {
-        int size = getItemCount();
         postItems.clear();
-        notifyItemRangeRemoved(0, size);
     }
 
     @Override
@@ -214,7 +215,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     public static class PostViewHolder extends RecyclerView.ViewHolder
     {
-        private final com.example.mobv2.databinding.ItemPostBinding binding;
+        private final ItemPostBinding binding;
 
         public PostViewHolder(@NonNull View itemView)
         {

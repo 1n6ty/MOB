@@ -175,7 +175,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
 
         var comment =
                 CommentImpl.createNewComment(commentId, postView.postItemHelper.getUser(), messageText.toString());
-        commentsAdapter.addElement(comment);
+        var commentItem = commentsAdapter.addElementAndGet(comment);
+//        commentItem.commentItemHelper.setHavingCommentsIds(postView.postItemHelper);
         postView.postItemHelper.getCommentIds()
                                .add(commentId);
 

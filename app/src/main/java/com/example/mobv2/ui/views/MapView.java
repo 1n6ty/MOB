@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MapView
@@ -89,11 +90,12 @@ public class MapView
                     return;
                 }
 
-                for (int i = positionStart; i < itemCount; i++)
+                Iterator<MarkerView> iterator = markerViews.iterator();
+                while (iterator.hasNext())
                 {
-                    markerViews.get(i)
-                               .remove();
-                    markerViews.remove(i);
+                    MarkerView nextMarkerView = iterator.next();
+                    nextMarkerView.remove();
+                    iterator.remove();
                 }
             }
         });

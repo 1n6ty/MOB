@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="ratesCount"
+            type="androidx.databinding.ObservableInt" />
+    </data>
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +61,7 @@
                     tools:text="@string/sample_comment" />
 
                 <TextView
-                    android:id="@+id/comment_date_view"
+                    android:id="@+id/date_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:textAppearance="@style/itemDateTextStyle"
@@ -72,16 +79,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
-                    <LinearLayout
-                        android:id="@+id/linearLayout3"
+                    <com.example.mobv2.ui.views.RatesGroup
+                        android:id="@+id/rates_group"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
-                        <ImageView
-                            android:id="@+id/rate_up_view"
+                        <ImageButton
+                            android:id="@+id/rate_up_button"
                             style="@style/postButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -89,7 +97,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_ui_add" />
+                            app:srcCompat="@drawable/foreground_button_rate_up_selector" />
 
                         <TextView
                             android:id="@+id/rates_count_view"
@@ -97,18 +105,19 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginRight="@dimen/vertical_small_margin"
-                            tools:text="100" />
+                            android:text="@{Integer.toString(ratesCount)}"
+                            tools:text="@string/menu_reaction_count" />
 
-                        <ImageView
-                            android:id="@+id/rate_down_view"
+                        <ImageButton
+                            android:id="@+id/rate_down_button"
                             style="@style/postButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_remove" />
-                    </LinearLayout>
+                            app:srcCompat="@drawable/foreground_button_rate_down_selector" />
+                    </com.example.mobv2.ui.views.RatesGroup>
 
                     <ImageView
                         android:id="@+id/show_reactions_view"

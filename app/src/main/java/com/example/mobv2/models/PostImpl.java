@@ -277,7 +277,7 @@ public class PostImpl implements Post, HavingCommentsIds
         return type;
     }
 
-    public static class Operation implements MyObservableArrayList.OnListChangedCallback<String>
+    public static class Operation extends MyObservableArrayList.OnListChangedCallback<String>
     {
         private final ObservableInt observableInt;
         private final int firstOperand;

@@ -29,7 +29,7 @@ public class MyObservableArrayList<T> extends ArrayList<T>
     {
         boolean add = super.add(t);
         int index = indexOf(t);
-        if (add) if (callback != null) callback.onAdded(index, t);
+        if (add && callback != null) callback.onAdded(index, t);
         return add;
     }
 
@@ -53,18 +53,30 @@ public class MyObservableArrayList<T> extends ArrayList<T>
     {
         int index = indexOf(o);
         boolean remove = super.remove(o);
-        if (remove) if (callback != null) callback.onRemoved(index, o);
+        if (remove && callback != null) callback.onRemoved(index, o);
         return remove;
     }
 
-    public interface OnListChangedCallback<T>
+    @Override
+    public void clear()
     {
-        void onAdded(int index,
-                     T element);
+        if (callback != null) callback.onClear();
+        super.clear();
+    }
 
-        void onRemoved(int index);
+    public abstract static class OnListChangedCallback<T>
+    {
+        public abstract void onAdded(int index,
+                                     T element);
 
-        void onRemoved(int index,
-                       Object o);
+        public abstract void onRemoved(int index);
+
+        public abstract void onRemoved(int index,
+                                       Object o);
+
+        public void onClear()
+        {
+
+        }
     }
 }

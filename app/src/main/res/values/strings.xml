@@ -42,11 +42,11 @@
     <string name="auth_button">Next -&gt;</string>
 
     <!--  post menu item titles  -->
-    <string name="menu_copy_post">Copy</string>
-    <string name="menu_forward_post">Forward</string>
+    <string name="menu_copy_text">Copy</string>
+    <string name="menu_forward">Forward</string>
     <string name="menu_goto_post">Go to post</string>
-    <string name="menu_edit_post">Edit</string>
-    <string name="menu_delete_post">Delete</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
 
     <!--  menu item sorts  -->
     <string name="menu_sort_by_appreciations">Sort by appreciations</string>

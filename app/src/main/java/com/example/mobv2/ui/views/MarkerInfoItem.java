@@ -102,7 +102,7 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         postDao.insert(post);
         PostItem postItem = postsAdapter.addElementAndGetItem(post);
         postItem.postItemHelper.setMarkerInfoItemHelper(markerInfoItemHelper);
-//        markersAdapterHelper.postsRecyclerView.scrollToPosition(0);
+        markersAdapter.scrollToStartPosition();
     }
 
     public void getPostFromLocalDbAndAddToPosts(String postId)
@@ -110,7 +110,7 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         var post = postDao.getById(postId);
         PostItem postItem = postsAdapter.addElementAndGetItem(post);
         postItem.postItemHelper.setMarkerInfoItemHelper(markerInfoItemHelper);
-//            markersAdapterHelper.postsRecyclerView.scrollToPosition(0);
+        markersAdapter.scrollToStartPosition();
     }
 
     public class MarkerInfoItemHelper

@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_copy_post"
-        android:title="@string/menu_copy_post"
+        android:id="@+id/menu_copy_text"
+        android:title="@string/menu_copy_text"
         app:showAsAction="never" />
     <item
-        android:id="@+id/menu_forward_post"
-        android:title="@string/menu_forward_post"
+        android:id="@+id/menu_forward"
+        android:title="@string/menu_forward"
         app:showAsAction="never" />
 
     <item
@@ -18,13 +18,13 @@
 
     <!--  For user item's creator  -->
     <item
-        android:id="@+id/menu_edit_post"
-        android:title="@string/menu_edit_post"
+        android:id="@+id/menu_edit"
+        android:title="@string/menu_edit"
         android:visible="false"
         app:showAsAction="never" />
     <item
-        android:id="@+id/menu_delete_post"
-        android:title="@string/menu_delete_post"
+        android:id="@+id/menu_delete"
+        android:title="@string/menu_delete"
         android:visible="false"
         app:showAsAction="never" />
 </menu>
