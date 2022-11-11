@@ -19,7 +19,7 @@ import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.markercreators.MapSkillsBottomSheetFragment;
 import com.example.mobv2.ui.fragments.markercreators.MarkerCreatorViewModel;
 import com.example.mobv2.ui.views.MapView;
-import com.example.mobv2.ui.views.MarkerInfoItem;
+import com.example.mobv2.ui.views.items.MarkerInfoItem;
 import com.example.mobv2.ui.views.MarkerView;
 import com.example.mobv2.utils.MarkerAddition;
 import com.example.mobv2.utils.MyObservableArrayList;
@@ -79,7 +79,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
             @Override
             public void onClear()
             {
-               notifyItemRangeRemoved(0, getItemCount());
+                notifyItemRangeRemoved(0, getItemCount());
             }
         });
     }

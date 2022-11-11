@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.views;
+package com.example.mobv2.ui.views.items;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;

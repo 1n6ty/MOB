@@ -314,17 +314,16 @@ public class MOBServerAPI
                      String title,
                      double markX,
                      double markY,
-                     String[] imgPaths,
+                     File[] files,
                      String token)
     {
-        if (imgPaths != null)
+        if (files != null)
         {
-            MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.length];
-            for (int i = 0; i < imgPaths.length; i++)
+            MultipartBody.Part[] imgs = new MultipartBody.Part[files.length];
+            for (int i = 0; i < files.length; i++)
             {
-                File file = new File(imgPaths[i]);
                 imgs[i] =
-                        MultipartBody.Part.createFormData("images", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+                        MultipartBody.Part.createFormData("images", files[i].getName(), RequestBody.create(MediaType.parse("image/*"), files[i]));
             }
             Call<LinkedTreeMap<String, Object>> call =
                     MOBAPI.createPostWithImage(title, content, markX, markY, imgs, token);

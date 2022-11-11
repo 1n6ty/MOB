@@ -14,7 +14,7 @@ import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.views.CommentItem;
+import com.example.mobv2.ui.views.items.CommentItem;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.google.gson.internal.LinkedTreeMap;
 

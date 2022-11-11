@@ -23,8 +23,10 @@ import com.example.mobv2.models.Image;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
+import com.example.mobv2.utils.UriUtils;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
     private final ActivityResultLauncher<String> launcher =
             registerForActivityResult(new ActivityResultContracts.GetMultipleContents(), this);
 
-    private final List<String> imagePaths;
+    private final List<File> files;
 
     private MarkerCreatorViewModel viewModel;
 
@@ -50,7 +52,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
     {
         super(R.layout.fragment_marker_creator);
 
-        imagePaths = new ArrayList<>();
+        files = new ArrayList<>();
     }
 
     @Override
@@ -104,13 +106,16 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
     public void onActivityResult(List<Uri> result)
     {
         if (result.size() == 0)
+        {
             return;
+        }
 
         List<Image> images = new ArrayList<>();
         for (Uri uri : result)
         {
+            File file = new UriUtils(getContext()).getFileFromUri(uri);
+            files.add(file);
             images.add(new Image(uri.getPath(), uri, Image.IMAGE_OFFLINE));
-//                        imagePaths.add(UriUtils.getPath(getContext(), uri));
         }
 
         ImagesAdapter adapter = new ImagesAdapter((MainActivity) getActivity(), images);
@@ -128,7 +133,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
                                     .toString();
         String title = markerTitleView.getText()
                                       .toString();
-        mainActivity.mobServerAPI.post(callback, text, title, latLng.latitude, latLng.longitude, imagePaths.toArray(new String[0]), MainActivity.token);
+        mainActivity.mobServerAPI.post(callback, text, title, latLng.latitude, latLng.longitude, files.toArray(new File[0]), MainActivity.token);
 
         mainActivity.toPreviousFragment();
     }

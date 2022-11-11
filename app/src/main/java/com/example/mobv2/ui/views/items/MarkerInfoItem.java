@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.views;
+package com.example.mobv2.ui.views.items;
 
 import androidx.annotation.NonNull;
 
@@ -11,6 +11,7 @@ import com.example.mobv2.models.MarkerInfoImpl;
 import com.example.mobv2.models.PostImpl;
 import com.example.mobv2.ui.abstractions.Item;
 import com.example.mobv2.ui.activities.MainActivity;
+import com.example.mobv2.ui.views.MarkerView;
 import com.example.mobv2.utils.BitmapConverter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;

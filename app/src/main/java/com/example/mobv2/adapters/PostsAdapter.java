@@ -16,7 +16,7 @@ import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.models.PostImpl;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
-import com.example.mobv2.ui.views.PostItem;
+import com.example.mobv2.ui.views.items.PostItem;
 import com.example.mobv2.utils.MyObservableArrayList;
 
 import java.util.Collections;

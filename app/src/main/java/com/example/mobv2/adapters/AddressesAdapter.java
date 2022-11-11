@@ -3,19 +3,16 @@ package com.example.mobv2.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
-import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.fragments.main.MainFragmentViewModel;
+import com.example.mobv2.ui.views.items.AddressItemHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +24,12 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     private final AddressDao addressDao;
 
     private final MainActivity mainActivity;
-    private final List<AddressImpl> addresses;
+    private final List<AddressItemHelper> addressItemHelperList;
 
     public AddressesAdapter(MainActivity mainActivity)
     {
         this.mainActivity = mainActivity;
-        this.addresses = new ArrayList<>();
+        this.addressItemHelperList = new ArrayList<>();
 
         addressDao = mainActivity.appDatabase.addressDao();
     }
@@ -51,58 +48,26 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     public void onBindViewHolder(@NonNull AddressViewHolder holder,
                                  int position)
     {
-        AddressImpl address = addresses.get(position);
+        var address = addressItemHelperList.get(position);
 
-        holder.addressPrimaryView.setText(address.getPrimary());
-        holder.addressSecondaryView.setText(address.getSecondary());
+        address.refreshItemBinding(holder.binding);
+    }
 
-        holder.itemView.setOnClickListener(view -> onAddressItemClick(position));
+    public boolean checkIfAddressEqualsClickedAddress(AddressItemHelper addressItemHelper)
+    {
+        return addressItemHelper.addressItemHelper.compareById(getClickedAddressItem());
+    }
 
-        holder.itemView.setBackgroundResource(R.drawable.background_item_address_selector);
+    public void deselectClickedAddress()
+    {
+        var clickedAddress = getClickedAddressItem();
+        clickedAddress.addressItemHelper.setCurrent(false);
+        addressDao.update(clickedAddress.addressItemHelper.getAddress());
 
-        if (address.isCurrent())
+        for (int i = 0; i < addressItemHelperList.size(); i++)
         {
-            holder.itemView.setSelected(true);
-            holder.itemView.setBackgroundResource(R.drawable.background_item_address_selected);
-        }
-    }
-
-    private void onAddressItemClick(int position)
-    {
-        AddressImpl address = addresses.get(position);
-
-        if (checkIfAddressEqualsClickedAddress(address))
-            return;
-
-        deselectClickedAddress();
-
-        address.setCurrent(true);
-        addressDao.update(address);
-
-        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
-
-        var mainFragmentViewModel =
-                new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
-        mainFragmentViewModel.setAddressChanged(true);
-
-        notifyItemChanged(position);
-    }
-
-    private boolean checkIfAddressEqualsClickedAddress(AddressImpl address)
-    {
-        return address.compareById(getClickedAddress());
-    }
-
-    private void deselectClickedAddress()
-    {
-        AddressImpl clickedAddress = getClickedAddress();
-        clickedAddress.setCurrent(false);
-        addressDao.update(clickedAddress);
-
-        for (int i = 0; i < addresses.size(); i++)
-        {
-            AddressImpl address = addresses.get(i);
-            if (address.compareById(clickedAddress))
+            var addressItem = addressItemHelperList.get(i);
+            if (addressItem.addressItemHelper.compareById(clickedAddress))
             {
                 notifyItemChanged(i);
                 return;
@@ -110,15 +75,16 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         }
     }
 
-    private AddressImpl getClickedAddress()
+    private AddressItemHelper getClickedAddressItem()
     {
-        for (int i = 0; i < addresses.size(); i++)
+        for (int i = 0; i < addressItemHelperList.size(); i++)
         {
-            AddressImpl address = addresses.get(i);
-            if (address.isCurrent()) return address;
+            var addressItem = addressItemHelperList.get(i);
+            if (addressItem.addressItemHelper.isCurrent())
+                return addressItem;
         }
 
-        return new AddressImpl();
+        return new AddressItemHelper(mainActivity, this, new AddressImpl());
     }
 
     @Override
@@ -126,8 +92,8 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     {
         try
         {
-            addresses.add(address);
-            notifyItemInserted(addresses.size() - 1);
+            addressItemHelperList.add(new AddressItemHelper(mainActivity, this, address));
+            notifyItemInserted(addressItemHelperList.size() - 1);
         }
         catch (IllegalStateException e)
         {
@@ -138,23 +104,18 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     @Override
     public int getItemCount()
     {
-        return addresses.size();
+        return addressItemHelperList.size();
     }
 
     public static class AddressViewHolder extends RecyclerView.ViewHolder
     {
-        private final TextView addressPrimaryView;
-        private final TextView addressSecondaryView;
+        private final ItemAddressBinding binding;
 
         public AddressViewHolder(@NonNull View itemView)
         {
             super(itemView);
 
-            ItemAddressBinding binding = ItemAddressBinding.bind(itemView);
-
-            addressPrimaryView = binding.addressPrimaryView;
-            addressSecondaryView = binding.addressSecondaryView;
-
+            binding = ItemAddressBinding.bind(itemView);
         }
     }
 }

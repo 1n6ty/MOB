@@ -1,119 +1,52 @@
 package com.example.mobv2.utils;
 
-import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.util.Log;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class UriUtils
 {
-    /*
-     * Gets the file path of the given Uri.
-     */
-    @SuppressLint("NewApi")
-    public static String getPath(Context context,
-                                 Uri uri)
+    private final Context context;
+
+    public UriUtils(Context context)
     {
-        String selection = null;
-        String[] selectionArgs = null;
-        // Uri is different in versions after KITKAT (Android 4.4), we need to
-        // deal with different Uris.
-        if (DocumentsContract.isDocumentUri(context, uri))
-        {
-            if (isExternalStorageDocument(uri))
-            {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                return Environment.getExternalStorageDirectory() + "/" + split[1];
-            }
-            else if (isDownloadsDocument(uri))
-            {
-                final String id = DocumentsContract.getDocumentId(uri);
-                if (id.startsWith("raw:"))
-                {
-                    return id.replaceFirst("raw:", "");
-                }
-                uri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-            }
-            else if (isMediaDocument(uri))
-            {
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                final String type = split[0];
-                switch (type)
-                {
-                    case "image":
-                        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                        break;
-                    case "video":
-                        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                        break;
-                    case "audio":
-                        uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                        break;
-                }
-                selection = "_id=?";
-                selectionArgs = new String[]{
-                        split[1]
-                };
-            }
-        }
-        if ("content".equalsIgnoreCase(uri.getScheme()))
-        {
-            String[] projection = {
-                    MediaStore.Images.Media.DATA
-            };
-            try (Cursor cursor = context.getContentResolver()
-                                        .query(uri, projection, selection, selectionArgs, null))
-            {
-                if (cursor != null && cursor.moveToFirst())
-                {
-                    int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    return cursor.getString(columnIndex);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.e("on getPath", "Exception", e);
-            }
-        }
-        else if ("file".equalsIgnoreCase(uri.getScheme()))
-        {
-            return uri.getPath();
-        }
-        return null;
+        this.context = context;
     }
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is ExternalStorageProvider.
-     */
-    private static boolean isExternalStorageDocument(Uri uri)
+    public File getFileFromUri(Uri uri)
     {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
+        try
+        {
+            var stream = context.getContentResolver()
+                                .openInputStream(uri);
+            var bitmap = BitmapFactory.decodeStream(stream);
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is DownloadsProvider.
-     */
-    private static boolean isDownloadsDocument(Uri uri)
-    {
-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-    }
+            stream.close();
 
-    /**
-     * @param uri The Uri to check.
-     * @return Whether the Uri authority is MediaProvider.
-     */
-    private static boolean isMediaDocument(Uri uri)
-    {
-        return "com.android.providers.media.documents".equals(uri.getAuthority());
+            File file = new File(context.getCacheDir(), "photo");
+            file.createNewFile();
+
+            var byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, byteArrayOutputStream);
+            byte[] bitmapdata = byteArrayOutputStream.toByteArray();
+
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(bitmapdata);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+
+            return file;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
