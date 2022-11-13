@@ -217,12 +217,11 @@ public class MOBServerAPI {
     }
 
     public void post(MOBAPICallback obj,
-                    String content, String title, double markX, double markY, String[] imgPaths, String token){
-        if(imgPaths != null) {
-            MultipartBody.Part[] imgs = new MultipartBody.Part[imgPaths.length];
-            for(int i = 0; i < imgPaths.length; i++){
-                File file = new File(imgPaths[i]);
-                imgs[i] = MultipartBody.Part.createFormData("images", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+                    String content, String title, double markX, double markY, File [] files, String token){
+        if(files != null) {
+            MultipartBody.Part[] imgs = new MultipartBody.Part[files];
+            for(int i = 0; i < files.length; i++){
+                imgs[i] = MultipartBody.Part.createFormData("images", files[i].getName(), RequestBody.create(MediaType.parse("image/*"), files[i]));
             }
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.createPostWithImage(title, content, markX, markY, imgs, token);
             call.enqueue(createResponseCallback(obj));
@@ -248,7 +247,7 @@ public class MOBServerAPI {
         call.enqueue(createResponseCallback(obj));
     }
     public void editUser(MOBAPICallback obj,
-                         String name, String nick_name, String password, String email, String bio, String phone_number, String new_profile_img_url, String token){
+                         String name, String nick_name, String password, String email, String bio, String phone_number, File new_profile_img, String token){
         if(name != null){
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserName(name, token);
             call.enqueue(createResponseCallback(obj));
@@ -273,8 +272,7 @@ public class MOBServerAPI {
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserPhone(phone_number, token);
             call.enqueue(createResponseCallback(obj));
         }
-        if(new_profile_img_url != null){
-            File file = new File(new_profile_img_url);
+        if(file != null){
             MultipartBody.Part img = MultipartBody.Part.createFormData("new_profile_img", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserProfileImg(img, token);
             call.enqueue(createResponseCallback(obj));
