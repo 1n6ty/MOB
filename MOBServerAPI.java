@@ -219,7 +219,7 @@ public class MOBServerAPI {
     public void post(MOBAPICallback obj,
                     String content, String title, double markX, double markY, File [] files, String token){
         if(files != null) {
-            MultipartBody.Part[] imgs = new MultipartBody.Part[files];
+            MultipartBody.Part[] imgs = new MultipartBody.Part[files.length];
             for(int i = 0; i < files.length; i++){
                 imgs[i] = MultipartBody.Part.createFormData("images", files[i].getName(), RequestBody.create(MediaType.parse("image/*"), files[i]));
             }
@@ -272,8 +272,8 @@ public class MOBServerAPI {
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserPhone(phone_number, token);
             call.enqueue(createResponseCallback(obj));
         }
-        if(file != null){
-            MultipartBody.Part img = MultipartBody.Part.createFormData("new_profile_img", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+        if(new_profile_img != null){
+            MultipartBody.Part img = MultipartBody.Part.createFormData("new_profile_img", new_profile_img.getName(), RequestBody.create(MediaType.parse("image/*"), new_profile_img));
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserProfileImg(img, token);
             call.enqueue(createResponseCallback(obj));
         }
