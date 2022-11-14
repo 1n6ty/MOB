@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
+import com.example.mobv2.models.abstractions.UserContent;
 import com.example.mobv2.models.abstractions.Post;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
@@ -28,7 +29,7 @@ import localdatabase.typeconverters.ReactionsConverter;
 import localdatabase.typeconverters.StringListConverter;
 
 @Entity
-public class PostImpl implements Post, HavingCommentsIds
+public class PostImpl implements Post, HavingCommentsIds, UserContent
 {
     @Ignore
     public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
@@ -36,24 +37,24 @@ public class PostImpl implements Post, HavingCommentsIds
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "postid")
-    private String id;
+    private final String id;
 
     @Embedded
-    private UserImpl user;
+    private final UserImpl user;
     @TypeConverters(DateConverter.class)
-    private Date date;
-    private String title;
-    private String text;
+    private final Date date;
+    private final String title;
+    private final String text;
     @TypeConverters(StringListConverter.class)
-    private List<String> images;
+    private final List<String> images;
     @TypeConverters(ReactionsConverter.class)
-    private List<Reaction> reactions;
+    private final List<Reaction> reactions;
     @TypeConverters(StringListConverter.class)
-    private List<String> commentIds;
+    private final List<String> commentIds;
     @TypeConverters(StringListConverter.class)
-    private List<String> positiveRates;
+    private final List<String> positiveRates;
     @TypeConverters(StringListConverter.class)
-    private List<String> negativeRates;
+    private final List<String> negativeRates;
 
     @Ignore
     private final ObservableInt commentsCount;
@@ -90,9 +91,8 @@ public class PostImpl implements Post, HavingCommentsIds
         this.positiveRates = new MyObservableArrayList<>(positiveRates);
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
-        commentsCount = new ObservableInt(commentIds.size());
-
         // TODO FIX IT PLEASE
+        commentsCount = new ObservableInt(commentIds.size());
         ((MyObservableArrayList<String>) this.commentIds)
                 .setOnListChangedCallback(new Operation(commentsCount, 1, -1));
 

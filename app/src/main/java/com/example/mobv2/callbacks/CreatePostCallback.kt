@@ -18,7 +18,7 @@ class CreatePostCallback(private val mainActivity: MainActivity,
         Log.v("DEBUG", obj.toString())
         val response = obj["response"] as LinkedTreeMap<String, Any>?
 
-        okCallback?.parseCreatedMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(response, latLng)
+        okCallback?.parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(response, latLng)
     }
 
     override fun funcBad(obj: LinkedTreeMap<String, Any>)
@@ -31,8 +31,8 @@ class CreatePostCallback(private val mainActivity: MainActivity,
         Log.v("DEBUG", obj.toString())
     }
 
-    override fun setOkCallback(callback: CreatePostOkCallback)
+    override fun setOkCallback(okCallback: CreatePostOkCallback)
     {
-        this.okCallback = callback
+        this.okCallback = okCallback
     }
 }

@@ -116,14 +116,7 @@ public class MapView
         {
             onAdapterChanged();
             adapter.registerAdapterDataObserver(observer);
-            setOnMarkerClickListener(new OnMarkerClickListener()
-            {
-                @Override
-                public void onMarkerClick(MarkerView markerView)
-                {
-                    markerView.onClick();
-                }
-            });
+            setOnMarkerClickListener(MarkerView::onClick);
 
             adapter.onCreate(this);
         }

@@ -3,6 +3,7 @@ package localdatabase.daos;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -19,7 +20,7 @@ public interface CommentDao
     @Query("SELECT * FROM commentimpl WHERE commentid = :id")
     CommentImpl getById(String id);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(CommentImpl comment);
 
     @Update

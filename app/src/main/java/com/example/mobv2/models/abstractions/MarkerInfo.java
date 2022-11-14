@@ -3,8 +3,6 @@ package com.example.mobv2.models.abstractions;
 import com.example.mobv2.utils.abstractions.Comparable;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.List;
-
 public interface MarkerInfo extends Comparable<MarkerInfo>
 {
     String getId();
@@ -17,7 +15,7 @@ public interface MarkerInfo extends Comparable<MarkerInfo>
 
     int getMarkerType();
 
-    List<String> getPostIds();
+    String getPostId();
 
     boolean isClicked();
 

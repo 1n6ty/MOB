@@ -10,21 +10,21 @@ import com.google.android.gms.maps.model.Marker;
 public class MarkerView
 {
     private final Marker marker;
-    private OnClickListener onClickListener;
+    private OnMarkerClickListener onMarkerClickListener;
 
     public MarkerView(Marker marker)
     {
         this.marker = marker;
     }
 
-    public void setOnClickListener(OnClickListener onClickListener)
+    public void setOnClickListener(OnMarkerClickListener onMarkerClickListener)
     {
-        this.onClickListener = onClickListener;
+        this.onMarkerClickListener = onMarkerClickListener;
     }
 
     public void onClick()
     {
-        onClickListener.onClick(this);
+        onMarkerClickListener.onMarkerClick(this);
     }
 
     public float getAlpha()
@@ -174,8 +174,8 @@ public class MarkerView
         return marker.isVisible();
     }
 
-    public interface OnClickListener
+    public interface OnMarkerClickListener
     {
-        void onClick(MarkerView markerView);
+        void onMarkerClick(MarkerView markerView);
     }
 }

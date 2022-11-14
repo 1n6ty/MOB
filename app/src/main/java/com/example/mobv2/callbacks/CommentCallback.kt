@@ -17,7 +17,7 @@ class CommentCallback(private val mainActivity: MainActivity) : MOBAPICallback, 
         val response = obj["response"] as LinkedTreeMap<String, Any>?
         val commentId = (response!!["id"] as Double?)!!.toInt().toString()
 
-        okCallback?.createCommentByIdAndAddToPosts(commentId)
+        okCallback?.createCommentByIdAndAddToCommentIds(commentId)
     }
 
     override fun funcBad(obj: LinkedTreeMap<String, Any>)
@@ -30,8 +30,8 @@ class CommentCallback(private val mainActivity: MainActivity) : MOBAPICallback, 
         Log.v("DEBUG", obj.toString())
     }
 
-    override fun setOkCallback(callback: CommentOkCallback)
+    override fun setOkCallback(okCallback: CommentOkCallback)
     {
-        this.okCallback = callback;
+        this.okCallback = okCallback;
     }
 }

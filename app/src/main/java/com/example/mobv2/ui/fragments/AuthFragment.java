@@ -21,7 +21,6 @@ import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.models.UserImpl;
 import com.example.mobv2.models.abstractions.Address;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.fragments.main.MainFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -80,7 +79,15 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         nextButton.setOnClickListener(this::onNextButtonClick);
 
         // unnecessary
-        binding.skipAuthButton.setOnClickListener(v -> mainActivity.replaceFragment(new MainFragment()));
+        binding.skipAuthButton.setOnClickListener(v ->
+        {
+            var authCallback = new AuthCallback(mainActivity);
+            authCallback.setOkCallback(this::parseUserInfoFromMapAndAddToLocalDatabase);
+            mainActivity.mobServerAPI.me(authCallback, MainActivity.token.isEmpty()
+                    ? mainActivity.getPrivatePreferences()
+                                  .getString("TOKEN", "")
+                    : MainActivity.token);
+        });
     }
 
     private void onNextButtonClick(View view)
@@ -113,8 +120,18 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     @Override
     public void parseUserInfoFromMapAndAddToLocalDatabase(LinkedTreeMap<String, Object> map)
     {
-        MainActivity.token = (String) map.get("token");
-        MainActivity.refresh = (String) map.get("refresh");
+        // TODO simplify
+        if (map.containsKey("token") && map.containsKey("refresh"))
+        {
+            MainActivity.token = (String) map.get("token");
+            MainActivity.refresh = (String) map.get("refresh");
+
+            mainActivity.getPrivatePreferences()
+                        .edit()
+                        .putString("TOKEN", MainActivity.token)
+                        .putString("REFRESH", MainActivity.refresh)
+                        .apply();
+        }
 
         var user = new UserImpl.UserBuilder().parseFromMap((Map<String, Object>) map.get("user"));
 

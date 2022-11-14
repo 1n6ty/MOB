@@ -31,8 +31,4 @@
     <attr name="colorNavigationItemIcon" format="color" />
     <attr name="backgroundHelpButton" format="color" />
     <attr name="colorHelpButtonIcon" format="color" />
-
-    <declare-styleable name="ShowReactionsView">
-        <attr name="reactionsRecyclerView" format="reference" />
-    </declare-styleable>
 </resources>

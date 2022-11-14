@@ -259,7 +259,7 @@ public class MOBServerAPI
                              String token,
                              String refreshToken)
     {
-        Call<LinkedTreeMap<String, Object>> refreshCall = MOBAPI.refresh(token, refreshToken);
+        Call<LinkedTreeMap<String, Object>> refreshCall = MOBAPI.refresh(refreshToken, token);
         refreshCall.enqueue(createResponseCallback(obj));
     }
 
@@ -370,7 +370,7 @@ public class MOBServerAPI
                          String email,
                          String bio,
                          String phone_number,
-                         String new_profile_img_url,
+                         File file,
                          String token)
     {
         if (name != null)
@@ -403,9 +403,8 @@ public class MOBServerAPI
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserPhone(phone_number, token);
             call.enqueue(createResponseCallback(obj));
         }
-        if (new_profile_img_url != null)
+        if (file != null)
         {
-            File file = new File(new_profile_img_url);
             MultipartBody.Part img =
                     MultipartBody.Part.createFormData("new_profile_img", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserProfileImg(img, token);

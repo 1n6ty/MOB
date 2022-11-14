@@ -12,12 +12,9 @@ import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import localdatabase.typeconverters.LatLngConverter;
-import localdatabase.typeconverters.StringListConverter;
 
 @Entity
 public class MarkerInfoImpl implements MarkerInfo
@@ -36,9 +33,8 @@ public class MarkerInfoImpl implements MarkerInfo
     @TypeConverters(LatLngConverter.class)
     private LatLng latLng;
 
+    private String postId;
     private int markerType;
-    @TypeConverters(StringListConverter.class)
-    private List<String> postIds;
 
     @Ignore
     private boolean clicked;
@@ -63,19 +59,17 @@ public class MarkerInfoImpl implements MarkerInfo
         this.title = title;
         this.latLng = latLng;
         this.markerType = markerType;
-
-        postIds = new ArrayList<>();
     }
 
     public MarkerInfoImpl(String title,
                           LatLng latLng,
-                          int markerType,
-                          List<String> postIds)
+                          String postId,
+                          int markerType)
     {
         this.title = title;
         this.latLng = latLng;
+        this.postId = postId;
         this.markerType = markerType;
-        this.postIds = postIds;
     }
 
     @Override
@@ -140,9 +134,14 @@ public class MarkerInfoImpl implements MarkerInfo
         return markerType;
     }
 
-    public List<String> getPostIds()
+    public void setPostId(String postId)
     {
-        return postIds;
+        this.postId = postId;
+    }
+
+    public String getPostId()
+    {
+        return postId;
     }
 
     public boolean isClicked()

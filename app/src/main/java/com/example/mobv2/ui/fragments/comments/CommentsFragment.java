@@ -24,7 +24,7 @@ import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
-import com.example.mobv2.utils.SimpleTextWatcher;
+import com.example.mobv2.utils.MessageViewTextWatcher;
 
 import localdatabase.daos.UserDao;
 
@@ -81,8 +81,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         initPostView();
 
         initCommentsRecycler();
-        initMessageView();
         initSendButton();
+        initMessageView();
     }
 
     public void initToolbar()
@@ -96,7 +96,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
     {
         var postItem = viewModel.postItem;
         postItem.refreshItemBinding(binding.itemPost);
-        postItem.getShowCommentsView()
+        postItem.getShowCommentsButton()
                 .setVisibility(View.GONE);
         postItem.hideDeleteMenuItem();
         postItem.hideEditMenuItem();
@@ -108,7 +108,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         var postItem = viewModel.postItem;
         commentsRecyclerView = binding.commentsRecyclerView;
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        commentsAdapter = new CommentsAdapter(mainActivity, postItem.postItemHelper);
+        commentsAdapter =
+                new CommentsAdapter(mainActivity, binding.nestedScrollView, postItem.postItemHelper);
         commentsRecyclerView.setAdapter(commentsAdapter);
 
 //        var post = viewModel.postItem
@@ -121,34 +122,6 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
 //        }
     }
 
-    private void initMessageView()
-    {
-        messageView = binding.messageView;
-
-        messageView.addTextChangedListener(new SimpleTextWatcher()
-        {
-            @Override
-            public void onTextChanged(CharSequence s,
-                                      int start,
-                                      int before,
-                                      int count)
-            {
-                if (s.length() == 0)
-                {
-                    sendButton.setEnabled(false);
-                    sendButton.getDrawable()
-                              .setTint(mainActivity.getAttributeColor(R.attr.colorHelpButtonIcon));
-                }
-                else
-                {
-                    sendButton.setEnabled(true);
-                    sendButton.getDrawable()
-                              .setTint(mainActivity.getAttributeColor(android.R.attr.colorAccent));
-                }
-            }
-        });
-    }
-
     private void initSendButton()
     {
         sendButton = binding.sendButton;
@@ -158,25 +131,31 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         sendButton.setOnClickListener(this::onSendButtonClick);
     }
 
+    private void initMessageView()
+    {
+        messageView = binding.messageView;
+
+        messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, sendButton));
+    }
+
     private void onSendButtonClick(View view)
     {
         var postView = viewModel.postItem;
         var messageText = messageView.getText();
         CommentCallback callback = new CommentCallback(mainActivity);
-        callback.setOkCallback(this::createCommentByIdAndAddToPosts);
+        callback.setOkCallback(this::createCommentByIdAndAddToCommentIds);
         mainActivity.mobServerAPI.commentPost(callback, messageText.toString(), postView.postItemHelper.getId(), MainActivity.token);
     }
 
     @Override
-    public void createCommentByIdAndAddToPosts(String commentId)
+    public void createCommentByIdAndAddToCommentIds(String commentId)
     {
         var postView = viewModel.postItem;
         Editable messageText = messageView.getText();
 
         var comment =
-                CommentImpl.createNewComment(commentId, postView.postItemHelper.getUser(), messageText.toString());
-        var commentItem = commentsAdapter.addElementAndGet(comment);
-//        commentItem.commentItemHelper.setHavingCommentsIds(postView.postItemHelper);
+                CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText.toString());
+        commentsAdapter.addElement(comment);
         postView.postItemHelper.getCommentIds()
                                .add(commentId);
 

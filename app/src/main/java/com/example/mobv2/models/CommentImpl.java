@@ -11,6 +11,7 @@ import androidx.room.TypeConverters;
 
 import com.example.mobv2.models.abstractions.Comment;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
+import com.example.mobv2.models.abstractions.UserContent;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.example.mobv2.utils.abstractions.ParsableFromMap;
 import com.google.gson.internal.LinkedTreeMap;
@@ -28,26 +29,26 @@ import localdatabase.typeconverters.ReactionsConverter;
 import localdatabase.typeconverters.StringListConverter;
 
 @Entity
-public class CommentImpl implements Comment, HavingCommentsIds
+public class CommentImpl implements Comment, HavingCommentsIds, UserContent
 {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "commentid")
-    private String id;
+    private final String id;
 
     @Embedded
-    private UserImpl user;
+    private final UserImpl user;
     @TypeConverters(DateConverter.class)
-    private Date date;
-    private String text;
+    private final Date date;
+    private final String text;
     @TypeConverters(ReactionsConverter.class)
-    private List<Reaction> reactions;
+    private final List<Reaction> reactions;
     @TypeConverters(StringListConverter.class)
-    private List<String> commentIds;
+    private final List<String> commentIds;
     @TypeConverters(StringListConverter.class)
-    private List<String> positiveRates;
+    private final List<String> positiveRates;
     @TypeConverters(StringListConverter.class)
-    private List<String> negativeRates;
+    private final List<String> negativeRates;
 
     @Ignore
     private final ObservableInt commentsCount;
@@ -73,9 +74,8 @@ public class CommentImpl implements Comment, HavingCommentsIds
         this.positiveRates = new MyObservableArrayList<>(positiveRates);
         this.negativeRates = new MyObservableArrayList<>(negativeRates);
 
-        commentsCount = new ObservableInt(commentIds.size());
-
         // TODO FIX IT PLEASE
+        commentsCount = new ObservableInt(commentIds.size());
         ((MyObservableArrayList<String>) this.commentIds)
                 .setOnListChangedCallback(new PostImpl.Operation(commentsCount, 1, -1));
 

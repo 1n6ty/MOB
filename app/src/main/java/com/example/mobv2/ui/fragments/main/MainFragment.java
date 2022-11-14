@@ -190,8 +190,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         {
             var markerMap = (LinkedTreeMap<String, Object>) map.get(postId);
             var markerInfo = new MarkerInfoImpl.MarkerInfoBuilder().parseFromMap(markerMap);
-            markerInfo.getPostIds()
-                      .add(postId);
+            markerInfo.setPostId(postId);
 
             markersAdapter.addElement(markerInfo);
         }

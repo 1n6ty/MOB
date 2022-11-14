@@ -56,14 +56,6 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
         initBodyView();
     }
 
-    @Override
-    public void onDestroyView()
-    {
-        super.onDestroyView();
-
-        if (onDestroyViewListener != null) onDestroyViewListener.onDestroyView(getView());
-    }
-
     private void initViewModel()
     {
         viewModel = new ViewModelProvider(requireActivity()).get(MarkerCreatorViewModel.class);
@@ -88,12 +80,12 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
     private void onToolbarClick(View view)
     {
         var clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        CharSequence clipText = clipboard.getPrimaryClip()
-                                         .getItemAt(0)
-                                         .getText();
-        CharSequence subtitle = toolbar.getSubtitle()
-                                       .toString()
-                                       .replace(" : ", " ");
+        var clipText = clipboard.getPrimaryClip()
+                                .getItemAt(0)
+                                .getText();
+        var subtitle = toolbar.getSubtitle()
+                              .toString()
+                              .replace(" : ", " ");
         if (!clipText.equals(subtitle))
         {
             var clip = ClipData.newPlainText("simple text", subtitle);
@@ -109,13 +101,25 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
         createAddressMarkerButton = binding.createAddressMarkerButton;
         createSubAddressMarkerButton = binding.createSubAddressMarkerButton;
 
-        createAddressMarkerButton.setOnClickListener(view -> Toast.makeText(getContext(), "Not exist", Toast.LENGTH_LONG)
-                                                                  .show());
+        createAddressMarkerButton.setOnClickListener(view ->
+        {
+            Toast.makeText(getContext(), "Not exist", Toast.LENGTH_LONG)
+                 .show();
+            dismiss();
+        });
         createSubAddressMarkerButton.setOnClickListener(view ->
         {
             ((MainActivity) getActivity()).goToFragment(new MarkerCreatorFragment());
             dismiss();
         });
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+
+        if (onDestroyViewListener != null) onDestroyViewListener.onDestroyView(getView());
     }
 
     public void setOnDestroyViewListener(OnDestroyViewListener onDestroyViewListener)

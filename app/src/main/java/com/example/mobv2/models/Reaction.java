@@ -1,13 +1,19 @@
 package com.example.mobv2.models;
 
+import androidx.databinding.ObservableInt;
+
+import com.example.mobv2.utils.MyObservableArrayList;
+
 import java.util.List;
 
 public class Reaction
 {
     private final String emoji;
-    private final List<String> userIdsWhoLiked;
+    private final MyObservableArrayList<String> userIdsWhoLiked;
 
     private boolean checked;
+
+    private final ObservableInt count;
 
     public Reaction(String emoji,
                     List<String> userIdsWhoLiked)
@@ -20,8 +26,11 @@ public class Reaction
                     boolean checked)
     {
         this.emoji = emoji;
-        this.userIdsWhoLiked = userIdsWhoLiked;
+        this.userIdsWhoLiked = new MyObservableArrayList<>(userIdsWhoLiked);
         this.checked = checked;
+
+        count = new ObservableInt(userIdsWhoLiked.size());
+        this.userIdsWhoLiked.setOnListChangedCallback(new PostImpl.Operation(count, 1, -1));
     }
 
     public String getEmoji()
@@ -34,9 +43,9 @@ public class Reaction
         return userIdsWhoLiked;
     }
 
-    public int getCount()
+    public ObservableInt getCount()
     {
-        return userIdsWhoLiked == null ? -1 : userIdsWhoLiked.size();
+        return count;
     }
 
     public void setChecked(boolean checked)

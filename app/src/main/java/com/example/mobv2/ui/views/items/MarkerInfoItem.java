@@ -16,8 +16,6 @@ import com.example.mobv2.utils.BitmapConverter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.List;
-
 import localdatabase.daos.MarkerInfoDao;
 import localdatabase.daos.PostDao;
 
@@ -79,20 +77,18 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         markersAdapter.deselectClickedMarkerInfoItem();
 
         markerInfoItemHelper.setClicked(true);
-        markersAdapter.setBufferMarkerInfoItem(this);
         markersAdapter.refreshPostsRecycler();
         markersAdapter.refreshPostsFragment();
-        refreshItemBinding(markerView);
+        markersAdapter.notifyItemChanged(this);
     }
 
     public void addPostToPostsThroughServer()
     {
-        String postId = markerInfoItemHelper.getPostIds()
-                                            .get(0);
+        String postId = markerInfoItemHelper.getPostId();
 
         var callback = new GetPostCallback(mainActivity);
         callback.setOkCallback(this::parsePostFromMapAndAddToPosts);
-        callback.setFailCallback(() -> getPostFromLocalDbAndAddToPosts(postId));
+        callback.setFailCallback(() -> getPostByIdFromLocalDbAndAddToPosts(postId));
         mainActivity.mobServerAPI.getPost(callback, postId, MainActivity.token);
     }
 
@@ -106,7 +102,7 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         markersAdapter.scrollToStartPosition();
     }
 
-    public void getPostFromLocalDbAndAddToPosts(String postId)
+    private void getPostByIdFromLocalDbAndAddToPosts(String postId)
     {
         var post = postDao.getById(postId);
         PostItem postItem = postsAdapter.addElementAndGetItem(post);
@@ -163,9 +159,9 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
             return markerInfo.getMarkerType();
         }
 
-        public List<String> getPostIds()
+        public String getPostId()
         {
-            return markerInfo.getPostIds();
+            return markerInfo.getPostId();
         }
 
         public boolean isClicked()

@@ -29,7 +29,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
     private final MarkersAdapter markersAdapter;
 
-    private final MyObservableArrayList<PostItem> postItems;
+    private final MyObservableArrayList<PostItem> postItemList;
 
     public PostsAdapter(MainActivity mainActivity,
                         MarkersAdapter markersAdapter)
@@ -37,8 +37,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         this.mainActivity = mainActivity;
         this.markersAdapter = markersAdapter;
 
-        postItems = new MyObservableArrayList<>();
-        postItems.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
+        postItemList = new MyObservableArrayList<>();
+        postItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
         {
             @Override
             public void onAdded(int index,
@@ -87,7 +87,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
 
         if (position > -1)
         {
-            var postItem = postItems.get(position);
+            var postItem = postItemList.get(position);
 
             mainFragmentViewModel.setPostTitle(postItem.postItemHelper.getTitle());
         }
@@ -97,7 +97,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public void onBindViewHolder(@NonNull PostViewHolder holder,
                                  int position)
     {
-        var postItem = postItems.get(position);
+        var postItem = postItemList.get(position);
 
         postItem.refreshItemBinding(holder.binding);
     }
@@ -105,41 +105,25 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     @Override
     public void addElement(@NonNull PostImpl post)
     {
-        Date date = post.getDate();
-        PostItem postItem = new PostItem(mainActivity, markersAdapter, this, post);
-        if (postItems.isEmpty() || date.compareTo(postItems.get(postItems.size() - 1).postItemHelper.getDate()) < 0)
-        {
-            postItems.add(postItem);
-            return;
-        }
-
-        for (int i = 0; i < postItems.size(); i++)
-        {
-            Date currentDate = postItems.get(i).postItemHelper.getDate();
-            if (date.compareTo(currentDate) >= 0)
-            {
-                postItems.add(i, postItem);
-                break;
-            }
-        }
+        addElementAndGetItem(post);
     }
 
     public PostItem addElementAndGetItem(@NonNull PostImpl post)
     {
         Date date = post.getDate();
-        PostItem postItem = new PostItem(mainActivity, markersAdapter, this, post);
-        if (postItems.isEmpty() || date.compareTo(postItems.get(postItems.size() - 1).postItemHelper.getDate()) < 0)
+        PostItem postItem = new PostItem(mainActivity, this, post);
+        if (postItemList.isEmpty() || date.compareTo(postItemList.get(postItemList.size() - 1).postItemHelper.getDate()) < 0)
         {
-            postItems.add(postItem);
+            postItemList.add(postItem);
             return postItem;
         }
 
-        for (int i = 0; i < postItems.size(); i++)
+        for (int i = 0; i < postItemList.size(); i++)
         {
-            Date currentDate = postItems.get(i).postItemHelper.getDate();
+            Date currentDate = postItemList.get(i).postItemHelper.getDate();
             if (date.compareTo(currentDate) >= 0)
             {
-                postItems.add(i, postItem);
+                postItemList.add(i, postItem);
                 return postItem;
             }
         }
@@ -150,67 +134,67 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     @Override
     public boolean reverse()
     {
-        Collections.reverse(postItems);
-        notifyItemRangeChanged(0, postItems.size());
+        Collections.reverse(postItemList);
+        notifyItemRangeChanged(0, postItemList.size());
         return true;
     }
 
     @Override
     public boolean sortByAppreciations()
     {
-        Collections.sort(postItems, (postItem, nextPostItem) ->
+        Collections.sort(postItemList, (postItem, nextPostItem) ->
         {
             var postPositiveRates = postItem.postItemHelper.getPositiveRates();
             var nextPostPositiveRates = nextPostItem.postItemHelper.getPositiveRates();
 
             return Integer.compare(nextPostPositiveRates.size(), postPositiveRates.size());
         });
-        notifyItemRangeChanged(0, postItems.size());
+        notifyItemRangeChanged(0, postItemList.size());
         return true;
     }
 
     @Override
     public boolean sortByDate()
     {
-        Collections.sort(postItems, (postItem, nextPostItem) ->
+        Collections.sort(postItemList, (postItem, nextPostItem) ->
         {
             var nextPostItemHelperDate = nextPostItem.postItemHelper.getDate();
             var postItemHelperDate = postItem.postItemHelper.getDate();
 
             return (nextPostItemHelperDate.compareTo(postItemHelperDate));
         });
-        notifyItemRangeChanged(0, postItems.size());
+        notifyItemRangeChanged(0, postItemList.size());
         return true;
     }
 
     @Override
     public boolean sortByComments()
     {
-        Collections.sort(postItems, (postItem, nextPostItem) ->
+        Collections.sort(postItemList, (postItem, nextPostItem) ->
         {
             var nextPostItemHelperCommentIds = nextPostItem.postItemHelper.getCommentIds();
             var postItemHelperCommentIds = postItem.postItemHelper.getCommentIds();
 
             return Integer.compare(nextPostItemHelperCommentIds.size(), postItemHelperCommentIds.size());
         });
-        notifyItemRangeChanged(0, postItems.size());
+        notifyItemRangeChanged(0, postItemList.size());
         return true;
     }
 
     public void deletePostItem(PostItem postItem)
     {
-        postItems.remove(postItem);
+        postItemList.remove(postItem);
     }
 
     public void clear()
     {
-        postItems.clear();
+        postItemList.clear();
     }
 
     @Override
     public int getItemCount()
     {
-        return postItems.size();
+        return postItemList.size();
     }
 
     public static class PostViewHolder extends RecyclerView.ViewHolder

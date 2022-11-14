@@ -18,8 +18,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-public class AddressItemHelper implements Item<ItemAddressBinding>
+import localdatabase.daos.AddressDao;
+
+public class AddressItem implements Item<ItemAddressBinding>
 {
+    private final AddressDao addressDao;
+
     private final MainActivity mainActivity;
     private final AddressesAdapter addressesAdapter;
 
@@ -27,13 +31,15 @@ public class AddressItemHelper implements Item<ItemAddressBinding>
 
     private ItemAddressBinding addressBinding;
 
-    public AddressItemHelper(MainActivity mainActivity,
+    public AddressItem(MainActivity mainActivity,
                              AddressesAdapter addressesAdapter,
                              AddressImpl address)
     {
         this.mainActivity = mainActivity;
         this.addressesAdapter = addressesAdapter;
         this.addressItemHelper = new AddressItemHelper(address);
+
+        addressDao = mainActivity.appDatabase.addressDao();
     }
 
     @Override
@@ -63,16 +69,14 @@ public class AddressItemHelper implements Item<ItemAddressBinding>
 
         addressesAdapter.deselectClickedAddress();
 
-//        address.setCurrent(true);
-//        addressDao.update(address);
+        addressItemHelper.setCurrent(true);
+        addressDao.update(addressItemHelper.getAddress());
 
-//        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), addressItemHelper.getId(), MainActivity.token);
 
         var mainFragmentViewModel =
                 new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
         mainFragmentViewModel.setAddressChanged(true);
-
-//        addressesAdapter.notifyItemChanged(position);
     }
 
     public class AddressItemHelper
@@ -82,6 +86,15 @@ public class AddressItemHelper implements Item<ItemAddressBinding>
         public AddressItemHelper(AddressImpl address)
         {
             this.address = address;
+        }
+
+        public void join()
+        {
+
+        }
+
+        public void leave()
+        {
         }
 
         public boolean compareById(AddressItemHelper addressItemHelper)

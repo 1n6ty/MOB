@@ -30,8 +30,8 @@ class GetMarkersCallback(private val mainActivity: MainActivity) : MOBAPICallbac
         Log.v("DEBUG", obj.toString())
     }
 
-    override fun setOkCallback(callback: GetMarkersOkCallback)
+    override fun setOkCallback(okCallback: GetMarkersOkCallback)
     {
-        this.okCallback = callback
+        this.okCallback = okCallback
     }
 }

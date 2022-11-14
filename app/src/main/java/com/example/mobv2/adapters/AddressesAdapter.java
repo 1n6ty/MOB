@@ -12,10 +12,8 @@ import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.ui.activities.MainActivity;
-import com.example.mobv2.ui.views.items.AddressItemHelper;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.mobv2.ui.views.items.AddressItem;
+import com.example.mobv2.utils.MyObservableArrayList;
 
 import localdatabase.daos.AddressDao;
 
@@ -24,12 +22,40 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     private final AddressDao addressDao;
 
     private final MainActivity mainActivity;
-    private final List<AddressItemHelper> addressItemHelperList;
+    private final MyObservableArrayList<AddressItem> addressItemList;
 
     public AddressesAdapter(MainActivity mainActivity)
     {
         this.mainActivity = mainActivity;
-        this.addressItemHelperList = new ArrayList<>();
+        this.addressItemList = new MyObservableArrayList<>();
+        addressItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
+        {
+            @Override
+            public void onAdded(int index,
+                                AddressItem element)
+            {
+                notifyItemInserted(index);
+            }
+
+            @Override
+            public void onRemoved(int index)
+            {
+                notifyItemRemoved(index);
+            }
+
+            @Override
+            public void onRemoved(int index,
+                                  Object o)
+            {
+                notifyItemRemoved(index);
+            }
+
+            @Override
+            public void onClear()
+            {
+                notifyItemRangeRemoved(0, getItemCount());
+            }
+        });
 
         addressDao = mainActivity.appDatabase.addressDao();
     }
@@ -48,14 +74,28 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     public void onBindViewHolder(@NonNull AddressViewHolder holder,
                                  int position)
     {
-        var address = addressItemHelperList.get(position);
+        var address = addressItemList.get(position);
 
         address.refreshItemBinding(holder.binding);
     }
 
-    public boolean checkIfAddressEqualsClickedAddress(AddressItemHelper addressItemHelper)
+    @Override
+    public void addElement(@NonNull AddressImpl address)
     {
-        return addressItemHelper.addressItemHelper.compareById(getClickedAddressItem());
+        try
+        {
+            addressItemList.add(new AddressItem(mainActivity, this, address));
+            notifyItemInserted(addressItemList.size() - 1);
+        }
+        catch (IllegalStateException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkIfAddressEqualsClickedAddress(AddressItem addressItem)
+    {
+        return addressItem.addressItemHelper.compareById(getClickedAddressItem().addressItemHelper);
     }
 
     public void deselectClickedAddress()
@@ -64,10 +104,10 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         clickedAddress.addressItemHelper.setCurrent(false);
         addressDao.update(clickedAddress.addressItemHelper.getAddress());
 
-        for (int i = 0; i < addressItemHelperList.size(); i++)
+        for (int i = 0; i < addressItemList.size(); i++)
         {
-            var addressItem = addressItemHelperList.get(i);
-            if (addressItem.addressItemHelper.compareById(clickedAddress))
+            var addressItem = addressItemList.get(i);
+            if (addressItem.addressItemHelper.compareById(clickedAddress.addressItemHelper))
             {
                 notifyItemChanged(i);
                 return;
@@ -75,36 +115,21 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         }
     }
 
-    private AddressItemHelper getClickedAddressItem()
+    private AddressItem getClickedAddressItem()
     {
-        for (int i = 0; i < addressItemHelperList.size(); i++)
+        for (int i = 0; i < addressItemList.size(); i++)
         {
-            var addressItem = addressItemHelperList.get(i);
-            if (addressItem.addressItemHelper.isCurrent())
-                return addressItem;
+            var addressItem = addressItemList.get(i);
+            if (addressItem.addressItemHelper.isCurrent()) return addressItem;
         }
 
-        return new AddressItemHelper(mainActivity, this, new AddressImpl());
-    }
-
-    @Override
-    public void addElement(@NonNull AddressImpl address)
-    {
-        try
-        {
-            addressItemHelperList.add(new AddressItemHelper(mainActivity, this, address));
-            notifyItemInserted(addressItemHelperList.size() - 1);
-        }
-        catch (IllegalStateException e)
-        {
-            e.printStackTrace();
-        }
+        return new AddressItem(mainActivity, this, new AddressImpl());
     }
 
     @Override
     public int getItemCount()
     {
-        return addressItemHelperList.size();
+        return addressItemList.size();
     }
 
     public static class AddressViewHolder extends RecyclerView.ViewHolder

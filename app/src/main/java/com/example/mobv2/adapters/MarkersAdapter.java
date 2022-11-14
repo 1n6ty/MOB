@@ -13,14 +13,13 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
 import com.example.mobv2.callbacks.CreatePostCallback;
 import com.example.mobv2.callbacks.abstractions.CreatePostOkCallback;
-import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.models.MarkerInfoImpl;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.markercreators.MapSkillsBottomSheetFragment;
 import com.example.mobv2.ui.fragments.markercreators.MarkerCreatorViewModel;
 import com.example.mobv2.ui.views.MapView;
-import com.example.mobv2.ui.views.items.MarkerInfoItem;
 import com.example.mobv2.ui.views.MarkerView;
+import com.example.mobv2.ui.views.items.MarkerInfoItem;
 import com.example.mobv2.utils.MarkerAddition;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,7 +40,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     private final MyObservableArrayList<MarkerInfoItem> markerInfoItemList;
     private final MarkersAdapterHelper markersAdapterHelper;
     private MapView mapView;
-    private MarkerInfoItem bufferMarkerInfoItem;
+//    private MarkerInfoItem bufferMarkerInfoItem;
 
     public MarkersAdapter(MainActivity mainActivity,
                           MarkersAdapterHelper markersAdapterHelper)
@@ -49,9 +48,9 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         this.mainActivity = mainActivity;
         this.markersAdapterHelper = markersAdapterHelper;
 
-        markersAdapterHelper.postsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
         var postsAdapter = new PostsAdapter(mainActivity, this);
         markersAdapterHelper.postsRecyclerView.setAdapter(postsAdapter);
+        markersAdapterHelper.postsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
 
         markerInfoItemList = new MyObservableArrayList<>();
         markerInfoItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<MarkerInfoItem>()
@@ -131,7 +130,6 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
                 bottomSheetFragment.show(mainActivity.getSupportFragmentManager(), MapSkillsBottomSheetFragment.class.getSimpleName());
             }
         });
-
     }
 
     private void initMarkerCreatorViewModel(@NonNull LatLng latLng)
@@ -140,24 +138,23 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
                 new ViewModelProvider(mainActivity).get(MarkerCreatorViewModel.class);
 
         var createPostCallback = new CreatePostCallback(mainActivity, latLng);
-        createPostCallback.setOkCallback(this::parseCreatedMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList);
+        createPostCallback.setOkCallback(this::parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList);
         markerCreatorViewModel.setCallback(createPostCallback);
 
-        AddressImpl address = mainActivity.getOtherAddressByLatLng(latLng);
+        var address = mainActivity.getOtherAddressByLatLng(latLng);
 
         markerCreatorViewModel.setAddress(address);
     }
 
     @Override
-    public void parseCreatedMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(LinkedTreeMap<String, Object> map,
-                                                                              LatLng latLng)
+    public void parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(LinkedTreeMap<String, Object> map,
+                                                                       LatLng latLng)
     {
         String postId = String.valueOf(((Double) map.get("id")).intValue());
         double x = latLng.latitude;
         double y = latLng.longitude;
         var markerInfo = new MarkerInfoImpl(new LatLng(x, y), MarkerInfoImpl.SUB_ADDRESS_MARKER);
-        markerInfo.getPostIds()
-                  .add(postId);
+        markerInfo.setPostId(postId);
 
         addElement(markerInfo);
     }
@@ -171,12 +168,21 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         markerInfoItem.refreshItemBinding(markerView);
     }
 
+    @Override
+    public void addElement(@NonNull MarkerInfoImpl markerInfo)
+    {
+        var markerInfoItem =
+                new MarkerInfoItem(mainActivity, this, markersAdapterHelper.getPostsAdapter(), markerInfo);
+        markerInfoItemList.add(markerInfoItem);
+    }
+
     public void refreshPostsRecycler()
     {
-        PostsAdapter postsAdapter = markersAdapterHelper.getPostsAdapter();
+        var postsAdapter = markersAdapterHelper.getPostsAdapter();
         postsAdapter.clear();
 
-        switch (bufferMarkerInfoItem.markerInfoItemHelper.getMarkerType())
+        var clickedMarkerInfoItem = getClickedMarkerInfoItem();
+        switch (clickedMarkerInfoItem.markerInfoItemHelper.getMarkerType())
         {
             case MarkerInfoImpl.ADDRESS_MARKER:
                 for (var markerInfoItem : markerInfoItemList)
@@ -188,7 +194,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
                 }
                 break;
             case MarkerInfoImpl.SUB_ADDRESS_MARKER:
-                bufferMarkerInfoItem.addPostToPostsThroughServer();
+                clickedMarkerInfoItem.addPostToPostsThroughServer();
                 break;
         }
     }
@@ -198,20 +204,12 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
 
         final boolean isAddressMarker =
-                bufferMarkerInfoItem.markerInfoItemHelper.getMarkerType() == MarkerInfoImpl.ADDRESS_MARKER;
+                getClickedMarkerInfoItem().markerInfoItemHelper.getMarkerType() == MarkerInfoImpl.ADDRESS_MARKER;
         Menu postsToolbarMenu = markersAdapterHelper.postsToolbar.getMenu();
         postsToolbarMenu.findItem(R.id.menu_posts_reverse)
                         .setVisible(isAddressMarker);
         postsToolbarMenu.findItem(R.id.menu_show_more)
                         .setVisible(isAddressMarker);
-    }
-
-    @Override
-    public void addElement(@NonNull MarkerInfoImpl markerInfo)
-    {
-        MarkerInfoItem markerInfoItem =
-                new MarkerInfoItem(mainActivity, this, markersAdapterHelper.getPostsAdapter(), markerInfo);
-        markerInfoItemList.add(markerInfoItem);
     }
 
     public void deleteMarkerInfoItem(MarkerInfoItem markerInfoItem)
@@ -270,19 +268,20 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM));
     }
 
-    public void animateCameraTo(@NonNull LatLng latLng, GoogleMap.CancelableCallback callback)
+    public void animateCameraTo(@NonNull LatLng latLng,
+                                GoogleMap.CancelableCallback callback)
     {
         mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM), callback);
-    }
-
-    public void setBufferMarkerInfoItem(MarkerInfoItem bufferMarkerInfoItem)
-    {
-        this.bufferMarkerInfoItem = bufferMarkerInfoItem;
     }
 
     public void scrollToStartPosition()
     {
         markersAdapterHelper.postsRecyclerView.scrollToPosition(0);
+    }
+
+    public void notifyItemChanged(MarkerInfoItem markerInfoItem)
+    {
+        notifyItemChanged(markerInfoItemList.indexOf(markerInfoItem));
     }
 
     @Override

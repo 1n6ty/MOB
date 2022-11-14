@@ -6,6 +6,18 @@
     <data>
 
         <variable
+            name="fullName"
+            type="String" />
+
+        <variable
+            name="date"
+            type="String" />
+
+        <variable
+            name="text"
+            type="String" />
+
+        <variable
             name="ratesCount"
             type="androidx.databinding.ObservableInt" />
 
@@ -35,7 +47,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/horizontal_margin"
                 android:layout_marginBottom="@dimen/vertical_margin"
-                app:layout_constraintBottom_toTopOf="@+id/post_text_view"
+                app:layout_constraintBottom_toTopOf="@+id/text_view"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -68,38 +80,41 @@
                         android:id="@+id/fullName_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sample_fullname"
+                        android:text="@{fullName}"
+                        tools:text="@string/sample_fullname"
                         android:textAppearance="@style/postItemHeaderTextStyle" />
 
                     <TextView
                         android:id="@+id/date_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="@string/sample_date"
+                        android:text="@{date}"
+                        tools:text="@string/sample_date"
                         android:textAppearance="@style/itemDateTextStyle" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/post_text_view"
+                android:id="@+id/text_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/horizontal_margin"
                 android:layout_marginBottom="@dimen/vertical_small_margin"
                 android:textAppearance="@style/itemContentTextStyle"
-                app:layout_constraintBottom_toTopOf="@+id/post_images_recycler_view"
+                app:layout_constraintBottom_toTopOf="@+id/images_recycler_view"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                android:text="@{text}"
                 tools:text="Content" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/post_images_recycler_view"
+                android:id="@+id/images_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/horizontal_very_small_margin"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_text_view"
+                app:layout_constraintTop_toBottomOf="@+id/text_view"
                 tools:background="@drawable/background_content_post"
                 tools:itemCount="1"
                 tools:listitem="@layout/item_image" />
@@ -115,7 +130,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_images_recycler_view">
+                app:layout_constraintTop_toBottomOf="@+id/images_recycler_view">
 
                 <com.example.mobv2.ui.views.RatesGroup
                     android:id="@+id/rates_group"
@@ -166,7 +181,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/show_reactions_view"
+                        android:id="@+id/show_reactions_button"
                         style="@style/postButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -175,7 +190,7 @@
                         app:srcCompat="@drawable/ic_arrow_down" />
 
                     <LinearLayout
-                        android:id="@+id/show_comments_view"
+                        android:id="@+id/show_comments_button"
                         style="@style/commentButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">

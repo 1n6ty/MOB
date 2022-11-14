@@ -38,8 +38,8 @@ class AuthCallback(private val mainActivity: MainActivity) : MOBAPICallback,
             .show()
     }
 
-    override fun setOkCallback(callback: AuthOkCallback)
+    override fun setOkCallback(okCallback: AuthOkCallback)
     {
-        okCallback = callback
+        this.okCallback = okCallback
     }
 }

@@ -1,15 +1,18 @@
 package com.example.mobv2.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
+import com.example.mobv2.callbacks.GetCommentCallback;
+import com.example.mobv2.callbacks.abstractions.GetCommentOkCallback;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.models.CommentImpl;
 import com.example.mobv2.models.abstractions.HavingCommentsIds;
@@ -18,27 +21,27 @@ import com.example.mobv2.ui.views.items.CommentItem;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.Date;
+import localdatabase.daos.CommentDao;
 
-import serverapi.MOBServerAPI;
-
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
-        implements AbleToAdd<CommentImpl>
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder> implements AbleToAdd<CommentImpl>, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
 {
+    private final CommentDao commentDao;
+
     private final MainActivity mainActivity;
+    private final NestedScrollView nestedScrollView;
 
     private final HavingCommentsIds havingCommentsIds;
-    private final MyObservableArrayList<CommentItem> commentItems;
-
-    private int lastIndex = 0;
+    private final MyObservableArrayList<CommentItem> commentItemList;
 
     public CommentsAdapter(MainActivity mainActivity,
+                           NestedScrollView nestedScrollView,
                            HavingCommentsIds havingCommentsIds)
     {
         this.mainActivity = mainActivity;
+        this.nestedScrollView = nestedScrollView;
         this.havingCommentsIds = havingCommentsIds;
-        this.commentItems = new MyObservableArrayList<>();
-        commentItems.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<CommentItem>()
+        this.commentItemList = new MyObservableArrayList<>();
+        commentItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<CommentItem>()
         {
             @Override
             public void onAdded(int index,
@@ -66,97 +69,70 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             }
         });
 
-        var commentsIds = this.havingCommentsIds.getCommentIds();
+        commentDao = mainActivity.appDatabase.commentDao();
+
+        var commentsIds = havingCommentsIds.getCommentIds();
         for (int i = 0; i < Math.min(commentsIds.size(), 4); i++)
         {
-            mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
-            {
-                @Override
-                public void funcOk(LinkedTreeMap<String, Object> obj)
-                {
-                    Log.v("DEBUG", obj.toString());
-
-                    var response = (LinkedTreeMap<String, Object>) obj.get("response");
-
-                    CommentImpl comment = new CommentImpl.CommentBuilder().parseFromMap(response);
-                    addElement(comment);
-
-                    lastIndex++;
-                }
-
-                @Override
-                public void funcBad(LinkedTreeMap<String, Object> obj)
-                {
-                    Log.v("DEBUG", obj.toString());
-                }
-
-                @Override
-                public void fail(Throwable obj)
-                {
-                    Log.v("DEBUG", obj.toString());
-                }
-            }, commentsIds.get(commentsIds.size() - 1 - i), MainActivity.token);
+            getCommentByIndex(commentsIds.size() - 1 - i);
         }
     }
 
-    /*@Override
+    @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView)
     {
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        nestedScrollView.setOnScrollChangeListener(this::onScrollChange);
+    }
+
+    @Override
+    public void onScrollChange(NestedScrollView view,
+                               int scrollX,
+                               int scrollY,
+                               int oldScrollX,
+                               int oldScrollY)
+    {
+        var commentsIds = havingCommentsIds.getCommentIds();
+        if (commentsIds.size() - 1 >= getItemCount())
         {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView,
-                                             int newState)
+            View childView = view.getChildAt(view.getChildCount() - 1);
+
+            if (scrollY > oldScrollY && scrollY >= childView.getMeasuredHeight() - view.getMeasuredHeight())
             {
-                super.onScrollStateChanged(recyclerView, newState);
+                getCommentByIndex(commentsIds.size() - 1 - getItemCount());
             }
+        }
+    }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView,
-                                   int dx,
-                                   int dy)
-            {
-                super.onScrolled(recyclerView, dx, dy);
+    private void getCommentByIndex(int index)
+    {
+        var commentsIds = havingCommentsIds.getCommentIds();
+        String commentId = commentsIds.get(index);
+        var callback = new GetCommentCallback(mainActivity);
+        callback.setOkCallback(this::parseCommentFromMapAndAddToComments);
+        callback.setFailCallback(() -> getCommentByIdFromLocalDbAndAddToComments(commentId));
 
-                LinearLayoutManager layoutManager =
-                        (LinearLayoutManager) recyclerView.getLayoutManager();
-                final int totalItemCount = layoutManager.getItemCount();
-                final int visibleItemCount = layoutManager.getChildCount();
-                final int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+        mainActivity.mobServerAPI.getComment(callback, commentId, MainActivity.token);
+    }
 
-                if (lastIndex < getItemCount() && (totalItemCount - visibleItemCount <= firstVisibleItem))
-                {
-                    var commentsIds = havingCommentsIds.getCommentsIds();
-                    mainActivity.mobServerAPI.getComment(new MOBServerAPI.MOBAPICallback()
-                    {
-                        @Override
-                        public void funcOk(LinkedTreeMap<String, Object> obj)
-                        {
-                            Log.v("DEBUG", obj.toString());
+    @Override
+    public void parseCommentFromMapAndAddToComments(LinkedTreeMap<String, Object> map)
+    {
+        var comment = new CommentImpl.CommentBuilder().parseFromMap(map);
+        commentDao.insert(comment);
+        addElement(comment);
+    }
 
-                            var response = (LinkedTreeMap<String, Object>) obj.get("response");
+    private void getCommentByIdFromLocalDbAndAddToComments(String commentId)
+    {
+        var comment = commentDao.getById(commentId);
+        if (comment == null)
+        {
+            Toast.makeText(mainActivity, "Comments is not uploaded", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-                            CommentImpl comment =
-                                    new CommentImpl.CommentBuilder().parseFromMap(response);
-                            addElement(comment);
-                        }
-
-                        @Override
-                        public void funcBad(LinkedTreeMap<String, Object> obj)
-                        {
-                            Log.v("DEBUG", obj.toString());
-                        }
-
-                        @Override
-                        public void fail(Throwable obj)
-                        {
-                            Log.v("DEBUG", obj.toString());
-                        }
-                    }, commentsIds.get(lastIndex++), MainActivity.token);
-                }
-            }
-        });
-    }*/
+        addElement(comment);
+    }
 
     @NonNull
     @Override
@@ -172,7 +148,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void onBindViewHolder(@NonNull CommentViewHolder holder,
                                  int position)
     {
-        var commentItem = commentItems.get(position);
+        var commentItem = commentItemList.get(position);
 
         commentItem.refreshItemBinding(holder.binding);
         commentItem.commentItemHelper.setHavingCommentsIds(havingCommentsIds);
@@ -181,41 +157,25 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     @Override
     public void addElement(@NonNull CommentImpl comment)
     {
-        Date date = comment.getDate();
-        CommentItem commentItem = new CommentItem(mainActivity, this, comment);
-        if (commentItems.isEmpty() || date.compareTo(commentItems.get(commentItems.size() - 1).commentItemHelper.getDate()) < 0)
-        {
-            commentItems.add(commentItem);
-            return;
-        }
-
-        for (int i = 0; i < commentItems.size(); i++)
-        {
-            Date currentDate = commentItems.get(i).commentItemHelper.getDate();
-            if (date.compareTo(currentDate) >= 0)
-            {
-                commentItems.add(i, commentItem);
-                break;
-            }
-        }
+        addElementAndGet(comment);
     }
 
     public CommentItem addElementAndGet(@NonNull CommentImpl comment)
     {
-        Date date = comment.getDate();
-        CommentItem commentItem = new CommentItem(mainActivity, this, comment);
-        if (commentItems.isEmpty() || date.compareTo(commentItems.get(commentItems.size() - 1).commentItemHelper.getDate()) < 0)
+        var date = comment.getDate();
+        var commentItem = new CommentItem(mainActivity, this, comment);
+        if (commentItemList.isEmpty() || date.compareTo(commentItemList.get(commentItemList.size() - 1).commentItemHelper.getDate()) < 0)
         {
-            commentItems.add(commentItem);
+            commentItemList.add(commentItem);
             return commentItem;
         }
 
-        for (int i = 0; i < commentItems.size(); i++)
+        for (int i = 0; i < commentItemList.size(); i++)
         {
-            Date currentDate = commentItems.get(i).commentItemHelper.getDate();
+            var currentDate = commentItemList.get(i).commentItemHelper.getDate();
             if (date.compareTo(currentDate) >= 0)
             {
-                commentItems.add(i, commentItem);
+                commentItemList.add(i, commentItem);
                 return commentItem;
             }
         }
@@ -225,13 +185,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     public void deleteComment(CommentItem commentItem)
     {
-        commentItems.remove(commentItem);
+        commentItemList.remove(commentItem);
     }
 
     @Override
     public int getItemCount()
     {
-        return commentItems.size();
+        return commentItemList.size();
     }
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder
