@@ -236,7 +236,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         {
             case R.id.menu_posts_reverse:
                 return postsAdapter.reverse();
-            case R.id.menu_sort_by_appreciations:
+            case R.id.menu_sort_by_rates:
                 return postsAdapter.sortByAppreciations();
             case R.id.menu_sort_by_date:
                 return postsAdapter.sortByDate();

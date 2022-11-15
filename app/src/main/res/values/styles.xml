@@ -18,6 +18,17 @@
         <item name="android:textSize">@dimen/pre_medium_text_size</item>
     </style>
 
+    <style name="nestedToolbarStyle">
+        <item name="android:background">?backgroundSecondaryWindow</item>
+        <item name="titleTextColor">?colorPrimaryText</item>
+        <item name="itemIconTint">?colorAlternativeToolbarIcon</item>
+        <item name="subtitleTextAppearance">@style/toolbarSubtitleTextStyle</item>
+    </style>
+
+    <style name="nestedToolbarSubtitleTextStyle">
+        <item name="android:textSize">@dimen/pre_medium_text_size</item>
+    </style>
+
     <style name="collapsingToolbarStyle">
         <item name="navigationIconTint">?colorToolbarIcon</item>
         <item name="titleTextColor">?colorToolbarTitle</item>

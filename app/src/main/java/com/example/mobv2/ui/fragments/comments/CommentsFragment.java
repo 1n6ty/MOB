@@ -3,6 +3,7 @@ package com.example.mobv2.ui.fragments.comments;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -28,12 +29,14 @@ import com.example.mobv2.utils.MessageViewTextWatcher;
 
 import localdatabase.daos.UserDao;
 
-public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> implements HavingToolbar, CommentOkCallback
+public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
+        implements HavingToolbar, Toolbar.OnMenuItemClickListener, CommentOkCallback
 {
     private CommentsFragmentViewModel viewModel;
     private UserDao userDao;
 
     private Toolbar toolbar;
+    private Toolbar commentsToolbar;
     private RecyclerView commentsRecyclerView;
     private CommentsAdapter commentsAdapter;
     private EditText messageView;
@@ -80,6 +83,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
 
         initPostView();
 
+        initCommentsToolbar();
         initCommentsRecycler();
         initSendButton();
         initMessageView();
@@ -101,6 +105,33 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         postItem.hideDeleteMenuItem();
         postItem.hideEditMenuItem();
         postItem.hideForwardMenuItem();
+    }
+
+    private void initCommentsToolbar()
+    {
+        commentsToolbar = binding.commentsToolbar;
+
+        commentsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item)
+    {
+        CommentsAdapter commentsAdapter = (CommentsAdapter) commentsRecyclerView.getAdapter();
+        if (commentsAdapter == null) return false;
+        switch (item.getItemId())
+        {
+            case R.id.menu_posts_reverse:
+                return commentsAdapter.reverse();
+            case R.id.menu_sort_by_rates:
+                return commentsAdapter.sortByAppreciations();
+            case R.id.menu_sort_by_date:
+                return commentsAdapter.sortByDate();
+            case R.id.menu_sort_by_comments:
+                return commentsAdapter.sortByComments();
+            default:
+                return false;
+        }
     }
 
     private void initCommentsRecycler()
@@ -131,13 +162,6 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
         sendButton.setOnClickListener(this::onSendButtonClick);
     }
 
-    private void initMessageView()
-    {
-        messageView = binding.messageView;
-
-        messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, sendButton));
-    }
-
     private void onSendButtonClick(View view)
     {
         var postView = viewModel.postItem;
@@ -160,5 +184,12 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding> impl
                                .add(commentId);
 
         messageText.clear();
+    }
+
+    private void initMessageView()
+    {
+        messageView = binding.messageView;
+
+        messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, sendButton));
     }
 }

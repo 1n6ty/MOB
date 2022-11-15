@@ -126,6 +126,11 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         return new AddressItem(mainActivity, this, new AddressImpl());
     }
 
+    public void notifyItemChanged(AddressItem addressItem)
+    {
+        notifyItemChanged(addressItemList.indexOf(addressItem));
+    }
+
     @Override
     public int getItemCount()
     {

@@ -5,7 +5,6 @@ import android.database.Observable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.mobv2.adapters.abstractions.AdapterHelper;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;

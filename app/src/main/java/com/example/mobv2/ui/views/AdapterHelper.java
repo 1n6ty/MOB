@@ -1,6 +1,4 @@
-package com.example.mobv2.adapters.abstractions;
-
-import com.example.mobv2.ui.views.MarkerView;
+package com.example.mobv2.ui.views;
 
 public class AdapterHelper
 {

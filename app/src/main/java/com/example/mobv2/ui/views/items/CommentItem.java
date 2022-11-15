@@ -353,7 +353,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
                                                             .remove(comment.getId());
             commentsAdapter.deleteComment(CommentItem.this);
 
-            // delete from local db
+            commentDao.delete(comment);
             mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);
 
             Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)

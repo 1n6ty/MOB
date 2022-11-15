@@ -16,6 +16,9 @@
         <item name="colorToolbarTitle">@color/white</item>
         <item name="colorToolbarSubtitle">@color/white</item>
         <item name="colorToolbarIcon">@color/white</item>
+        <item name="colorAlternativeToolbarTitle">@color/gray_700</item>
+        <item name="colorAlternativeToolbarSubtitle">@color/gray_700</item>
+        <item name="colorAlternativeToolbarIcon">@color/gray_700</item>
         <item name="backgroundMainToolbar">@color/white</item>
         <item name="colorMainToolbarTitle">@color/gray_500</item>
         <item name="colorMarkerCreatorToolbarTitle">@color/gray_700</item>

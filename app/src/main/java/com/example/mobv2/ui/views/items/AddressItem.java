@@ -77,6 +77,7 @@ public class AddressItem implements Item<ItemAddressBinding>
         var mainFragmentViewModel =
                 new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
         mainFragmentViewModel.setAddressChanged(true);
+        addressesAdapter.notifyItemChanged(this);
     }
 
     public class AddressItemHelper

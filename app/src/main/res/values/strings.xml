@@ -49,7 +49,7 @@
     <string name="menu_delete">Delete</string>
 
     <!--  menu item sorts  -->
-    <string name="menu_sort_by_appreciations">Sort by appreciations</string>
+    <string name="menu_sort_by_rates">Sort by rates</string>
     <string name="menu_sort_by_date">Sort by date</string>
     <string name="menu_sort_by_comments">Sort by comments</string>
 

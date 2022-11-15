@@ -5,27 +5,24 @@
     <item
         android:id="@+id/menu_posts_refresh"
         android:icon="@drawable/ic_refresh"
-        android:iconTint="?colorToolbarIcon"
         android:title=""
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/menu_posts_reverse"
         android:icon="@drawable/ic_arrow_down"
-        android:iconTint="?colorToolbarIcon"
         android:title=""
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/menu_show_more"
         android:icon="@drawable/ic_show_more"
-        android:iconTint="?colorToolbarIcon"
         android:title=""
         app:showAsAction="ifRoom">
         <menu>
             <item
-                android:id="@+id/menu_sort_by_appreciations"
-                android:title="@string/menu_sort_by_appreciations" />
+                android:id="@+id/menu_sort_by_rates"
+                android:title="@string/menu_sort_by_rates" />
             <item
                 android:id="@+id/menu_sort_by_date"
                 android:title="@string/menu_sort_by_date" />

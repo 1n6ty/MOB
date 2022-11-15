@@ -40,7 +40,7 @@ import serverapi.MOBServerAPI;
 
 public class MainActivity extends ThemedActivity implements RefreshTokenOkCallback
 {
-    private static final String ip = "http://192.168.0.104:8000";
+    private static final String ip = "http://192.168.78.28:8000";
 
     //WARNING UNSAFE
     public static String token = "";

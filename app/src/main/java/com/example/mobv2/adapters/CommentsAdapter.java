@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapters.abstractions.AbleToAdd;
+import com.example.mobv2.adapters.abstractions.AbleToReverse;
+import com.example.mobv2.adapters.abstractions.AbleToSortByUserWills;
 import com.example.mobv2.callbacks.GetCommentCallback;
 import com.example.mobv2.callbacks.abstractions.GetCommentOkCallback;
 import com.example.mobv2.databinding.ItemCommentBinding;
@@ -21,9 +23,12 @@ import com.example.mobv2.ui.views.items.CommentItem;
 import com.example.mobv2.utils.MyObservableArrayList;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.Collections;
+
 import localdatabase.daos.CommentDao;
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder> implements AbleToAdd<CommentImpl>, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
+        implements AbleToAdd<CommentImpl>, AbleToReverse, AbleToSortByUserWills, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
 {
     private final CommentDao commentDao;
 
@@ -57,7 +62,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             }
 
             @Override
-            public void onRemoved(int index, Object o)
+            public void onRemoved(int index,
+                                  Object o)
             {
                 notifyItemRemoved(index);
             }
@@ -127,7 +133,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var comment = commentDao.getById(commentId);
         if (comment == null)
         {
-            Toast.makeText(mainActivity, "Comments is not uploaded", Toast.LENGTH_LONG).show();
+            Toast.makeText(mainActivity, "Comments is not uploaded", Toast.LENGTH_LONG)
+                 .show();
             return;
         }
 
@@ -164,7 +171,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     {
         var date = comment.getDate();
         var commentItem = new CommentItem(mainActivity, this, comment);
-        if (commentItemList.isEmpty() || date.compareTo(commentItemList.get(commentItemList.size() - 1).commentItemHelper.getDate()) < 0)
+        if (commentItemList.isEmpty() || date.compareTo(commentItemList.get(commentItemList.size() - 1).commentItemHelper.getDate()) <= 0)
         {
             commentItemList.add(commentItem);
             return commentItem;
@@ -173,7 +180,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         for (int i = 0; i < commentItemList.size(); i++)
         {
             var currentDate = commentItemList.get(i).commentItemHelper.getDate();
-            if (date.compareTo(currentDate) >= 0)
+            if (date.compareTo(currentDate) > 0)
             {
                 commentItemList.add(i, commentItem);
                 return commentItem;
@@ -182,6 +189,60 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
         return null;
     }
+
+    @Override
+    public boolean reverse()
+    {
+        Collections.reverse(commentItemList);
+        notifyItemRangeChanged(0, commentItemList.size());
+        return true;
+    }
+
+    @Override
+    public boolean sortByAppreciations()
+    {
+        Collections.sort(commentItemList, (commentItem, nextCommentItem) ->
+        {
+            var commentPositiveRates = commentItem.commentItemHelper.getPositiveRates();
+            var commentNegativeRates = commentItem.commentItemHelper.getNegativeRates();
+            var nextCommentPositiveRates = nextCommentItem.commentItemHelper.getPositiveRates();
+            var nextCommentNegativeRates = nextCommentItem.commentItemHelper.getNegativeRates();
+
+            return Integer.compare(nextCommentPositiveRates.size() - nextCommentNegativeRates.size(),
+                    commentPositiveRates.size() - commentNegativeRates.size());
+        });
+        notifyItemRangeChanged(0, commentItemList.size());
+        return true;
+    }
+
+    @Override
+    public boolean sortByDate()
+    {
+        Collections.sort(commentItemList, (commentItem, nextCommentItem) ->
+        {
+            var nextPostItemHelperDate = nextCommentItem.commentItemHelper.getDate();
+            var postItemHelperDate = commentItem.commentItemHelper.getDate();
+
+            return (nextPostItemHelperDate.compareTo(postItemHelperDate));
+        });
+        notifyItemRangeChanged(0, commentItemList.size());
+        return true;
+    }
+
+    @Override
+    public boolean sortByComments()
+    {
+        Collections.sort(commentItemList, (commentItem, nextCommentItem) ->
+        {
+            var nextPostItemHelperCommentIds = nextCommentItem.commentItemHelper.getCommentIds();
+            var postItemHelperCommentIds = commentItem.commentItemHelper.getCommentIds();
+
+            return Integer.compare(nextPostItemHelperCommentIds.size(), postItemHelperCommentIds.size());
+        });
+        notifyItemRangeChanged(0, commentItemList.size());
+        return true;
+    }
+
 
     public void deleteComment(CommentItem commentItem)
     {

@@ -4,6 +4,9 @@
     <attr name="colorToolbarTitle" format="color" />
     <attr name="colorToolbarSubtitle" format="color" />
     <attr name="colorToolbarIcon" format="color" />
+    <attr name="colorAlternativeToolbarTitle" format="color" />
+    <attr name="colorAlternativeToolbarSubtitle" format="color" />
+    <attr name="colorAlternativeToolbarIcon" format="color" />
     <attr name="backgroundMainToolbar" format="color" />
     <attr name="colorMainToolbarTitle" format="color" />
     <attr name="colorMarkerCreatorToolbarTitle"  format="color" />

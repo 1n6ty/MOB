@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHolder>
-        implements AbleToReverse, AbleToSortByUserWills, AbleToAdd<PostImpl>
+        implements AbleToAdd<PostImpl>, AbleToReverse, AbleToSortByUserWills
 {
     private final MainActivity mainActivity;
 
@@ -54,7 +54,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             }
 
             @Override
-            public void onRemoved(int index, Object o)
+            public void onRemoved(int index,
+                                  Object o)
             {
                 notifyItemRemoved(index);
             }
@@ -112,7 +113,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     {
         Date date = post.getDate();
         PostItem postItem = new PostItem(mainActivity, this, post);
-        if (postItemList.isEmpty() || date.compareTo(postItemList.get(postItemList.size() - 1).postItemHelper.getDate()) < 0)
+        if (postItemList.isEmpty() || date.compareTo(postItemList.get(postItemList.size() - 1).postItemHelper.getDate()) <= 0)
         {
             postItemList.add(postItem);
             return postItem;
@@ -121,7 +122,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         for (int i = 0; i < postItemList.size(); i++)
         {
             Date currentDate = postItemList.get(i).postItemHelper.getDate();
-            if (date.compareTo(currentDate) >= 0)
+            if (date.compareTo(currentDate) > 0)
             {
                 postItemList.add(i, postItem);
                 return postItem;
@@ -145,9 +146,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         Collections.sort(postItemList, (postItem, nextPostItem) ->
         {
             var postPositiveRates = postItem.postItemHelper.getPositiveRates();
+            var postNegativeRates = postItem.postItemHelper.getNegativeRates();
             var nextPostPositiveRates = nextPostItem.postItemHelper.getPositiveRates();
+            var nextPostNegativeRates = nextPostItem.postItemHelper.getNegativeRates();
 
-            return Integer.compare(nextPostPositiveRates.size(), postPositiveRates.size());
+            return Integer.compare(nextPostPositiveRates.size() - nextPostNegativeRates.size(),
+                    postPositiveRates.size() - postNegativeRates.size());
         });
         notifyItemRangeChanged(0, postItemList.size());
         return true;
