@@ -33,7 +33,7 @@ public class MarkerInfoImpl implements MarkerInfo
     @TypeConverters(LatLngConverter.class)
     private LatLng latLng;
 
-    private String postId;
+    private String addressId;
     private int markerType;
 
     @Ignore
@@ -45,30 +45,35 @@ public class MarkerInfoImpl implements MarkerInfo
     }
 
     @Ignore
-    public MarkerInfoImpl(LatLng latLng,
-                          int markerType)
-    {
-        this(TITLE_DEFAULT, latLng, markerType);
-    }
-
-    @Ignore
-    public MarkerInfoImpl(String title,
+    public MarkerInfoImpl(String id,
                           LatLng latLng,
                           int markerType)
     {
+        this(id, TITLE_DEFAULT, latLng, markerType);
+    }
+
+    @Ignore
+    public MarkerInfoImpl(String id,
+                          String title,
+                          LatLng latLng,
+                          int markerType)
+    {
+        this.id = id;
         this.title = title;
         this.latLng = latLng;
         this.markerType = markerType;
     }
 
-    public MarkerInfoImpl(String title,
+    public MarkerInfoImpl(String id,
+                          String title,
                           LatLng latLng,
-                          String postId,
+                          String addressId,
                           int markerType)
     {
+        this.id = id;
         this.title = title;
         this.latLng = latLng;
-        this.postId = postId;
+        this.addressId = addressId;
         this.markerType = markerType;
     }
 
@@ -82,6 +87,7 @@ public class MarkerInfoImpl implements MarkerInfo
 
     public static class MarkerInfoBuilder implements ParsableFromMap<MarkerInfoImpl>
     {
+        private String id;
         private String title;
         private LatLng position;
 
@@ -89,10 +95,16 @@ public class MarkerInfoImpl implements MarkerInfo
         @Override
         public MarkerInfoImpl parseFromMap(@NonNull Map<String, Object> map)
         {
+            parseIdFromMap(map);
             setTitleByDefault();
             parsePositionFromMap(map);
 
-            return new MarkerInfoImpl(title, position, SUB_ADDRESS_MARKER);
+            return new MarkerInfoImpl(id, title, position, SUB_ADDRESS_MARKER);
+        }
+
+        private void parseIdFromMap(Map<String, Object> map)
+        {
+            id = (String) map.get("post_id");
         }
 
         private void setTitleByDefault()
@@ -114,11 +126,6 @@ public class MarkerInfoImpl implements MarkerInfo
         return id;
     }
 
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
     public String getTitle()
     {
         return title;
@@ -134,14 +141,14 @@ public class MarkerInfoImpl implements MarkerInfo
         return markerType;
     }
 
-    public void setPostId(String postId)
+    public String getAddressId()
     {
-        this.postId = postId;
+        return addressId;
     }
 
-    public String getPostId()
+    public void setAddressId(String addressId)
     {
-        return postId;
+        this.addressId = addressId;
     }
 
     public boolean isClicked()

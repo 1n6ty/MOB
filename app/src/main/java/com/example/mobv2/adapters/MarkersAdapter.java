@@ -153,8 +153,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         String postId = String.valueOf(((Double) map.get("id")).intValue());
         double x = latLng.latitude;
         double y = latLng.longitude;
-        var markerInfo = new MarkerInfoImpl(new LatLng(x, y), MarkerInfoImpl.SUB_ADDRESS_MARKER);
-        markerInfo.setPostId(postId);
+        var markerInfo = new MarkerInfoImpl(postId, new LatLng(x, y), MarkerInfoImpl.SUB_ADDRESS_MARKER);
 
         addElement(markerInfo);
     }

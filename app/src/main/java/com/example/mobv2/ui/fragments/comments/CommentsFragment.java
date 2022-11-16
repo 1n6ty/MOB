@@ -27,12 +27,14 @@ import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.fragments.BaseFragment;
 import com.example.mobv2.utils.MessageViewTextWatcher;
 
+import localdatabase.daos.CommentDao;
 import localdatabase.daos.UserDao;
 
 public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         implements HavingToolbar, Toolbar.OnMenuItemClickListener, CommentOkCallback
 {
     private CommentsFragmentViewModel viewModel;
+    private CommentDao commentDao;
     private UserDao userDao;
 
     private Toolbar toolbar;
@@ -55,12 +57,18 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     {
         var view = super.onCreateView(inflater, container, savedInstanceState);
 
+        initCommentDao();
         initUserDao();
 
         initViewModel();
         binding.setBindingContext(viewModel);
 
         return view;
+    }
+
+    private void initCommentDao()
+    {
+        commentDao = mainActivity.appDatabase.commentDao();
     }
 
     private void initUserDao()
@@ -142,15 +150,6 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         commentsAdapter =
                 new CommentsAdapter(mainActivity, binding.nestedScrollView, postItem.postItemHelper);
         commentsRecyclerView.setAdapter(commentsAdapter);
-
-//        var post = viewModel.postItem
-//                            .getPost();
-//
-//        for (String commentId : post.getCommentsIds())
-//        {
-//            MainActivity.MOB_SERVER_API.getComment(new GetCommentCallback(mainActivity, commentsRecycler),
-//                    commentId, MainActivity.token);
-//        }
     }
 
     private void initSendButton()
@@ -179,6 +178,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
         var comment =
                 CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText.toString());
+
+        commentDao.insert(comment);
         commentsAdapter.addElement(comment);
         postView.postItemHelper.getCommentIds()
                                .add(commentId);

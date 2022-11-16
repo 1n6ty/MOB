@@ -7,15 +7,13 @@ public interface MarkerInfo extends Comparable<MarkerInfo>
 {
     String getId();
 
-    void setId(String id);
-
     String getTitle();
 
     LatLng getLatLng();
 
     int getMarkerType();
 
-    String getPostId();
+    String getAddressId();
 
     boolean isClicked();
 

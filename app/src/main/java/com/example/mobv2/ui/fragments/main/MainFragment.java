@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,14 +26,13 @@ import com.example.mobv2.callbacks.GetMarkersCallback;
 import com.example.mobv2.callbacks.SetAddressCallback;
 import com.example.mobv2.callbacks.abstractions.GetMarkersOkCallback;
 import com.example.mobv2.databinding.FragmentMainBinding;
-import com.example.mobv2.models.AddressImpl;
 import com.example.mobv2.models.MarkerInfoImpl;
 import com.example.mobv2.ui.abstractions.HavingToolbar;
 import com.example.mobv2.ui.activities.MainActivity;
 import com.example.mobv2.ui.callbacks.PostsSheetCallback;
 import com.example.mobv2.ui.fragments.BaseFragment;
-import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.example.mobv2.ui.views.MapView;
+import com.example.mobv2.ui.views.navigationdrawer.NavDrawer;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -40,14 +40,16 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.internal.LinkedTreeMap;
 
 import localdatabase.daos.AddressDao;
+import localdatabase.daos.MarkerInfoDao;
 import localdatabase.daos.UserDao;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
         implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback, GetMarkersOkCallback
 {
     private MainFragmentViewModel viewModel;
-    private UserDao userDao;
     private AddressDao addressDao;
+    private MarkerInfoDao markerInfoDao;
+    private UserDao userDao;
 
     private Toolbar toolbar;
     private NavDrawer navDrawer;
@@ -71,7 +73,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         var view = super.onCreateView(inflater, container, savedInstanceState);
 
-        initUserAndAddress();
+        initAddressDao();
+        initMarkerInfoDao();
+        initUserDao();
 
         initViewModel();
         binding.setBindingContext(viewModel);
@@ -79,15 +83,24 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         return view;
     }
 
+    private void initAddressDao()
+    {
+        addressDao = mainActivity.appDatabase.addressDao();
+    }
+
+    private void initMarkerInfoDao()
+    {
+        markerInfoDao = mainActivity.appDatabase.markerInfoDao();
+    }
+
+    private void initUserDao()
+    {
+        userDao = mainActivity.appDatabase.userDao();
+    }
+
     private void initViewModel()
     {
         viewModel = new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
-    }
-
-    private void initUserAndAddress()
-    {
-        userDao = mainActivity.appDatabase.userDao();
-        addressDao = mainActivity.appDatabase.addressDao();
     }
 
     @Override
@@ -125,8 +138,8 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                 {
                     int size = ((Float) mainActivity.getResources()
                                                     .getDimension(R.dimen.icon_size)).intValue();
-                    Bitmap bitmap = Bitmap.createScaledBitmap(resource, size, size, false);
-                    Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                    var bitmap = Bitmap.createScaledBitmap(resource, size, size, false);
+                    var drawable = new BitmapDrawable(getResources(), bitmap);
                     toolbar.setNavigationIcon(drawable);
                 }
 
@@ -141,8 +154,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void initMap()
     {
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        var mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null)
         {
             mapFragment.getMapAsync(this::onMapReady);
@@ -164,7 +176,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void fillMap()
     {
-        AddressImpl currentAddress = addressDao.getCurrentOne();
+        var currentAddress = addressDao.getCurrentOne();
         if (currentAddress != null)
         {
             var addressString = currentAddress.toString();
@@ -177,6 +189,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
             // add other markers
             var callback = new GetMarkersCallback(mainActivity);
             callback.setOkCallback(this::parseMarkerInfosFromMapAndAddToMarkerInfoList);
+            callback.setFailCallback(this::getMarkerInfosByCurrentAddressIdFromLocalDbAndAddToMarkerInfoList);
 
             mainActivity.mobServerAPI.getMarks(callback, MainActivity.token);
             markersAdapter.animateCameraTo(currentAddress.getLatLng());
@@ -189,9 +202,27 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         for (var postId : map.keySet())
         {
             var markerMap = (LinkedTreeMap<String, Object>) map.get(postId);
+            markerMap.put("post_id", postId);
             var markerInfo = new MarkerInfoImpl.MarkerInfoBuilder().parseFromMap(markerMap);
-            markerInfo.setPostId(postId);
+            markerInfo.setAddressId(addressDao.getCurrentId());
 
+            markerInfoDao.insert(markerInfo);
+            markersAdapter.addElement(markerInfo);
+        }
+    }
+
+    private void getMarkerInfosByCurrentAddressIdFromLocalDbAndAddToMarkerInfoList()
+    {
+        var markerInfos = markerInfoDao.getAllByAddressId(addressDao.getCurrentId());
+        if (markerInfos == null || markerInfos.isEmpty())
+        {
+            Toast.makeText(mainActivity, "Markers are not uploaded", Toast.LENGTH_LONG)
+                 .show();
+            return;
+        }
+
+        for (var markerInfo : markerInfos)
+        {
             markersAdapter.addElement(markerInfo);
         }
     }

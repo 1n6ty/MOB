@@ -133,7 +133,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         var comment = commentDao.getById(commentId);
         if (comment == null)
         {
-            Toast.makeText(mainActivity, "Comments is not uploaded", Toast.LENGTH_LONG)
+            Toast.makeText(mainActivity, "Comment is not uploaded", Toast.LENGTH_LONG)
                  .show();
             return;
         }

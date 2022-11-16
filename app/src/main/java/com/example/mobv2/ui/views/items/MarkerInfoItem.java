@@ -1,5 +1,7 @@
 package com.example.mobv2.ui.views.items;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.example.mobv2.R;
@@ -51,8 +53,6 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
     @Override
     public void refreshItemBinding(@NonNull MarkerView markerView)
     {
-        markerInfoItemHelper.setId(markerView.getId());
-
         markerView.setTitle(markerInfoItemHelper.getTitle());
         markerView.setPosition(markerInfoItemHelper.getLatLng());
 
@@ -84,7 +84,7 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
 
     public void addPostToPostsThroughServer()
     {
-        String postId = markerInfoItemHelper.getPostId();
+        String postId = markerInfoItemHelper.getId();
 
         var callback = new GetPostCallback(mainActivity);
         callback.setOkCallback(this::parsePostFromMapAndAddToPosts);
@@ -105,6 +105,12 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
     private void getPostByIdFromLocalDbAndAddToPosts(String postId)
     {
         var post = postDao.getById(postId);
+        if (post == null)
+        {
+            Toast.makeText(mainActivity, "Post is not uploaded", Toast.LENGTH_LONG)
+                 .show();
+            return;
+        }
         PostItem postItem = postsAdapter.addElementAndGetItem(post);
         postItem.postItemHelper.setMarkerInfoItemHelper(markerInfoItemHelper);
         markersAdapter.scrollToStartPosition();
@@ -132,16 +138,12 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         public void delete()
         {
             markersAdapter.deleteMarkerInfoItem(MarkerInfoItem.this);
+            markerInfoDao.delete(markerInfo);
         }
 
         public String getId()
         {
             return markerInfo.getId();
-        }
-
-        public void setId(String id)
-        {
-            markerInfo.setId(id);
         }
 
         public String getTitle()
@@ -151,17 +153,13 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
 
         public LatLng getLatLng()
         {
-            return markerInfo.getLatLng();
+            var latLng = markerInfo.getLatLng();
+            return latLng == null ? new LatLng(0, 0) : latLng;
         }
 
         public int getMarkerType()
         {
             return markerInfo.getMarkerType();
-        }
-
-        public String getPostId()
-        {
-            return markerInfo.getPostId();
         }
 
         public boolean isClicked()
