@@ -30,6 +30,7 @@ import localdatabase.daos.CommentDao;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
         implements AbleToAdd<CommentImpl>, AbleToReverse, AbleToSortByUserWills, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
 {
+    private final int maxUploadedCommentsCount = 6;
     private final CommentDao commentDao;
 
     private final MainActivity mainActivity;
@@ -78,7 +79,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         commentDao = mainActivity.appDatabase.commentDao();
 
         var commentsIds = havingCommentsIds.getCommentIds();
-        for (int i = 0; i < Math.min(commentsIds.size(), 4); i++)
+        for (int i = 0; i < Math.min(commentsIds.size(), maxUploadedCommentsCount); i++)
         {
             getCommentByIndex(commentsIds.size() - 1 - i);
         }
@@ -243,6 +244,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         return true;
     }
 
+    public void scrollTo(int x, int y)
+    {
+        nestedScrollView.scrollTo(x, y);
+    }
 
     public void deleteComment(CommentItem commentItem)
     {

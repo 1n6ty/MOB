@@ -16,7 +16,6 @@
         android:title="@string/menu_goto_post"
         app:showAsAction="never" />
 
-    <!--  For user item's creator  -->
     <item
         android:id="@+id/menu_edit"
         android:title="@string/menu_edit"

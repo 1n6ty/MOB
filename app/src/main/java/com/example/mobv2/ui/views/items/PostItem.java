@@ -117,7 +117,7 @@ public class PostItem implements Item<ItemPostBinding>
         var contextThemeWrapper =
                 new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
-        popupMenu.inflate(R.menu.menu_user_item);
+        popupMenu.inflate(R.menu.menu_item_post);
 
         initMenu(popupMenu);
         popupMenu.show();

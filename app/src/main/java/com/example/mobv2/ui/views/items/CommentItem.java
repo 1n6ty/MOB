@@ -53,6 +53,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private final CommentsAdapter commentsAdapter;
     private final ReactionsAdapter reactionsAdapter;
 
+    private CommentsAdapter innerCommentsAdapter;
+
     public final CommentItemHelper commentItemHelper;
 
     private ItemCommentBinding commentBinding;
@@ -85,6 +87,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     {
         this.commentBinding = commentBinding;
         var parentView = commentBinding.getRoot();
+        innerCommentsAdapter = (CommentsAdapter) commentBinding.commentsRecyclerView.getAdapter(); // todo finish him
 
         initInfo();
 
@@ -117,7 +120,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         var contextThemeWrapper =
                 new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, commentBinding.userInfoLayout);
-        popupMenu.inflate(R.menu.menu_user_item);
+        popupMenu.inflate(R.menu.menu_item_comment);
 
         initMenu(popupMenu);
         popupMenu.show();
@@ -295,7 +298,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
         var comment =
                 CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText.toString());
-        commentsAdapter.addElement(comment);
+        innerCommentsAdapter.addElement(comment);
         commentItemHelper.havingCommentsIds.getCommentIds()
                                            .add(commentId);
 
@@ -349,8 +352,11 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
         public boolean delete()
         {
-            if (havingCommentsIds != null) havingCommentsIds.getCommentIds()
-                                                            .remove(comment.getId());
+            if (havingCommentsIds != null)
+            {
+                havingCommentsIds.getCommentIds()
+                                 .remove(comment.getId());
+            }
             commentsAdapter.deleteComment(CommentItem.this);
 
             commentDao.delete(comment);
@@ -422,7 +428,10 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private void switchMenuItemVisibility(int menuItemId,
                                           boolean visible)
     {
-        if (menu != null) menu.findItem(menuItemId)
-                              .setVisible(visible);
+        if (menu != null)
+        {
+            menu.findItem(menuItemId)
+                .setVisible(visible);
+        }
     }
 }
