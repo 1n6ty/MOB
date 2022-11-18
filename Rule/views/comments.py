@@ -127,7 +127,7 @@ def deleteComment(req):
         comment = address.comments.filter(id = comment_id).all()
         if comment.count() > 0:
             comment = comment[0]
-            comments2delete = [comment, *list(comment.comments.all())]
+            comments2delete = [comment]
             ind = 0
             while ind < len(comments2delete):
                 if comments2delete[ind].comments.all().count() == 0:
