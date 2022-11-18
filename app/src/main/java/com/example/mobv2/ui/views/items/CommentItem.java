@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -60,9 +61,11 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private ItemCommentBinding commentBinding;
 
     private RatesGroup ratesGroup;
+    private TextView replyButton;
     private ImageButton showReactionsButton;
     private RecyclerView reactionsRecyclerView;
     private AppCompatButton showCommentsButton;
+    private RecyclerView innerCommentsRecyclerView;
     private ImageButton sendButton;
     private EditText messageView;
 
@@ -87,16 +90,21 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     {
         this.commentBinding = commentBinding;
         var parentView = commentBinding.getRoot();
-        innerCommentsAdapter = (CommentsAdapter) commentBinding.commentsRecyclerView.getAdapter(); // todo finish him
 
         initInfo();
 
         parentView.setOnClickListener(this::onItemViewClick);
 
         initRatesGroup();
+        initReplyButton();
         initShowReactionsButton();
         initReactionsRecyclerView();
         initShowCommentsButton();
+        innerCommentsRecyclerView = commentBinding.commentsRecyclerView;
+        innerCommentsAdapter =
+                new CommentsAdapter(mainActivity, commentBinding.nestedScrollView, commentItemHelper);
+        innerCommentsRecyclerView.setAdapter(innerCommentsAdapter);
+        innerCommentsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
         initSendButton();
         initMessageView();
     }
@@ -154,6 +162,17 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
             default:
                 return false;
         }
+    }
+
+    private void initReplyButton()
+    {
+        replyButton = commentBinding.replyButton;
+        replyButton.setOnClickListener(this::onReplyButtonClick);
+    }
+
+    private void onReplyButtonClick(View view)
+    {
+
     }
 
     private void initRatesGroup()
@@ -249,8 +268,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private void initReactionsRecyclerView()
     {
         reactionsRecyclerView = commentBinding.reactionsRecyclerView;
-        reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         reactionsRecyclerView.setAdapter(reactionsAdapter);
+        reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
     }
 
     private void initShowCommentsButton()
@@ -265,12 +284,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     {
         view.setVisibility(View.GONE);
         var commentsLayout = commentBinding.commentsLayout;
-        var commentsRecyclerView = commentBinding.commentsRecyclerView;
 
-        var commentsAdapter =
-                new CommentsAdapter(mainActivity, commentBinding.nestedScrollView, commentItemHelper);
-        commentsRecyclerView.setAdapter(commentsAdapter);
-        commentsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
         commentsLayout.setVisibility(View.VISIBLE);
     }
 
@@ -288,7 +302,14 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         var messageText = messageView.getText();
         CommentCallback callback = new CommentCallback(mainActivity);
         callback.setOkCallback(this::createCommentByIdAndAddToCommentIds);
-        mainActivity.mobServerAPI.commentComment(callback, messageText.toString(), commentItemHelper.getId(), MainActivity.token);
+//        mainActivity.mobServerAPI.commentComment(callback, messageText.toString(), commentItemHelper.getId(), MainActivity.token);
+        var comment =
+                CommentImpl.createNewComment("0", userDao.getCurrentOne(), messageText.toString());
+        innerCommentsAdapter.addElement(comment);
+        commentItemHelper.havingCommentsIds.getCommentIds()
+                                           .add("0");
+
+        messageText.clear();
     }
 
     @Override

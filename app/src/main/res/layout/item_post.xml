@@ -144,9 +144,8 @@
                     <ImageButton
                         android:id="@+id/rate_up_button"
                         style="@style/postButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="32dp"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="@dimen/vertical_small_margin"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -157,14 +156,13 @@
                         style="@style/ratesTextStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="@dimen/vertical_small_margin"
                         android:text="@{Integer.toString(ratesCount)}"
                         tools:text="@string/menu_reaction_count" />
 
                     <ImageButton
                         android:id="@+id/rate_down_button"
                         style="@style/postButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="32dp"
                         android:layout_height="match_parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -185,13 +183,13 @@
                         style="@style/postButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="@dimen/vertical_small_margin"
                         app:tint="?colorHelpButtonIcon"
                         app:srcCompat="@drawable/ic_arrow_down" />
 
                     <LinearLayout
                         android:id="@+id/show_comments_button"
                         style="@style/commentButtonStyle"
+                        android:layout_marginLeft="@dimen/vertical_small_margin"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent">
 
