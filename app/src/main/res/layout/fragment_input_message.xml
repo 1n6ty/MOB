@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
-    android:focusable="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -14,14 +11,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?backgroundPrimaryWindow">
+        android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/comments_layout"
+            android:background="@android:color/transparent"
+            app:elevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -32,75 +29,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                android:background="@android:color/transparent"
                 app:navigationIcon="@drawable/ic_arrow"
-                app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
-                app:subtitle="@{@string/comments_count + ' ' + bindingContext.postItem.postItemHelper.commentsCount}" />
+                app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
         </com.google.android.material.appbar.AppBarLayout>
-
-        <LinearLayout
-            android:id="@+id/comments_layout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@+id/input_layout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/nested_scroll_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <include
-                        android:id="@+id/item_post"
-                        layout="@layout/item_post" />
-
-                    <com.google.android.material.appbar.AppBarLayout
-                        android:id="@+id/appBarLayout3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:elevation="0dp">
-
-                        <com.google.android.material.appbar.MaterialToolbar
-                            android:id="@+id/comments_toolbar"
-                            style="@style/nestedToolbarStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="?attr/actionBarSize"
-                            app:menu="@menu/menu_recycler_toolbar"
-                            app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
-                            app:title="@{@string/comments_count + ' ' + bindingContext.postItem.postItemHelper.commentsCount}" />
-                    </com.google.android.material.appbar.AppBarLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/comments_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="true"
-                        android:overScrollMode="ifContentScrolls"
-                        android:saveEnabled="true"
-                        android:scrollbars="none"
-                        tools:listitem="@layout/item_comment" />
-                </LinearLayout>
-            </androidx.core.widget.NestedScrollView>
-        </LinearLayout>
-
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/input_layout"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:background="?backgroundSecondaryWindow"
-            android:elevation="2dp"
+            android:elevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/comments_layout">
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageButton
                 android:id="@+id/reactions_button"

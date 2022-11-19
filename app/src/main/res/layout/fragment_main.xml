@@ -7,14 +7,14 @@
 
         <variable
             name="bindingContext"
-            type="com.example.mobv2.ui.fragments.main.MainFragmentViewModel" />
+            type="com.example.mobv2.ui.fragment.main.MainFragmentViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragments.main.MainFragment"
+        tools:context=".ui.fragment.main.MainFragment"
         tools:openDrawer="end">
 
         <androidx.constraintlayout.widget.ConstraintLayout

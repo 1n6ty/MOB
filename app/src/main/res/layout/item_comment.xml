@@ -96,7 +96,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
-                    <com.example.mobv2.ui.views.RatesGroup
+                    <com.example.mobv2.ui.view.RatesGroup
                         android:id="@+id/rates_group"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -133,7 +133,7 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/foreground_button_rate_down_selector" />
-                    </com.example.mobv2.ui.views.RatesGroup>
+                    </com.example.mobv2.ui.view.RatesGroup>
 
                     <TextView
                         android:id="@+id/reply_button"
@@ -198,7 +198,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -216,63 +216,18 @@
                             android:nestedScrollingEnabled="true"
                             android:overScrollMode="ifContentScrolls"
                             android:saveEnabled="true"
-                            android:scrollbars="none"
-                            tools:listitem="@layout/item_image" />
+                            android:scrollbars="none" />
                     </androidx.core.widget.NestedScrollView>
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/input_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="?actionBarSize"
-                        android:background="?backgroundSecondaryWindow"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/coordinator_layout">
-
-                        <ImageButton
-                            android:id="@+id/reactions_button"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_marginLeft="@dimen/horizontal_margin"
-                            android:background="@drawable/background_button_image_selector"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/message_view"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_emoji_insert"
-                            app:tint="?colorAccent" />
-
-                        <EditText
-                            android:id="@+id/message_view"
-                            style="@style/authPasswordTextStyle"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginHorizontal="@dimen/horizontal_small_margin"
-                            android:hint="@string/write_some_letters"
-                            android:importantForAutofill="no"
-                            android:inputType="text"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/send_button"
-                            app:layout_constraintStart_toEndOf="@+id/reactions_button"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <ImageButton
-                            android:id="@+id/send_button"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_marginRight="@dimen/horizontal_margin"
-                            android:background="@drawable/background_button_image_selector"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/message_view"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_send"
-                            app:tint="?colorAccent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/comment_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="To comment"
+                        android:textAppearance="@style/itemContentTextStyle"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/rates_group"
+                        app:layout_constraintTop_toTopOf="parent" />
                 </LinearLayout>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

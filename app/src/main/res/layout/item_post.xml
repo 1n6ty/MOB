@@ -132,7 +132,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/images_recycler_view">
 
-                <com.example.mobv2.ui.views.RatesGroup
+                <com.example.mobv2.ui.view.RatesGroup
                     android:id="@+id/rates_group"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -168,7 +168,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/foreground_button_rate_down_selector" />
-                </com.example.mobv2.ui.views.RatesGroup>
+                </com.example.mobv2.ui.view.RatesGroup>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

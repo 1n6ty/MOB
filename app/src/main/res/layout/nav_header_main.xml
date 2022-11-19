@@ -6,7 +6,7 @@
     <data>
         <variable
             name="bindingContext"
-            type="com.example.mobv2.ui.fragments.main.MainFragmentViewModel" />
+            type="com.example.mobv2.ui.fragment.main.MainFragmentViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
