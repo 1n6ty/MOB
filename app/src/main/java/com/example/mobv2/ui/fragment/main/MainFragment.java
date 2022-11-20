@@ -15,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -51,13 +50,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private MarkerInfoDao markerInfoDao;
     private UserDao userDao;
 
-    private Toolbar toolbar;
     private NavDrawer navDrawer;
     private BottomSheetBehavior<View> sheetBehavior;
-    private Toolbar postsToolbar;
-    private RecyclerView postsRecyclerView;
 
-    private MapView mapView;
     private MarkersAdapter markersAdapter;
 
     public MainFragment()
@@ -117,7 +112,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
+        var toolbar = binding.toolbar;
         super.initToolbar(toolbar, "", v -> navDrawer.open());
 
         navDrawer = new NavDrawer(mainActivity);
@@ -166,9 +161,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap)
     {
-        mapView = new MapView(googleMap);
+        var mapView = new MapView(googleMap);
         markersAdapter =
-                new MarkersAdapter(mainActivity, new MarkersAdapter.MarkersAdapterHelper(sheetBehavior, postsToolbar, postsRecyclerView));
+                new MarkersAdapter(mainActivity, new MarkersAdapter.MarkersAdapterHelper(sheetBehavior, binding.postsToolbar, binding.postsRecyclerView));
         mapView.setAdapter(markersAdapter);
 
         fillMap();
@@ -229,8 +224,6 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void initBottomSheet()
     {
-        postsToolbar = binding.postsToolbar;
-        postsRecyclerView = binding.postsRecyclerView;
         setPostsToolbarListeners();
 
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
@@ -243,11 +236,12 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
                                                 .getHeight() / 6);
         sheetBehavior.setHalfExpandedRatio(0.5f);
 
-        postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+        binding.postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     private void setPostsToolbarListeners()
     {
+        var postsToolbar = binding.postsToolbar;
         postsToolbar.setNavigationOnClickListener(view -> markersAdapter.onMapClick());
         postsToolbar.getMenu()
                     .findItem(R.id.menu_posts_refresh)
@@ -261,7 +255,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     @Override
     public boolean onMenuItemClick(MenuItem item)
     {
-        PostsAdapter postsAdapter = (PostsAdapter) postsRecyclerView.getAdapter();
+        PostsAdapter postsAdapter = (PostsAdapter) binding.postsRecyclerView.getAdapter();
         if (postsAdapter == null) return false;
         switch (item.getItemId())
         {

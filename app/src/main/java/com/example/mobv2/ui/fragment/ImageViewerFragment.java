@@ -3,11 +3,9 @@ package com.example.mobv2.ui.fragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentImageViewerBinding;
@@ -19,10 +17,7 @@ import java.util.List;
 public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding>
         implements HavingToolbar
 {
-    private Toolbar toolbar;
-
     private List<Image> images;
-    private ImageView imageView;
 
     public ImageViewerFragment(List<Image> images)
     {
@@ -43,14 +38,12 @@ public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
-        super.initToolbar(toolbar, images.get(0)
-                                         .getName());
+        super.initToolbar(binding.toolbar, images.get(0)
+                                                 .getName());
     }
 
     private void initImageView()
     {
-        imageView = binding.imageView;
         Image startImage = images.get(0);
 
         if (startImage.getType() == Image.IMAGE_ONLINE)
@@ -59,7 +52,7 @@ public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding
         }
         else if (startImage.getType() == Image.IMAGE_OFFLINE)
         {
-            imageView.setImageURI((Uri) startImage.getPath());
+            binding.imageView.setImageURI((Uri) startImage.getPath());
         }
 
     }

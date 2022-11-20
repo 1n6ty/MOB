@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,11 +34,6 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     private AddressDao addressDao;
     private UserDao userDao;
 
-    private EditText passwordView;
-    private EditText loginView;
-    private TextView errorLoginView;
-    private TextView errorPasswordView;
-
     public AuthFragment()
     {
         super(R.layout.fragment_auth);
@@ -55,21 +48,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         addressDao = mainActivity.appDatabase.addressDao();
         userDao = mainActivity.appDatabase.userDao();
 
-        initPhoneView();
-        initPasswordView();
         initNextButton();
-    }
-
-    private void initPhoneView()
-    {
-        loginView = binding.loginView;
-        errorLoginView = binding.errorLoginView;
-    }
-
-    private void initPasswordView()
-    {
-        passwordView = binding.passwordView;
-        errorPasswordView = binding.errorPasswordView;
     }
 
     private void initNextButton()
@@ -93,15 +72,15 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     private void onNextButtonClick(View view)
     {
         final int DELAY = 3000;
-        String loginText = loginView.getText()
+        String loginText = binding.loginView.getText()
                                     .toString()
                                     .trim();
-        String passwordText = passwordView.getText()
+        String passwordText = binding.passwordView.getText()
                                           .toString();
 
         View errorView;
-        if (loginText.isEmpty()) errorView = errorLoginView;
-        else if (passwordText.isEmpty()) errorView = errorPasswordView;
+        if (loginText.isEmpty()) errorView = binding.errorLoginView;
+        else if (passwordText.isEmpty()) errorView = binding.errorPasswordView;
         else errorView = null;
 
         if (errorView != null)

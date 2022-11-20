@@ -29,7 +29,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/vertical_small_margin"
+        android:layout_marginBottom="@dimen/vertical_very_small_margin"
         android:background="?backgroundSecondaryWindow"
         app:cardCornerRadius="0dp"
         app:cardElevation="4dp">
@@ -146,9 +146,6 @@
                         style="@style/postButtonStyle"
                         android:layout_width="32dp"
                         android:layout_height="match_parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/foreground_button_rate_up_selector" />
 
                     <TextView
@@ -164,9 +161,6 @@
                         style="@style/postButtonStyle"
                         android:layout_width="32dp"
                         android:layout_height="match_parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/foreground_button_rate_down_selector" />
                 </com.example.mobv2.ui.view.RatesGroup>
 
@@ -216,7 +210,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/horizontal_margin"
                 android:orientation="horizontal"
-                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_reaction" />
         </LinearLayout>

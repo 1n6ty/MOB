@@ -6,22 +6,19 @@ import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ContextThemeWrapper;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.ObservableInt;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.CommentsAdapter;
 import com.example.mobv2.adapter.ReactionsAdapter;
-import com.example.mobv2.callback.CommentCallback;
 import com.example.mobv2.callback.MOBAPICallbackImpl;
 import com.example.mobv2.callback.abstraction.CommentOkCallback;
 import com.example.mobv2.databinding.ItemCommentBinding;
@@ -31,8 +28,8 @@ import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.HavingCommentsIds;
 import com.example.mobv2.ui.abstraction.Item;
 import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.InputMessageFragment;
-import com.example.mobv2.ui.view.RatesGroup;
+import com.example.mobv2.ui.fragment.inputMessage.InputMessageFragment;
+import com.example.mobv2.ui.fragment.inputMessage.InputMessageFragmentViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,16 +54,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private ItemCommentBinding commentBinding;
 
-    private RatesGroup ratesGroup;
-    private TextView replyButton;
-    private ImageButton showReactionsButton;
-    private RecyclerView reactionsRecyclerView;
-    private AppCompatButton showCommentsButton;
-    private RecyclerView innerCommentsRecyclerView;
-
     private Menu menu;
-
-    private String messageText;
 
     public CommentItem(MainActivity mainActivity,
                        CommentsAdapter commentsAdapter,
@@ -92,16 +80,13 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
         parentView.setOnClickListener(this::onItemViewClick);
 
+        initCloseCommentsButton();
         initRatesGroup();
         initReplyButton();
         initShowReactionsButton();
         initReactionsRecyclerView();
         initShowCommentsButton();
-        innerCommentsRecyclerView = commentBinding.commentsRecyclerView;
-        innerCommentsAdapter =
-                new CommentsAdapter(mainActivity, commentBinding.nestedScrollView, commentItemHelper);
-        innerCommentsRecyclerView.setAdapter(innerCommentsAdapter);
-        innerCommentsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+        initCommentsRecyclerView();
     }
 
     private void initInfo()
@@ -159,43 +144,30 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         }
     }
 
-    private void initReplyButton()
+    private void initCloseCommentsButton()
     {
-        replyButton = commentBinding.replyButton;
-        replyButton.setOnClickListener(this::onReplyButtonClick);
+        commentBinding.closeCommentsButton.setOnClickListener(this::onCloseCommentsButtonClick);
     }
 
-    private void onReplyButtonClick(View view)
+    private void onCloseCommentsButtonClick(View view)
     {
-        var inputMessageFragment = new InputMessageFragment();
-        inputMessageFragment.setOnSendButtonClickListener(this::onSendButtonClick);
-        mainActivity.goToFragment(inputMessageFragment, 0, 0);
-    }
+        view.setVisibility(View.GONE);
+        commentBinding.showCommentsButton.setVisibility(View.VISIBLE);
 
-    private void onSendButtonClick(View view,
-                                   String text)
-    {
-        CommentCallback callback = new CommentCallback(mainActivity);
-        callback.setOkCallback(this::createCommentByIdAndAddToCommentIds);
-        messageText = text;
-        mainActivity.mobServerAPI.commentComment(callback, text, commentItemHelper.getId(), MainActivity.token);
-    }
-
-    @Override
-    public void createCommentByIdAndAddToCommentIds(String commentId)
-    {
-        var comment = CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText);
-        innerCommentsAdapter.addElement(comment);
-        commentItemHelper.getCommentIds()
-                         .add(commentId);
+        commentBinding.commentsRecyclerView.setVisibility(View.GONE);
     }
 
     private void initRatesGroup()
     {
-        ratesGroup = commentBinding.ratesGroup;
+        var ratesGroup = commentBinding.ratesGroup;
 
         var user = commentItemHelper.getUser();
         var userId = user.getId();
+
+        ratesGroup.getRateUpButton()
+                  .setSelected(false);
+        ratesGroup.getRateDownButton()
+                  .setSelected(false);
 
         if (commentItemHelper.getPositiveRates()
                              .contains(userId))
@@ -236,9 +208,43 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         if (!secondRates.remove(userId)) secondRates.add(userId);
     }
 
+    private void initReplyButton()
+    {
+        var replyButton = commentBinding.replyButton;
+        replyButton.setOnClickListener(this::onReplyButtonClick);
+    }
+
+    private void onReplyButtonClick(View view)
+    {
+        var viewModel =
+                new ViewModelProvider(mainActivity).get(InputMessageFragmentViewModel.class);
+
+        viewModel.setParentId(commentItemHelper.getId());
+        viewModel.setCreateCommentByIdAndAddToCommentIds(this::createCommentByIdAndTextAndAddToCommentIds);
+        if (!viewModel.getActive())
+        {
+            mainActivity.goToFragment(new InputMessageFragment(), 0, 0);
+        }
+    }
+
+    @Override
+    public void createCommentByIdAndTextAndAddToCommentIds(String commentId,
+                                                           String messageText)
+    {
+        var comment = CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText);
+        if (innerCommentsAdapter == null) initAdapterForInnerCommentsRecyclerView();
+        innerCommentsAdapter.addElement(comment);
+        commentItemHelper.getCommentIds()
+                         .add(commentId);
+    }
+
     private void initShowReactionsButton()
     {
-        showReactionsButton = commentBinding.showReactionsButton;
+        var showReactionsButton = commentBinding.showReactionsButton;
+
+        if (reactionsAdapter != null)
+            commentBinding.reactionsRecyclerView.setVisibility(View.VISIBLE);
+
         showReactionsButton.setOnClickListener(this::onShowReactionsViewClick);
         showReactionsButton.setOnLongClickListener(this::onShowReactionsViewLongClick);
     }
@@ -282,25 +288,53 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void initReactionsRecyclerView()
     {
-        reactionsRecyclerView = commentBinding.reactionsRecyclerView;
-        reactionsRecyclerView.setAdapter(reactionsAdapter);
+        var reactionsRecyclerView = commentBinding.reactionsRecyclerView;
         reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        if (reactionsAdapter != null) reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
     private void initShowCommentsButton()
     {
-        showCommentsButton = commentBinding.showCommentsButton;
-        showCommentsButton.setVisibility(commentItemHelper.getCommentsCount()
-                                                          .get() > 0 ? View.VISIBLE : View.GONE);
+        var showCommentsButton = commentBinding.showCommentsButton;
+
+        if (innerCommentsAdapter != null)
+        {
+            showCommentsButton.setVisibility(View.GONE);
+        }
+        else
+        {
+            showCommentsButton.setVisibility(commentItemHelper.getCommentsCount()
+                                                              .get() > 0
+                    ? View.VISIBLE
+                    : View.GONE);
+        }
+
         showCommentsButton.setOnClickListener(this::onShowCommentButtonClick);
     }
 
     private void onShowCommentButtonClick(View view)
     {
         view.setVisibility(View.GONE);
-        var commentsLayout = commentBinding.commentsLayout;
+        commentBinding.closeCommentsButton.setVisibility(View.VISIBLE);
 
-        commentsLayout.setVisibility(View.VISIBLE);
+        commentBinding.commentsRecyclerView.setVisibility(View.VISIBLE);
+
+        if (innerCommentsAdapter == null) initAdapterForInnerCommentsRecyclerView();
+    }
+
+    private void initAdapterForInnerCommentsRecyclerView()
+    {
+        innerCommentsAdapter =
+                new CommentsAdapter(mainActivity, commentBinding.nestedScrollView, commentItemHelper);
+        commentBinding.commentsRecyclerView.setAdapter(innerCommentsAdapter);
+    }
+
+    private void initCommentsRecyclerView()
+    {
+        var innerCommentsRecyclerView = commentBinding.commentsRecyclerView;
+        innerCommentsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+        if (innerCommentsAdapter != null)
+            innerCommentsRecyclerView.setAdapter(innerCommentsAdapter);
     }
 
     public class CommentItemHelper implements HavingCommentsIds

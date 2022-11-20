@@ -5,7 +5,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentNotificationAndSoundBinding;
@@ -14,8 +13,6 @@ import com.example.mobv2.ui.abstraction.HavingToolbar;
 public class NotificationAndSoundFragment extends BaseFragment<FragmentNotificationAndSoundBinding>
         implements HavingToolbar
 {
-    private Toolbar toolbar;
-
     public NotificationAndSoundFragment()
     {
         super(R.layout.fragment_notification_and_sound);
@@ -32,7 +29,6 @@ public class NotificationAndSoundFragment extends BaseFragment<FragmentNotificat
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
-        super.initToolbar(toolbar, R.string.menu_notification_and_sound);
+        super.initToolbar(binding.toolbar, R.string.menu_notification_and_sound);
     }
 }

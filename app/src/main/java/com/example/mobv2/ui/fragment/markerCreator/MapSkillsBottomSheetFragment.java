@@ -7,12 +7,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.databinding.FragmentMapSkillsBottomSheetBinding;
@@ -29,9 +27,6 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
     private MarkerCreatorViewModel viewModel;
 
     private FragmentMapSkillsBottomSheetBinding binding;
-    private Toolbar toolbar;
-    private Button createAddressMarkerButton;
-    private Button createSubAddressMarkerButton;
 
     @Nullable
     @Override
@@ -64,7 +59,7 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
     @Override
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
+        var toolbar = binding.toolbar;
 
         String secondaryAddressTitle = viewModel.getAddress()
                                                 .getSecondary();
@@ -83,9 +78,9 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
         var clipText = clipboard.getPrimaryClip()
                                 .getItemAt(0)
                                 .getText();
-        var subtitle = toolbar.getSubtitle()
-                              .toString()
-                              .replace(" : ", " ");
+        var subtitle = binding.toolbar.getSubtitle()
+                                      .toString()
+                                      .replace(" : ", " ");
         if (!clipText.equals(subtitle))
         {
             var clip = ClipData.newPlainText("simple text", subtitle);
@@ -98,16 +93,13 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
 
     private void initBodyView()
     {
-        createAddressMarkerButton = binding.createAddressMarkerButton;
-        createSubAddressMarkerButton = binding.createSubAddressMarkerButton;
-
-        createAddressMarkerButton.setOnClickListener(view ->
+        binding.createAddressMarkerButton.setOnClickListener(view ->
         {
             Toast.makeText(getContext(), "Not exist", Toast.LENGTH_LONG)
                  .show();
             dismiss();
         });
-        createSubAddressMarkerButton.setOnClickListener(view ->
+        binding.createSubAddressMarkerButton.setOnClickListener(view ->
         {
             ((MainActivity) getActivity()).goToFragment(new MarkerCreatorFragment());
             dismiss();

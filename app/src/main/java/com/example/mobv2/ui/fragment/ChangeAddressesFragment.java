@@ -4,13 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.AddressesAdapter;
@@ -26,11 +23,6 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         implements HavingToolbar
 {
     private AddressDao addressDao;
-
-    private Toolbar toolbar;
-    private RecyclerView addressesRecyclerView;
-    private ImageView noAddressesView;
-    private AddressesAdapter addressAdapter;
 
     public ChangeAddressesFragment()
     {
@@ -63,15 +55,13 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
-        super.initToolbar(toolbar, "Addresses");
+        super.initToolbar(binding.toolbar, "Addresses");
     }
 
     private void initAddressesRecycler()
     {
-        addressesRecyclerView = binding.addressesRecyclerView;
-        noAddressesView = binding.noAddressesView;
-        addressAdapter = new AddressesAdapter(mainActivity);
+        var addressesRecyclerView = binding.addressesRecyclerView;
+        var addressAdapter = new AddressesAdapter(mainActivity);
 
         addressesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         addressesRecyclerView.setAdapter(addressAdapter);
@@ -82,7 +72,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
             addressAdapter.addElement(address);
         }
 
-        noAddressesView.setVisibility(addressAdapter.getItemCount() < 1
+        binding.noAddressesView.setVisibility(addressAdapter.getItemCount() < 1
                 ? View.VISIBLE
                 : View.INVISIBLE);
     }

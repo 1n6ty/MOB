@@ -5,7 +5,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentMapFeaturesBinding;
@@ -14,8 +13,6 @@ import com.example.mobv2.ui.abstraction.HavingToolbar;
 public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding>
         implements HavingToolbar
 {
-    private Toolbar toolbar;
-
     public MapFeaturesFragment()
     {
         super(R.layout.fragment_map_features);
@@ -32,7 +29,6 @@ public class MapFeaturesFragment extends BaseFragment<FragmentMapFeaturesBinding
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
-        super.initToolbar(toolbar, R.string.menu_map_features);
+        super.initToolbar(binding.toolbar, R.string.menu_map_features);
     }
 }

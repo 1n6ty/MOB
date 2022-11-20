@@ -3,18 +3,14 @@ package com.example.mobv2.ui.fragment.markerCreator;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.ImagesAdapter;
@@ -42,12 +38,6 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
 
     private MarkerCreatorViewModel viewModel;
 
-    private Toolbar toolbar;
-    private EditText markerTitleView;
-    private EditText markerTextView;
-    private RecyclerView imagesRecyclerView;
-    private ImageView addImageButton;
-
     public MarkerCreatorFragment()
     {
         super(R.layout.fragment_marker_creator);
@@ -64,7 +54,6 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
 
         initToolbar();
 
-        initTextInfo();
         initImagesInfo();
         initConfirmAddingMarkerButton();
     }
@@ -77,22 +66,12 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
     @Override
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
-        super.initToolbar(toolbar, "Create marker");
-    }
-
-    private void initTextInfo()
-    {
-        markerTitleView = binding.markerTitleView;
-        markerTextView = binding.markerTextView;
+        super.initToolbar(binding.toolbar, "Create marker");
     }
 
     private void initImagesInfo()
     {
-        addImageButton = binding.addImageButton;
-        imagesRecyclerView = binding.imagesRecyclerView;
-
-        addImageButton.setOnClickListener(view ->
+        binding.addImageButton.setOnClickListener(view ->
         {
             launcher.launch("image/*");
         });
@@ -119,6 +98,7 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
         }
 
         ImagesAdapter adapter = new ImagesAdapter((MainActivity) getActivity(), images);
+        var imagesRecyclerView = binding.imagesRecyclerView;
         imagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         imagesRecyclerView.setAdapter(adapter);
     }
@@ -129,10 +109,10 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
                                  .getLatLng();
         MOBServerAPI.MOBAPICallback callback = viewModel.getCallback();
 
-        String text = markerTextView.getText()
-                                    .toString();
-        String title = markerTitleView.getText()
-                                      .toString();
+        String text = binding.markerTextView.getText()
+                                            .toString();
+        String title = binding.markerTitleView.getText()
+                                              .toString();
         mainActivity.mobServerAPI.post(callback, text, title, latLng.latitude, latLng.longitude, files.toArray(new File[0]), MainActivity.token);
 
         mainActivity.toPreviousFragment();

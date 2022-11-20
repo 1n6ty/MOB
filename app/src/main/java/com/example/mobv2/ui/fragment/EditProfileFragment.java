@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
@@ -18,8 +17,6 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
         implements HavingToolbar
 {
     private UserImpl user;
-
-    private Toolbar toolbar;
 
     public EditProfileFragment()
     {
@@ -44,11 +41,9 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
-
         MainActivity.loadImageInView(user.getAvatarUrl(), getView(), binding.avatarView);
 
-        AsyncTask.execute(() -> super.initToolbar(toolbar, user.getFullName()));
+        AsyncTask.execute(() -> super.initToolbar(binding.toolbar, user.getFullName()));
     }
 
     private void initSettingsPhoneNumberView()

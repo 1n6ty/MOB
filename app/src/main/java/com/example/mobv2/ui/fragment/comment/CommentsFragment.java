@@ -1,20 +1,16 @@
 package com.example.mobv2.ui.fragment.comment;
 
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.CommentsAdapter;
@@ -37,12 +33,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     private CommentDao commentDao;
     private UserDao userDao;
 
-    private Toolbar toolbar;
-    private Toolbar commentsToolbar;
-    private RecyclerView commentsRecyclerView;
     private CommentsAdapter commentsAdapter;
-    private EditText messageView;
-    private ImageButton sendButton;
 
     public CommentsFragment()
     {
@@ -99,9 +90,8 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     public void initToolbar()
     {
-        toolbar = binding.toolbar;
         var postItem = viewModel.postItem;
-        super.initToolbar(toolbar, postItem.postItemHelper.getTitle());
+        super.initToolbar(binding.toolbar, postItem.postItemHelper.getTitle());
     }
 
     private void initPostView()
@@ -117,15 +107,14 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     private void initCommentsToolbar()
     {
-        commentsToolbar = binding.commentsToolbar;
-
-        commentsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+        binding.commentsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item)
     {
-        CommentsAdapter commentsAdapter = (CommentsAdapter) commentsRecyclerView.getAdapter();
+        CommentsAdapter commentsAdapter =
+                (CommentsAdapter) binding.commentsRecyclerView.getAdapter();
         if (commentsAdapter == null) return false;
         switch (item.getItemId())
         {
@@ -145,7 +134,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     private void initCommentsRecycler()
     {
         var postItem = viewModel.postItem;
-        commentsRecyclerView = binding.commentsRecyclerView;
+        var commentsRecyclerView = binding.commentsRecyclerView;
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         commentsAdapter =
                 new CommentsAdapter(mainActivity, binding.nestedScrollView, postItem.postItemHelper);
@@ -154,7 +143,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     private void initSendButton()
     {
-        sendButton = binding.sendButton;
+        var sendButton = binding.sendButton;
         sendButton.setEnabled(false);
         sendButton.getDrawable()
                   .setTint(mainActivity.getAttributeColor(R.attr.colorHelpButtonIcon));
@@ -164,33 +153,32 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     private void onSendButtonClick(View view)
     {
         var postView = viewModel.postItem;
-        var messageText = messageView.getText();
-        CommentCallback callback = new CommentCallback(mainActivity);
-        callback.setOkCallback(this::createCommentByIdAndAddToCommentIds);
+        var messageText = binding.messageView.getText();
+        CommentCallback callback = new CommentCallback(mainActivity, messageText.toString());
+        callback.setOkCallback(this::createCommentByIdAndTextAndAddToCommentIds);
         mainActivity.mobServerAPI.commentPost(callback, messageText.toString(), postView.postItemHelper.getId(), MainActivity.token);
     }
 
     @Override
-    public void createCommentByIdAndAddToCommentIds(String commentId)
+    public void createCommentByIdAndTextAndAddToCommentIds(String commentId,
+                                                           String messageText)
     {
         var postView = viewModel.postItem;
-        Editable messageText = messageView.getText();
 
         var comment =
-                CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText.toString());
+                CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText);
 
         commentDao.insert(comment);
         commentsAdapter.addElement(comment);
         postView.postItemHelper.getCommentIds()
                                .add(commentId);
 
-        messageText.clear();
+        binding.messageView.getText()
+                           .clear();
     }
 
     private void initMessageView()
     {
-        messageView = binding.messageView;
-
-        messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, sendButton));
+        binding.messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, binding.sendButton));
     }
 }

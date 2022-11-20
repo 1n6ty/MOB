@@ -6,9 +6,6 @@ import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,7 +14,6 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
@@ -35,7 +31,6 @@ import com.example.mobv2.ui.abstraction.Item;
 import com.example.mobv2.ui.activity.MainActivity;
 import com.example.mobv2.ui.fragment.comment.CommentsFragment;
 import com.example.mobv2.ui.fragment.comment.CommentsFragmentViewModel;
-import com.example.mobv2.ui.view.RatesGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,18 +48,11 @@ public class PostItem implements Item<ItemPostBinding>
 
     private final MainActivity mainActivity;
     private final PostsAdapter postsAdapter;
-    private final ReactionsAdapter reactionsAdapter;
+    private ReactionsAdapter reactionsAdapter;
 
     public final PostItemHelper postItemHelper;
 
     private ItemPostBinding postBinding;
-
-    private TextView textView;
-    private RecyclerView imagesRecyclerView;
-    private RatesGroup ratesGroup;
-    private ImageView showReactionsButton;
-    private RecyclerView reactionsRecyclerView;
-    private LinearLayout showCommentsButton;
 
     private Menu menu;
 
@@ -75,8 +63,6 @@ public class PostItem implements Item<ItemPostBinding>
         this.mainActivity = mainActivity;
         this.postsAdapter = postsAdapter;
         this.postItemHelper = new PostItemHelper(post);
-        reactionsAdapter =
-                new ReactionsAdapter(mainActivity, postItemHelper.getReactions(), postItemHelper.post);
 
         postDao = mainActivity.appDatabase.postDao();
         userDao = mainActivity.appDatabase.userDao();
@@ -92,10 +78,10 @@ public class PostItem implements Item<ItemPostBinding>
         parentView.setOnClickListener(this::onPostViewClick);
 
         initContent();
-        initRatesGroup(postBinding);
-        initShowReactionsButton(postBinding);
-        initReactionsRecyclerView(postBinding);
-        initShowCommentsButton(postBinding);
+        initRatesGroup();
+        initShowReactionsButton();
+        initReactionsRecyclerView();
+        initShowCommentsButton();
     }
 
     private void initInfo()
@@ -157,24 +143,29 @@ public class PostItem implements Item<ItemPostBinding>
         }
     }
 
-    private void initRatesGroup(@NonNull ItemPostBinding postBinding)
+    private void initRatesGroup()
     {
-        ratesGroup = postBinding.ratesGroup;
+        var ratesGroup = postBinding.ratesGroup;
 
         var user = postItemHelper.getUser();
         var userId = user.getId();
 
+        ratesGroup.getRateUpButton()
+                  .setSelected(false);
+        ratesGroup.getRateDownButton()
+                  .setSelected(false);
+
         if (postItemHelper.getPositiveRates()
                           .contains(userId))
         {
-            postBinding.ratesGroup.getRateUpButton()
-                                  .setSelected(true);
+            ratesGroup.getRateUpButton()
+                      .setSelected(true);
         }
         else if (postItemHelper.getNegativeRates()
                                .contains(userId))
         {
-            postBinding.ratesGroup.getRateDownButton()
-                                  .setSelected(true);
+            ratesGroup.getRateDownButton()
+                      .setSelected(true);
         }
 
         ratesGroup.setOnRateUpClickListener(this::onRateUpButtonClick);
@@ -203,9 +194,12 @@ public class PostItem implements Item<ItemPostBinding>
         if (!secondRates.remove(userId)) secondRates.add(userId);
     }
 
-    private void initShowReactionsButton(@NonNull ItemPostBinding postBinding)
+    private void initShowReactionsButton()
     {
-        showReactionsButton = postBinding.showReactionsButton;
+        var showReactionsButton = postBinding.showReactionsButton;
+
+        if (reactionsAdapter != null) postBinding.reactionsRecyclerView.setVisibility(View.GONE);
+
         showReactionsButton.setOnClickListener(this::onShowReactionsViewClick);
         showReactionsButton.setOnLongClickListener(this::onShowReactionsViewLongClick);
     }
@@ -213,9 +207,15 @@ public class PostItem implements Item<ItemPostBinding>
     private void onShowReactionsViewClick(View view)
     {
         var reactionsRecyclerView = postBinding.reactionsRecyclerView;
-        reactionsRecyclerView.setVisibility(reactionsRecyclerView.getVisibility() == View.GONE
-                ? View.VISIBLE
-                : View.GONE);
+        if (reactionsRecyclerView.getVisibility() == View.GONE)
+        {
+            if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
+            reactionsRecyclerView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            reactionsRecyclerView.setVisibility(View.GONE);
+        }
     }
 
     private boolean onShowReactionsViewLongClick(View view)
@@ -237,8 +237,10 @@ public class PostItem implements Item<ItemPostBinding>
             menu.findItem(id)
                 .setOnMenuItemClickListener(item ->
                 {
+                    postBinding.reactionsRecyclerView.setVisibility(View.VISIBLE);
                     String emojiItem = item.getTitle()
                                            .toString();
+                    if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
                     reactionsAdapter.addElement(new Reaction(emojiItem, new ArrayList<>()));
                     return true;
                 });
@@ -247,12 +249,19 @@ public class PostItem implements Item<ItemPostBinding>
         return true;
     }
 
+    private void initAdapterForReactionsRecyclerView()
+    {
+        reactionsAdapter =
+                new ReactionsAdapter(mainActivity, postItemHelper.getReactions(), postItemHelper.post);
+        postBinding.reactionsRecyclerView.setAdapter(reactionsAdapter);
+    }
+
     private void initContent()
     {
         postBinding.setText(postItemHelper.getText());
 
-        textView = postBinding.textView;
-        imagesRecyclerView = postBinding.imagesRecyclerView;
+        var textView = postBinding.textView;
+        var imagesRecyclerView = postBinding.imagesRecyclerView;
         switch (postItemHelper.getType())
         {
             case PostImpl.POST_ONLY_TEXT:
@@ -273,9 +282,9 @@ public class PostItem implements Item<ItemPostBinding>
         }
     }
 
-    private void initShowCommentsButton(@NonNull ItemPostBinding postBinding)
+    private void initShowCommentsButton()
     {
-        showCommentsButton = postBinding.showCommentsButton;
+        var showCommentsButton = postBinding.showCommentsButton;
         showCommentsButton.setOnClickListener(this::onCommentViewClick);
     }
 
@@ -286,11 +295,11 @@ public class PostItem implements Item<ItemPostBinding>
         mainActivity.goToFragment(new CommentsFragment());
     }
 
-    private void initReactionsRecyclerView(@NonNull ItemPostBinding postBinding)
+    private void initReactionsRecyclerView()
     {
-        reactionsRecyclerView = postBinding.reactionsRecyclerView;
+        var reactionsRecyclerView = postBinding.reactionsRecyclerView;
         reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        reactionsRecyclerView.setAdapter(reactionsAdapter);
+        if (reactionsAdapter != null) reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
     public class PostItemHelper implements HavingCommentsIds

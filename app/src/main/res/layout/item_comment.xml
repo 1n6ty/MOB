@@ -31,205 +31,195 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/horizontal_margin"
-            android:layout_marginTop="@dimen/vertical_margin"
-            android:layout_marginBottom="@dimen/vertical_small_margin">
+            android:layout_marginLeft="@dimen/horizontal_very_small_margin"
+            android:layout_marginBottom="@dimen/vertical_very_small_margin">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/avatar_view"
+            <LinearLayout
+                android:id="@+id/linear_layout"
                 android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginRight="@dimen/horizontal_small_margin"
-                android:contentDescription="@string/sample_avatar_desc"
-                android:scaleType="centerCrop"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/show_comments_button"
                 app:layout_constraintEnd_toStartOf="@+id/user_info_layout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearance="@style/circleImageViewStyle"
-                app:srcCompat="@drawable/sample_avatar" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!--TODO  that's will be button that will close the comment branch      -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/avatar_view"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginRight="@dimen/horizontal_small_margin"
+                    android:contentDescription="@string/sample_avatar_desc"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearance="@style/circleImageViewStyle"
+                    app:srcCompat="@drawable/sample_avatar" />
+
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:id="@+id/close_comments_button"
+                    style="@style/postButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:src="@drawable/ic_arrow_up"
+                        app:tint="?colorHelpButtonIcon" />
+                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/user_info_layout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@+id/coordinator_layout"
+                app:layout_constraintBottom_toTopOf="@+id/show_comments_button"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/avatar_view"
+                app:layout_constraintStart_toEndOf="@id/linear_layout"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
-                    android:id="@+id/fullName_view"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@{fullName}"
-                    android:textAppearance="@style/postItemHeaderTextStyle"
-                    tools:text="@string/sample_fullname" />
-
-                <TextView
-                    android:id="@+id/comment_text_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@{commentText}"
-                    android:textAppearance="@style/itemContentTextStyle"
-                    tools:text="@string/sample_comment" />
-
-                <TextView
-                    android:id="@+id/date_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@{date}"
-                    android:textAppearance="@style/itemDateTextStyle"
-                    tools:text="@string/sample_date" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/linearLayout2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/vertical_small_margin"
-                    android:layout_marginBottom="@dimen/vertical_small_margin"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toTopOf="@+id/reactions_recycler_view"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
-
-                    <com.example.mobv2.ui.view.RatesGroup
-                        android:id="@+id/rates_group"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/reply_button"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageButton
-                            android:id="@+id/rate_up_button"
-                            style="@style/postButtonStyle"
-                            android:layout_width="32dp"
-                            android:layout_height="match_parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/foreground_button_rate_up_selector" />
-
-                        <TextView
-                            android:id="@+id/rates_count_view"
-                            style="@style/ratesTextStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:text="@{Integer.toString(ratesCount)}"
-                            tools:text="@string/menu_reaction_count" />
-
-                        <ImageButton
-                            android:id="@+id/rate_down_button"
-                            style="@style/postButtonStyle"
-                            android:layout_width="32dp"
-                            android:layout_height="match_parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/foreground_button_rate_down_selector" />
-                    </com.example.mobv2.ui.view.RatesGroup>
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/horizontal_very_small_margin"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/reply_button"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/fullName_view"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginLeft="@dimen/horizontal_small_margin"
-                        android:text="Reply"
-                        android:textAppearance="@style/ratesTextStyle"
-                        android:textColor="?colorTertiaryText"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/rates_group"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:text="@{fullName}"
+                        android:textAppearance="@style/postItemHeaderTextStyle"
+                        tools:text="@string/sample_fullname" />
 
-                    <ImageButton
-                        android:id="@+id/show_reactions_button"
-                        style="@style/postButtonStyle"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/comment_text_view"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:text="@{commentText}"
+                        android:textAppearance="@style/itemContentTextStyle"
+                        tools:text="@string/sample_comment" />
+
+                    <TextView
+                        android:id="@+id/date_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@{date}"
+                        android:textAppearance="@style/itemDateTextStyle"
+                        tools:text="@string/sample_date" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/linearLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="@dimen/vertical_small_margin"
+                        android:layout_marginBottom="@dimen/vertical_small_margin"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toTopOf="@+id/reactions_recycler_view"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_arrow_down"
-                        app:tint="?colorHelpButtonIcon" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/reactions_recycler_view"
+                        <com.example.mobv2.ui.view.RatesGroup
+                            android:id="@+id/rates_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/reply_button"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageButton
+                                android:id="@+id/rate_up_button"
+                                style="@style/postButtonStyle"
+                                android:layout_width="32dp"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/foreground_button_rate_up_selector" />
+
+                            <TextView
+                                android:id="@+id/rates_count_view"
+                                style="@style/ratesTextStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="@{Integer.toString(ratesCount)}"
+                                tools:text="@string/menu_reaction_count" />
+
+                            <ImageButton
+                                android:id="@+id/rate_down_button"
+                                style="@style/postButtonStyle"
+                                android:layout_width="32dp"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/foreground_button_rate_down_selector" />
+                        </com.example.mobv2.ui.view.RatesGroup>
+
+                        <TextView
+                            android:id="@+id/reply_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="@dimen/horizontal_small_margin"
+                            android:text="Reply"
+                            android:textAppearance="@style/ratesTextStyle"
+                            android:textColor="?colorTertiaryText"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/rates_group"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/show_reactions_button"
+                            style="@style/postButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_arrow_down"
+                            app:tint="?colorHelpButtonIcon" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/reactions_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_reaction" />
+                </LinearLayout>
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/nested_scroll_view"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-                    tools:listitem="@layout/item_reaction" />
+                    android:layout_height="match_parent">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/comments_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="true"
+                        android:overScrollMode="ifContentScrolls"
+                        android:saveEnabled="true"
+                        android:scrollbars="none" />
+                </androidx.core.widget.NestedScrollView>
             </LinearLayout>
 
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/coordinator_layout"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/show_comments_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/ripple_effect"
+                android:text="Show comments branch"
+                android:textAppearance="@style/itemContentTextStyle"
+                android:textSize="@dimen/medium_text_size"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/user_info_layout">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/show_comments_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:visibility="gone"
-                    android:background="@drawable/ripple_effect"
-                    android:text="Show comments branch"
-                    android:textAppearance="@style/itemContentTextStyle"
-                    android:textSize="@dimen/medium_text_size" />
-
-                <LinearLayout
-                    android:id="@+id/comments_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
-
-                    <androidx.core.widget.NestedScrollView
-                        android:id="@+id/nested_scroll_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/comments_recycler_view"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:nestedScrollingEnabled="true"
-                            android:overScrollMode="ifContentScrolls"
-                            android:saveEnabled="true"
-                            android:scrollbars="none" />
-                    </androidx.core.widget.NestedScrollView>
-
-                    <TextView
-                        android:id="@+id/comment_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="To comment"
-                        android:textAppearance="@style/itemContentTextStyle"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/rates_group"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </LinearLayout>
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                app:layout_constraintTop_toBottomOf="@+id/user_info_layout" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>
