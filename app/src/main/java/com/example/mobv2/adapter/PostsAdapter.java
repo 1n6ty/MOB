@@ -61,9 +61,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             }
 
             @Override
-            public void onClear()
+            public void onClear(int count)
             {
-                notifyItemRangeRemoved(0, getItemCount());
+                notifyItemRangeRemoved(0, count);
             }
         });
     }
@@ -188,11 +188,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     public void deletePostItem(PostItem postItem)
     {
         postItemList.remove(postItem);
-    }
-
-    public void clear()
-    {
-        postItemList.clear();
     }
 
     @Override

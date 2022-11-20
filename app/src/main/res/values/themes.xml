@@ -1,9 +1,7 @@
 <resources>
 
-    <style name="Theme.MOBv2.DayNight" parent="Theme.MOBv2" />
-
     <!-- Base application theme. -->
-    <style name="Theme.MOBv2" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.MOBv2.Day" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
 
         <item name="colorPrimary">?backgroundToolbar</item>
@@ -50,7 +48,7 @@
 
     <style name="Theme.MOBv2.AppBarOverlayDark" parent="ThemeOverlay.AppCompat.DayNight.ActionBar" />
 
-    <style name="Theme.MOBv2.NavigationView">
+    <style name="Theme.MOBv2.Day.NavigationView">
         <item name="android:listDivider">@color/white</item>
     </style>
 

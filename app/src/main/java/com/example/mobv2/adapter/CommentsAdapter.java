@@ -25,13 +25,10 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.Collections;
 
-import localDatabase.dao.CommentDao;
-
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
         implements AbleToAdd<CommentImpl>, AbleToReverse, AbleToSortByUserWills, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
 {
     private final int maxUploadedCommentsCount = 6;
-    private final CommentDao commentDao;
 
     private final MainActivity mainActivity;
     private final NestedScrollView nestedScrollView;
@@ -68,15 +65,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             {
                 notifyItemRemoved(index);
             }
-
-            @Override
-            public void onClear()
-            {
-                notifyItemRangeRemoved(0, getItemCount());
-            }
         });
-
-        commentDao = mainActivity.appDatabase.commentDao();
 
         var commentsIds = havingCommentsIds.getCommentIds();
         for (int i = 0; i < Math.min(commentsIds.size(), maxUploadedCommentsCount); i++)
@@ -125,13 +114,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void parseCommentFromMapAndAddToComments(LinkedTreeMap<String, Object> map)
     {
         var comment = new CommentImpl.CommentBuilder().parseFromMap(map);
-        commentDao.insert(comment);
+        mainActivity.appDatabase.commentDao()
+                                .insert(comment);
         addElement(comment);
     }
 
     private void getCommentByIdFromLocalDbAndAddToComments(String commentId)
     {
-        var comment = commentDao.getById(commentId);
+        var comment = mainActivity.appDatabase.commentDao()
+                                              .getById(commentId);
         if (comment == null)
         {
             Toast.makeText(mainActivity, "Comment is not uploaded", Toast.LENGTH_LONG)

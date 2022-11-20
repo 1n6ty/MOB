@@ -26,14 +26,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import localDatabase.dao.AddressDao;
-import localDatabase.dao.UserDao;
-
 public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements AuthOkCallback
 {
-    private AddressDao addressDao;
-    private UserDao userDao;
-
     public AuthFragment()
     {
         super(R.layout.fragment_auth);
@@ -44,9 +38,6 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
                               @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
-        addressDao = mainActivity.appDatabase.addressDao();
-        userDao = mainActivity.appDatabase.userDao();
 
         initNextButton();
     }
@@ -116,6 +107,8 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
 
         AsyncTask.execute(() ->
         {
+            var addressDao = mainActivity.appDatabase.addressDao();
+            var userDao = mainActivity.appDatabase.userDao();
             List<AddressImpl> addresses = addressDao.getAll();
             if (!user.compareById(userDao.getCurrentOne()))
             {
@@ -171,6 +164,6 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     @Override
     protected void updateWindow()
     {
-        super.updateWindow(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR, getResources().getColor(mainActivity.getAttribute(R.attr.backgroundSecondaryWindow)));
+        super.updateWindow(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR, mainActivity.getAttributeColor(R.attr.backgroundSecondaryWindow));
     }
 }

@@ -18,18 +18,14 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-import localDatabase.dao.AddressDao;
-
 public class AddressItem implements Item<ItemAddressBinding>
 {
-    private final AddressDao addressDao;
-
     private final MainActivity mainActivity;
     private final AddressesAdapter addressesAdapter;
 
     public final AddressItemHelper addressItemHelper;
 
-    private ItemAddressBinding addressBinding;
+    private ItemAddressBinding binding;
 
     public AddressItem(MainActivity mainActivity,
                              AddressesAdapter addressesAdapter,
@@ -38,18 +34,16 @@ public class AddressItem implements Item<ItemAddressBinding>
         this.mainActivity = mainActivity;
         this.addressesAdapter = addressesAdapter;
         this.addressItemHelper = new AddressItemHelper(address);
-
-        addressDao = mainActivity.appDatabase.addressDao();
     }
 
     @Override
-    public void refreshItemBinding(@NonNull ItemAddressBinding addressBinding)
+    public void refreshItemBinding(@NonNull ItemAddressBinding binding)
     {
-        this.addressBinding = addressBinding;
-        var parentView = addressBinding.getRoot();
+        this.binding = binding;
+        var parentView = binding.getRoot();
 
-        addressBinding.addressPrimaryView.setText(addressItemHelper.getPrimary());
-        addressBinding.addressSecondaryView.setText(addressItemHelper.getSecondary());
+        binding.addressPrimaryView.setText(addressItemHelper.getPrimary());
+        binding.addressSecondaryView.setText(addressItemHelper.getSecondary());
 
         parentView.setOnClickListener(this::onAddressItemClick);
 
@@ -70,7 +64,8 @@ public class AddressItem implements Item<ItemAddressBinding>
         addressesAdapter.deselectClickedAddress();
 
         addressItemHelper.setCurrent(true);
-        addressDao.update(addressItemHelper.getAddress());
+        mainActivity.appDatabase.addressDao()
+                                .update(addressItemHelper.getAddress());
 
         mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), addressItemHelper.getId(), MainActivity.token);
 

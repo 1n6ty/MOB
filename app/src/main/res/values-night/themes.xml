@@ -1,9 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.MOBv2.DayNight" parent="Theme.MOBv2.Dark" />
-
     <!-- Base application theme. -->
-    <style name="Theme.MOBv2.Dark" parent="Theme.MOBv2">
+    <style name="Theme.MOBv2.Dark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue_500</item>
         <item name="colorPrimaryVariant">@color/blue_700</item>

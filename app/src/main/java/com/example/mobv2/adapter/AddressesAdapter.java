@@ -15,12 +15,8 @@ import com.example.mobv2.ui.activity.MainActivity;
 import com.example.mobv2.ui.view.item.AddressItem;
 import com.example.mobv2.util.MyObservableArrayList;
 
-import localDatabase.dao.AddressDao;
-
 public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder> implements AbleToAdd<AddressImpl>
 {
-    private final AddressDao addressDao;
-
     private final MainActivity mainActivity;
     private final MyObservableArrayList<AddressItem> addressItemList;
 
@@ -49,15 +45,7 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
             {
                 notifyItemRemoved(index);
             }
-
-            @Override
-            public void onClear()
-            {
-                notifyItemRangeRemoved(0, getItemCount());
-            }
         });
-
-        addressDao = mainActivity.appDatabase.addressDao();
     }
 
     @NonNull
@@ -102,7 +90,8 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     {
         var clickedAddress = getClickedAddressItem();
         clickedAddress.addressItemHelper.setCurrent(false);
-        addressDao.update(clickedAddress.addressItemHelper.getAddress());
+        mainActivity.appDatabase.addressDao()
+                                .update(clickedAddress.addressItemHelper.getAddress());
 
         for (int i = 0; i < addressItemList.size(); i++)
         {

@@ -185,7 +185,7 @@
             android:layout_width="@dimen/nav_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:theme="@style/Theme.MOBv2.NavigationView"
+            android:theme="@style/Theme.MOBv2.Day.NavigationView"
             app:headerLayout="@layout/nav_header_main"
             app:itemIconTint="?colorNavigationItemIcon"
             app:itemTextAppearance="@style/navItemTextStyle"

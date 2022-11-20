@@ -11,6 +11,7 @@ public class MarkerView
 {
     private final Marker marker;
     private OnMarkerClickListener onMarkerClickListener;
+    private MapView.OnMarkerDragListener onMarkerDragListener;
 
     public MarkerView(Marker marker)
     {
@@ -22,9 +23,19 @@ public class MarkerView
         this.onMarkerClickListener = onMarkerClickListener;
     }
 
+    public void setOnDragListener(MapView.OnMarkerDragListener onMarkerDragListener)
+    {
+        this.onMarkerDragListener = onMarkerDragListener;
+    }
+
     public void onClick()
     {
         onMarkerClickListener.onMarkerClick(this);
+    }
+
+    public void onMarkerDragEnd()
+    {
+        onMarkerDragListener.onMarkerDragEnd(this);
     }
 
     public float getAlpha()

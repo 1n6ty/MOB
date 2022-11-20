@@ -37,22 +37,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import localDatabase.dao.CommentDao;
-import localDatabase.dao.UserDao;
-
 public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 {
-    private final CommentDao commentDao;
-    private final UserDao userDao;
-
     private final MainActivity mainActivity;
     private final CommentsAdapter commentsAdapter;
-    private final ReactionsAdapter reactionsAdapter;
+    private ReactionsAdapter reactionsAdapter;
     private CommentsAdapter innerCommentsAdapter;
 
     public final CommentItemHelper commentItemHelper;
 
-    private ItemCommentBinding commentBinding;
+    private ItemCommentBinding binding;
 
     private Menu menu;
 
@@ -63,18 +57,13 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         this.mainActivity = mainActivity;
         this.commentsAdapter = commentsAdapter;
         this.commentItemHelper = new CommentItemHelper(comment);
-        reactionsAdapter =
-                new ReactionsAdapter(mainActivity, commentItemHelper.getReactions(), commentItemHelper.comment);
-
-        commentDao = mainActivity.appDatabase.commentDao();
-        userDao = mainActivity.appDatabase.userDao();
     }
 
     @Override
-    public void refreshItemBinding(@NonNull ItemCommentBinding commentBinding)
+    public void refreshItemBinding(@NonNull ItemCommentBinding binding)
     {
-        this.commentBinding = commentBinding;
-        var parentView = commentBinding.getRoot();
+        this.binding = binding;
+        var parentView = binding.getRoot();
 
         initInfo();
 
@@ -91,23 +80,23 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void initInfo()
     {
-        var parentView = commentBinding.getRoot();
+        var parentView = binding.getRoot();
 
         var user = commentItemHelper.getUser();
 
-        commentBinding.setFullName(user.getFullName());
-        commentBinding.setDate(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(commentItemHelper.getDate()));
-        commentBinding.setCommentText(commentItemHelper.getText());
-        commentBinding.setRatesCount(commentItemHelper.getRatesCount());
+        binding.setFullName(user.getFullName());
+        binding.setDate(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(commentItemHelper.getDate()));
+        binding.setCommentText(commentItemHelper.getText());
+        binding.setRatesCount(commentItemHelper.getRatesCount());
 
-        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, commentBinding.avatarView);
+        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, binding.avatarView);
     }
 
     private void onItemViewClick(View view)
     {
         var contextThemeWrapper =
                 new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
-        var popupMenu = new PopupMenu(contextThemeWrapper, commentBinding.userInfoLayout);
+        var popupMenu = new PopupMenu(contextThemeWrapper, binding.userInfoLayout);
         popupMenu.inflate(R.menu.menu_item_comment);
 
         initMenu(popupMenu);
@@ -119,8 +108,10 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         menu = popupMenu.getMenu();
         var user = commentItemHelper.getUser();
 
-        boolean isCreator =
-                user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
+        var currentUser = mainActivity.appDatabase.userDao()
+                                                  .getCurrentOne();
+
+        boolean isCreator = user.compareById(currentUser);  // if the user is a post's creator
         switchMenuItemVisibility(R.id.menu_edit, isCreator);
         switchMenuItemVisibility(R.id.menu_delete, isCreator);
 
@@ -146,20 +137,20 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void initCloseCommentsButton()
     {
-        commentBinding.closeCommentsButton.setOnClickListener(this::onCloseCommentsButtonClick);
+        binding.closeCommentsButton.setOnClickListener(this::onCloseCommentsButtonClick);
     }
 
     private void onCloseCommentsButtonClick(View view)
     {
         view.setVisibility(View.GONE);
-        commentBinding.showCommentsButton.setVisibility(View.VISIBLE);
+        binding.showCommentsButton.setVisibility(View.VISIBLE);
 
-        commentBinding.commentsRecyclerView.setVisibility(View.GONE);
+        binding.commentsRecyclerView.setVisibility(View.GONE);
     }
 
     private void initRatesGroup()
     {
-        var ratesGroup = commentBinding.ratesGroup;
+        var ratesGroup = binding.ratesGroup;
 
         var user = commentItemHelper.getUser();
         var userId = user.getId();
@@ -203,14 +194,15 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private void removeRateFromFirstRatesAndAddRateToSecondRates(List<String> firstRates,
                                                                  List<String> secondRates)
     {
-        var userId = userDao.getCurrentId();
+        var userId = mainActivity.appDatabase.userDao()
+                                             .getCurrentId();
         firstRates.remove(userId);
         if (!secondRates.remove(userId)) secondRates.add(userId);
     }
 
     private void initReplyButton()
     {
-        var replyButton = commentBinding.replyButton;
+        var replyButton = binding.replyButton;
         replyButton.setOnClickListener(this::onReplyButtonClick);
     }
 
@@ -231,7 +223,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     public void createCommentByIdAndTextAndAddToCommentIds(String commentId,
                                                            String messageText)
     {
-        var comment = CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText);
+        var comment = CommentImpl.createNewComment(commentId, mainActivity.appDatabase.userDao()
+                                                                                      .getCurrentOne(), messageText);
         if (innerCommentsAdapter == null) initAdapterForInnerCommentsRecyclerView();
         innerCommentsAdapter.addElement(comment);
         commentItemHelper.getCommentIds()
@@ -240,10 +233,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void initShowReactionsButton()
     {
-        var showReactionsButton = commentBinding.showReactionsButton;
-
-        if (reactionsAdapter != null)
-            commentBinding.reactionsRecyclerView.setVisibility(View.VISIBLE);
+        var showReactionsButton = binding.showReactionsButton;
 
         showReactionsButton.setOnClickListener(this::onShowReactionsViewClick);
         showReactionsButton.setOnLongClickListener(this::onShowReactionsViewLongClick);
@@ -251,7 +241,10 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void onShowReactionsViewClick(View view)
     {
-        RecyclerView reactionsRecyclerView = commentBinding.reactionsRecyclerView;
+        RecyclerView reactionsRecyclerView = binding.reactionsRecyclerView;
+
+        if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
+
         reactionsRecyclerView.setVisibility(reactionsRecyclerView.getVisibility() == View.GONE
                 ? View.VISIBLE
                 : View.GONE);
@@ -278,6 +271,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
                 {
                     String emojiItem = item.getTitle()
                                            .toString();
+                    if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
                     reactionsAdapter.addElement(new Reaction(emojiItem, new ArrayList<>()));
                     return true;
                 });
@@ -288,14 +282,29 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void initReactionsRecyclerView()
     {
-        var reactionsRecyclerView = commentBinding.reactionsRecyclerView;
+        var reactionsRecyclerView = binding.reactionsRecyclerView;
         reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        if (reactionsAdapter != null) reactionsRecyclerView.setAdapter(reactionsAdapter);
+        if (reactionsAdapter != null)
+        {
+            reactionsRecyclerView.setAdapter(reactionsAdapter);
+            reactionsRecyclerView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            initAdapterForReactionsRecyclerView();
+        }
+    }
+
+    private void initAdapterForReactionsRecyclerView()
+    {
+        reactionsAdapter =
+                new ReactionsAdapter(mainActivity, commentItemHelper.getReactions(), commentItemHelper.comment);
+        binding.reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
     private void initShowCommentsButton()
     {
-        var showCommentsButton = commentBinding.showCommentsButton;
+        var showCommentsButton = binding.showCommentsButton;
 
         if (innerCommentsAdapter != null)
         {
@@ -315,9 +324,9 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private void onShowCommentButtonClick(View view)
     {
         view.setVisibility(View.GONE);
-        commentBinding.closeCommentsButton.setVisibility(View.VISIBLE);
+        binding.closeCommentsButton.setVisibility(View.VISIBLE);
 
-        commentBinding.commentsRecyclerView.setVisibility(View.VISIBLE);
+        binding.commentsRecyclerView.setVisibility(View.VISIBLE);
 
         if (innerCommentsAdapter == null) initAdapterForInnerCommentsRecyclerView();
     }
@@ -325,13 +334,13 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private void initAdapterForInnerCommentsRecyclerView()
     {
         innerCommentsAdapter =
-                new CommentsAdapter(mainActivity, commentBinding.nestedScrollView, commentItemHelper);
-        commentBinding.commentsRecyclerView.setAdapter(innerCommentsAdapter);
+                new CommentsAdapter(mainActivity, binding.nestedScrollView, commentItemHelper);
+        binding.commentsRecyclerView.setAdapter(innerCommentsAdapter);
     }
 
     private void initCommentsRecyclerView()
     {
-        var innerCommentsRecyclerView = commentBinding.commentsRecyclerView;
+        var innerCommentsRecyclerView = binding.commentsRecyclerView;
         innerCommentsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
         if (innerCommentsAdapter != null)
             innerCommentsRecyclerView.setAdapter(innerCommentsAdapter);
@@ -383,7 +392,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
             }
             commentsAdapter.deleteComment(CommentItem.this);
 
-            commentDao.delete(comment);
+            mainActivity.appDatabase.commentDao()
+                                    .delete(comment);
             mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);
 
             Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)

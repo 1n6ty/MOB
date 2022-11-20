@@ -5,6 +5,7 @@ import static com.example.mobv2.adapter.MarkersAdapter.LOCALE;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +30,6 @@ import com.example.mobv2.ui.fragment.main.MainFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
@@ -217,11 +217,22 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
             rawAddress.setLatLng(latLng);
             return rawAddress;
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public float[] getDistance(double startLatitude,
+                               double startLongitude,
+                               double endLatitude,
+                               double endLongitude)
+    {
+        float[] distance = new float[2];
+        Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude, distance);
+
+        return distance;
     }
 
     public void startRefreshingToken()

@@ -60,8 +60,9 @@ public class MyObservableArrayList<T> extends ArrayList<T>
     @Override
     public void clear()
     {
-        if (callback != null) callback.onClear();
+        int count = size();
         super.clear();
+        if (callback != null) callback.onClear(count);
     }
 
     public abstract static class OnListChangedCallback<T>
@@ -74,7 +75,7 @@ public class MyObservableArrayList<T> extends ArrayList<T>
         public abstract void onRemoved(int index,
                                        Object o);
 
-        public void onClear()
+        public void onClear(int count)
         {
 
         }

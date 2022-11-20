@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MOBv2.DayNight"
+        android:theme="@style/Theme.MOBv2.Day"
         android:usesCleartextTraffic="true">
         <provider
             android:name="androidx.core.content.FileProvider"

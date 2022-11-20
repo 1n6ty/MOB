@@ -3,6 +3,7 @@ package com.example.mobv2.ui.view.item;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.MarkersAdapter;
@@ -13,41 +14,33 @@ import com.example.mobv2.model.MarkerInfoImpl;
 import com.example.mobv2.model.PostImpl;
 import com.example.mobv2.ui.abstraction.Item;
 import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.view.MapView;
 import com.example.mobv2.ui.view.MarkerView;
 import com.example.mobv2.util.BitmapConverter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
-import localDatabase.dao.MarkerInfoDao;
-import localDatabase.dao.PostDao;
-
-public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
+public class MarkerInfoItem implements Item<MarkerView>, MarkerView.OnMarkerClickListener, MapView.OnMarkerDragListener, GetPostOkCallback
 {
-    private final MarkerInfoDao markerInfoDao;
-    private final PostDao postDao;
-
     private final int[][] drawableIds =
-            new int[][]{{R.drawable.ic_marker_address_24dp, R.drawable.ic_marker_address_36dp},
-                    {R.drawable.ic_marker_24dp, R.drawable.ic_marker_36dp}};
+            new int[][]{{R.drawable.ic_marker_address_36dp, R.drawable.ic_marker_address_48dp},
+                    {R.drawable.ic_marker_36dp, R.drawable.ic_marker_48dp}};
 
     private final MainActivity mainActivity;
     private final MarkersAdapter markersAdapter;
-    private final PostsAdapter postsAdapter;
+    private final RecyclerView postsRecyclerView;
 
     public final MarkerInfoItemHelper markerInfoItemHelper;
 
     public MarkerInfoItem(MainActivity mainActivity,
                           MarkersAdapter markersAdapter,
-                          PostsAdapter postsAdapter,
+                          RecyclerView postsRecyclerView,
                           MarkerInfoImpl markerInfo)
     {
         this.mainActivity = mainActivity;
         this.markersAdapter = markersAdapter;
-        this.postsAdapter = postsAdapter;
+        this.postsRecyclerView = postsRecyclerView;
         this.markerInfoItemHelper = new MarkerInfoItemHelper(markerInfo);
-
-        markerInfoDao = mainActivity.appDatabase.markerInfoDao();
-        postDao = mainActivity.appDatabase.postDao();
     }
 
     @Override
@@ -55,6 +48,15 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
     {
         markerView.setTitle(markerInfoItemHelper.getTitle());
         markerView.setPosition(markerInfoItemHelper.getLatLng());
+        var user = mainActivity.appDatabase.addressDao()
+                                           .getCurrentOne()
+                                           .getOwner();
+        var currentUser = mainActivity.appDatabase.userDao()
+                                                  .getCurrentOne();
+        if (user.compareById(currentUser))
+        {
+            markerView.setDraggable(true);
+        }
 
         int drawableId = markerInfoItemHelper.isClicked()
                 ? drawableIds[markerInfoItemHelper.getMarkerType()][1]
@@ -63,9 +65,11 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         markerView.setIcon(BitmapConverter.drawableToBitmapDescriptor(mainActivity.getResources(), drawableId));
 
         markerView.setOnClickListener(this::onMarkerClick);
+        markerView.setOnDragListener(this);
     }
 
-    private void onMarkerClick(MarkerView markerView)
+    @Override
+    public void onMarkerClick(MarkerView markerView)
     {
         markersAdapter.animateCameraTo(markerInfoItemHelper.getLatLng());
 
@@ -96,24 +100,36 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
     public void parsePostFromMapAndAddToPosts(LinkedTreeMap<String, Object> map)
     {
         var post = new PostImpl.PostBuilder().parseFromMap(map);
-        postDao.insert(post);
-        PostItem postItem = postsAdapter.addElementAndGetItem(post);
+        mainActivity.appDatabase.postDao()
+                                .insert(post);
+        PostItem postItem =
+                ((PostsAdapter) postsRecyclerView.getAdapter()).addElementAndGetItem(post);
         postItem.postItemHelper.setMarkerInfoItemHelper(markerInfoItemHelper);
         markersAdapter.scrollToStartPosition();
     }
 
     private void getPostByIdFromLocalDbAndAddToPosts(String postId)
     {
-        var post = postDao.getById(postId);
+        var post = mainActivity.appDatabase.postDao()
+                                           .getById(postId);
         if (post == null)
         {
             Toast.makeText(mainActivity, "Post is not uploaded", Toast.LENGTH_LONG)
                  .show();
             return;
         }
-        PostItem postItem = postsAdapter.addElementAndGetItem(post);
+        PostItem postItem =
+                ((PostsAdapter) postsRecyclerView.getAdapter()).addElementAndGetItem(post);
         postItem.postItemHelper.setMarkerInfoItemHelper(markerInfoItemHelper);
         markersAdapter.scrollToStartPosition();
+    }
+
+    @Override
+    public void onMarkerDragEnd(MarkerView markerView)
+    {
+        // are you sure that you want to move the marker in this position?
+
+        markerInfoItemHelper.move(markerView.getPosition());
     }
 
     public class MarkerInfoItemHelper
@@ -138,7 +154,15 @@ public class MarkerInfoItem implements Item<MarkerView>, GetPostOkCallback
         public void delete()
         {
             markersAdapter.deleteMarkerInfoItem(MarkerInfoItem.this);
-            markerInfoDao.delete(markerInfo);
+            mainActivity.appDatabase.markerInfoDao()
+                                    .delete(markerInfo);
+        }
+
+        public void move(LatLng latLng)
+        {
+            markerInfo.setLatLng(latLng);
+            mainActivity.appDatabase.markerInfoDao()
+                                    .update(markerInfo);
         }
 
         public String getId()

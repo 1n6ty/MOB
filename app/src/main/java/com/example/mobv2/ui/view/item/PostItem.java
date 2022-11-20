@@ -38,21 +38,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import localDatabase.dao.PostDao;
-import localDatabase.dao.UserDao;
-
 public class PostItem implements Item<ItemPostBinding>
 {
-    private final PostDao postDao;
-    private final UserDao userDao;
-
     private final MainActivity mainActivity;
     private final PostsAdapter postsAdapter;
     private ReactionsAdapter reactionsAdapter;
 
     public final PostItemHelper postItemHelper;
 
-    private ItemPostBinding postBinding;
+    private ItemPostBinding binding;
 
     private Menu menu;
 
@@ -63,15 +57,12 @@ public class PostItem implements Item<ItemPostBinding>
         this.mainActivity = mainActivity;
         this.postsAdapter = postsAdapter;
         this.postItemHelper = new PostItemHelper(post);
-
-        postDao = mainActivity.appDatabase.postDao();
-        userDao = mainActivity.appDatabase.userDao();
     }
 
-    public void refreshItemBinding(@NonNull ItemPostBinding postBinding)
+    public void refreshItemBinding(@NonNull ItemPostBinding binding)
     {
-        this.postBinding = postBinding;
-        var parentView = postBinding.getRoot();
+        this.binding = binding;
+        var parentView = binding.getRoot();
 
         initInfo();
 
@@ -86,16 +77,16 @@ public class PostItem implements Item<ItemPostBinding>
 
     private void initInfo()
     {
-        var parentView = postBinding.getRoot();
+        var parentView = binding.getRoot();
 
         var user = postItemHelper.getUser();
 
-        postBinding.setFullName(user.getFullName());
-        postBinding.setDate(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(postItemHelper.getDate()));
-        postBinding.setCommentsCount(postItemHelper.getCommentsCount());
-        postBinding.setRatesCount(postItemHelper.getRatesCount());
+        binding.setFullName(user.getFullName());
+        binding.setDate(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(postItemHelper.getDate()));
+        binding.setCommentsCount(postItemHelper.getCommentsCount());
+        binding.setRatesCount(postItemHelper.getRatesCount());
 
-        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, postBinding.avatarView);
+        MainActivity.loadImageInView(user.getAvatarUrl(), parentView, binding.avatarView);
     }
 
     private void onPostViewClick(View view)
@@ -115,7 +106,10 @@ public class PostItem implements Item<ItemPostBinding>
         var user = postItemHelper.getUser();
         var postType = postItemHelper.getType();
 
-        boolean isCreator = user.compareById(userDao.getCurrentOne());  // if the user is a post's creator
+        var currentUser = mainActivity.appDatabase.userDao()
+                                                  .getCurrentOne();
+
+        boolean isCreator = user.compareById(currentUser);  // if the user is a post's creator
         switchMenuItemVisibility(R.id.menu_edit, isCreator);
         switchMenuItemVisibility(R.id.menu_delete, isCreator);
 
@@ -143,9 +137,35 @@ public class PostItem implements Item<ItemPostBinding>
         }
     }
 
+    private void initContent()
+    {
+        binding.setText(postItemHelper.getText());
+
+        var textView = binding.textView;
+        var imagesRecyclerView = binding.imagesRecyclerView;
+        switch (postItemHelper.getType())
+        {
+            case PostImpl.POST_ONLY_TEXT:
+                imagesRecyclerView.setVisibility(View.GONE);
+                break;
+            case PostImpl.POST_ONLY_IMAGES:
+                textView.setVisibility(View.GONE);
+            case PostImpl.POST_FULL:
+                List<Image> images = new ArrayList<>();
+                for (String url : postItemHelper.getImages())
+                {
+                    images.add(new Image("", url, Image.IMAGE_ONLINE));
+                }
+                ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
+                imagesRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
+                imagesRecyclerView.setAdapter(adapter);
+                break;
+        }
+    }
+
     private void initRatesGroup()
     {
-        var ratesGroup = postBinding.ratesGroup;
+        var ratesGroup = binding.ratesGroup;
 
         var user = postItemHelper.getUser();
         var userId = user.getId();
@@ -189,16 +209,15 @@ public class PostItem implements Item<ItemPostBinding>
     private void removeRateFromFirstRatesAndAddRateToSecondRates(List<String> firstRates,
                                                                  List<String> secondRates)
     {
-        var userId = userDao.getCurrentId();
+        var userId = mainActivity.appDatabase.userDao()
+                                             .getCurrentId();
         firstRates.remove(userId);
         if (!secondRates.remove(userId)) secondRates.add(userId);
     }
 
     private void initShowReactionsButton()
     {
-        var showReactionsButton = postBinding.showReactionsButton;
-
-        if (reactionsAdapter != null) postBinding.reactionsRecyclerView.setVisibility(View.GONE);
+        var showReactionsButton = binding.showReactionsButton;
 
         showReactionsButton.setOnClickListener(this::onShowReactionsViewClick);
         showReactionsButton.setOnLongClickListener(this::onShowReactionsViewLongClick);
@@ -206,16 +225,13 @@ public class PostItem implements Item<ItemPostBinding>
 
     private void onShowReactionsViewClick(View view)
     {
-        var reactionsRecyclerView = postBinding.reactionsRecyclerView;
-        if (reactionsRecyclerView.getVisibility() == View.GONE)
-        {
-            if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
-            reactionsRecyclerView.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            reactionsRecyclerView.setVisibility(View.GONE);
-        }
+        var reactionsRecyclerView = binding.reactionsRecyclerView;
+
+        if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
+
+        reactionsRecyclerView.setVisibility(reactionsRecyclerView.getVisibility() == View.GONE
+                ? View.VISIBLE
+                : View.GONE);
     }
 
     private boolean onShowReactionsViewLongClick(View view)
@@ -237,7 +253,7 @@ public class PostItem implements Item<ItemPostBinding>
             menu.findItem(id)
                 .setOnMenuItemClickListener(item ->
                 {
-                    postBinding.reactionsRecyclerView.setVisibility(View.VISIBLE);
+                    binding.reactionsRecyclerView.setVisibility(View.VISIBLE);
                     String emojiItem = item.getTitle()
                                            .toString();
                     if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
@@ -249,42 +265,31 @@ public class PostItem implements Item<ItemPostBinding>
         return true;
     }
 
+    private void initReactionsRecyclerView()
+    {
+        var reactionsRecyclerView = binding.reactionsRecyclerView;
+        reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        if (reactionsAdapter != null)
+        {
+            reactionsRecyclerView.setAdapter(reactionsAdapter);
+            reactionsRecyclerView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            initAdapterForReactionsRecyclerView();
+        }
+    }
+
     private void initAdapterForReactionsRecyclerView()
     {
         reactionsAdapter =
                 new ReactionsAdapter(mainActivity, postItemHelper.getReactions(), postItemHelper.post);
-        postBinding.reactionsRecyclerView.setAdapter(reactionsAdapter);
-    }
-
-    private void initContent()
-    {
-        postBinding.setText(postItemHelper.getText());
-
-        var textView = postBinding.textView;
-        var imagesRecyclerView = postBinding.imagesRecyclerView;
-        switch (postItemHelper.getType())
-        {
-            case PostImpl.POST_ONLY_TEXT:
-                imagesRecyclerView.setVisibility(View.GONE);
-                break;
-            case PostImpl.POST_ONLY_IMAGES:
-                textView.setVisibility(View.GONE);
-            case PostImpl.POST_FULL:
-                List<Image> images = new ArrayList<>();
-                for (String url : postItemHelper.getImages())
-                {
-                    images.add(new Image("", url, Image.IMAGE_ONLINE));
-                }
-                ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                imagesRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
-                imagesRecyclerView.setAdapter(adapter);
-                break;
-        }
+        binding.reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
     private void initShowCommentsButton()
     {
-        var showCommentsButton = postBinding.showCommentsButton;
+        var showCommentsButton = binding.showCommentsButton;
         showCommentsButton.setOnClickListener(this::onCommentViewClick);
     }
 
@@ -293,13 +298,6 @@ public class PostItem implements Item<ItemPostBinding>
         var viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
         viewModel.setPostItem(this);
         mainActivity.goToFragment(new CommentsFragment());
-    }
-
-    private void initReactionsRecyclerView()
-    {
-        var reactionsRecyclerView = postBinding.reactionsRecyclerView;
-        reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
-        if (reactionsAdapter != null) reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
     public class PostItemHelper implements HavingCommentsIds
@@ -351,7 +349,8 @@ public class PostItem implements Item<ItemPostBinding>
             if (markerInfoItemHelper != null) markerInfoItemHelper.delete();
             postsAdapter.deletePostItem(PostItem.this);
 
-            postDao.delete(post);
+            mainActivity.appDatabase.postDao()
+                                    .delete(post);
             mainActivity.mobServerAPI.postDelete(new MOBAPICallbackImpl(), post.getId(), MainActivity.token);
 
             Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
@@ -433,12 +432,12 @@ public class PostItem implements Item<ItemPostBinding>
 
     public View getShowReactionsButton()
     {
-        return postBinding.showReactionsButton;
+        return binding.showReactionsButton;
     }
 
     public View getShowCommentsButton()
     {
-        return postBinding.showCommentsButton;
+        return binding.showCommentsButton;
     }
 
     public void hideCopyMenuItem()

@@ -33,7 +33,8 @@ import java.util.Objects;
 
 public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerInfoImpl>, CreatePostOkCallback
 {
-    public static final int ZOOM = 16;
+    public static final int ZOOM = 18;
+    public static final int CIRCLE_RADIUS = 50;  // in meters
     public static final Locale LOCALE = Locale.ENGLISH;
 
     private final MainActivity mainActivity;
@@ -48,12 +49,8 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         this.mainActivity = mainActivity;
         this.markersAdapterHelper = markersAdapterHelper;
 
-        var postsAdapter = new PostsAdapter(mainActivity, this);
-        markersAdapterHelper.postsRecyclerView.setAdapter(postsAdapter);
-        markersAdapterHelper.postsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
-
         markerInfoItemList = new MyObservableArrayList<>();
-        markerInfoItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<MarkerInfoItem>()
+        markerInfoItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
         {
             @Override
             public void onAdded(int index,
@@ -76,9 +73,9 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
             }
 
             @Override
-            public void onClear()
+            public void onClear(int count)
             {
-                notifyItemRangeRemoved(0, getItemCount());
+                notifyItemRangeRemoved(0, count);
             }
         });
     }
@@ -95,6 +92,21 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     {
         mapView.setOnMapClickListener(latLng -> onMapClick());
         mapView.setOnMapLongClickListener(this::onMapLongClick);
+        mapView.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener()
+        {
+            @Override
+            public void onCameraMove()
+            {
+                if (mapView.getCameraPosition().zoom < ZOOM)
+                {
+                    mapView.hideMarkers();
+                }
+                else
+                {
+                    mapView.showMarkers();
+                }
+            }
+        });
     }
 
     public void onMapClick()
@@ -104,16 +116,21 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
 
     private void onMapLongClick(@NonNull LatLng latLng)
     {
+        var currentAddress = mainActivity.appDatabase.addressDao()
+                                                     .getCurrentOne();
+
+        var currentAddressLatLng = currentAddress.getLatLng();
+        var distance =
+                mainActivity.getDistance(latLng.latitude, latLng.longitude, currentAddressLatLng.latitude, currentAddressLatLng.longitude);
+
+        if (distance[0] > MarkersAdapter.CIRCLE_RADIUS) return;
+
         deselectClickedMarkerInfoAndHideBottom();
 
         initMarkerCreatorViewModel(latLng);
 
         var pointerMarker =
                 mapView.addMarker(new MarkerAddition(latLng.latitude, latLng.longitude).create());
-
-        var bottomSheetFragment = new MapSkillsBottomSheetFragment();
-        bottomSheetFragment.setOnDestroyViewListener(view -> Objects.requireNonNull(pointerMarker)
-                                                                    .remove());
 
         animateCameraTo(latLng, new GoogleMap.CancelableCallback()
         {
@@ -127,6 +144,9 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
             @Override
             public void onFinish()
             {
+                var bottomSheetFragment = new MapSkillsBottomSheetFragment();
+                bottomSheetFragment.setOnDestroyViewListener(view -> Objects.requireNonNull(pointerMarker)
+                                                                            .remove());
                 bottomSheetFragment.show(mainActivity.getSupportFragmentManager(), MapSkillsBottomSheetFragment.class.getSimpleName());
             }
         });
@@ -171,14 +191,15 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     public void addElement(@NonNull MarkerInfoImpl markerInfo)
     {
         var markerInfoItem =
-                new MarkerInfoItem(mainActivity, this, markersAdapterHelper.getPostsAdapter(), markerInfo);
+                new MarkerInfoItem(mainActivity, this, markersAdapterHelper.postsRecyclerView, markerInfo);
         markerInfoItemList.add(markerInfoItem);
     }
 
     public void refreshPostsRecycler()
     {
-        var postsAdapter = markersAdapterHelper.getPostsAdapter();
-        postsAdapter.clear();
+        var postsAdapter = new PostsAdapter(mainActivity, this);
+        markersAdapterHelper.postsRecyclerView.setAdapter(postsAdapter);
+        markersAdapterHelper.postsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
 
         var clickedMarkerInfoItem = getClickedMarkerInfoItem();
         switch (clickedMarkerInfoItem.markerInfoItemHelper.getMarkerType())
@@ -259,18 +280,18 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
             }
         }
 
-        return new MarkerInfoItem(mainActivity, this, markersAdapterHelper.getPostsAdapter(), new MarkerInfoImpl());
+        return new MarkerInfoItem(mainActivity, this, null, new MarkerInfoImpl());
     }
 
     public void animateCameraTo(@NonNull LatLng latLng)
     {
-        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM));
+        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, mapView.getCameraPosition().zoom)));
     }
 
     public void animateCameraTo(@NonNull LatLng latLng,
                                 GoogleMap.CancelableCallback callback)
     {
-        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM), callback);
+        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, mapView.getCameraPosition().zoom)), callback);
     }
 
     public void scrollToStartPosition()
@@ -302,11 +323,6 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
             this.sheetBehavior = sheetBehavior;
             this.postsToolbar = postsToolbar;
             this.postsRecyclerView = postsRecyclerView;
-        }
-
-        public PostsAdapter getPostsAdapter()
-        {
-            return (PostsAdapter) postsRecyclerView.getAdapter();
         }
     }
 }

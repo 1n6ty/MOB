@@ -18,18 +18,14 @@ import com.example.mobv2.ui.activity.MainActivity;
 
 import java.util.List;
 
-import localDatabase.dao.UserDao;
-
 public class ReactionItem implements Item<ItemReactionBinding>
 {
-    private final UserDao userDao;
-
     private final MainActivity mainActivity;
     private final ReactionsAdapter reactionsAdapter;
 
     public final ReactionItemHelper reactionItemHelper;
 
-    private ItemReactionBinding reactionBinding;
+    private ItemReactionBinding binding;
 
     public ReactionItem(MainActivity mainActivity,
                         ReactionsAdapter reactionsAdapter,
@@ -38,22 +34,21 @@ public class ReactionItem implements Item<ItemReactionBinding>
         this.mainActivity = mainActivity;
         this.reactionsAdapter = reactionsAdapter;
         this.reactionItemHelper = new ReactionItemHelper(reaction);
-
-        userDao = mainActivity.appDatabase.userDao();
     }
 
     @Override
-    public void refreshItemBinding(@NonNull ItemReactionBinding reactionBinding)
+    public void refreshItemBinding(@NonNull ItemReactionBinding binding)
     {
-        this.reactionBinding = reactionBinding;
-        View parentView = reactionBinding.getRoot();
+        this.binding = binding;
+        View parentView = binding.getRoot();
 
-        List<String> userIdsWhoLiked = reactionItemHelper.getUserIdsWhoLiked();
-        String userId = userDao.getCurrentId();
+        var userIdsWhoLiked = reactionItemHelper.getUserIdsWhoLiked();
+        String userId = mainActivity.appDatabase.userDao()
+                                                .getCurrentId();
 
-        reactionBinding.setCount(reactionItemHelper.getCount());
+        binding.setCount(reactionItemHelper.getCount());
 
-        reactionBinding.imageReactionView.setText(reactionItemHelper.getEmoji());
+        binding.imageReactionView.setText(reactionItemHelper.getEmoji());
 
         parentView.setOnClickListener(view -> toggleChecked());
         parentView.setBackgroundResource(0);
@@ -72,7 +67,8 @@ public class ReactionItem implements Item<ItemReactionBinding>
 
     public void toggleChecked()
     {
-        String userId = userDao.getCurrentId();
+        String userId = mainActivity.appDatabase.userDao()
+                                                .getCurrentId();
 
         if (reactionItemHelper.isChecked())
         {

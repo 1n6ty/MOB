@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/horizontal_very_small_margin"
-            android:layout_marginBottom="@dimen/vertical_very_small_margin">
+            android:layout_marginTop="@dimen/vertical_very_small_margin">
 
             <LinearLayout
                 android:id="@+id/linear_layout"
@@ -187,13 +187,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        android:visibility="gone"
                         tools:listitem="@layout/item_reaction" />
                 </LinearLayout>
 
                 <androidx.core.widget.NestedScrollView
                     android:id="@+id/nested_scroll_view"
                     android:layout_width="match_parent"
+                    android:layout_marginTop="@dimen/horizontal_small_margin"
                     android:layout_height="match_parent">
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -215,7 +216,6 @@
                 android:text="Show comments branch"
                 android:textAppearance="@style/itemContentTextStyle"
                 android:textSize="@dimen/medium_text_size"
-                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -136,6 +136,12 @@ public class MarkerInfoImpl implements MarkerInfo
         return latLng;
     }
 
+    @Ignore
+    public void setLatLng(LatLng latLng)
+    {
+        this.latLng = latLng;
+    }
+
     public int getMarkerType()
     {
         return markerType;

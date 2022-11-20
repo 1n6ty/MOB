@@ -18,13 +18,9 @@ import com.example.mobv2.util.MyObservableArrayList;
 
 import java.util.List;
 
-import localDatabase.dao.UserDao;
-
 public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.ReactionViewHolder>
         implements AbleToAdd<Reaction>
 {
-    private final UserDao userDao;
-
     private final MainActivity mainActivity;
     private final MyObservableArrayList<ReactionItem> reactionItemList;
     private final UserContent userContent;
@@ -66,8 +62,6 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
         }
 
         this.userContent = userContent;
-
-        userDao = mainActivity.appDatabase.userDao();
     }
 
     @NonNull
@@ -137,7 +131,8 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
 
     private void upAndAddReactionItemToReactionItemList(ReactionItem reactionItem)
     {
-        String userId = userDao.getCurrentId();
+        String userId = mainActivity.appDatabase.userDao()
+                                                .getCurrentId();
         reactionItem.reactionItemHelper.up(userId);
         reactionItemList.add(reactionItem);
     }

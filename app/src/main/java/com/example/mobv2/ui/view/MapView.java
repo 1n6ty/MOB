@@ -7,6 +7,9 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -116,6 +119,7 @@ public class MapView
             onAdapterChanged();
             adapter.registerAdapterDataObserver(observer);
             setOnMarkerClickListener(MarkerView::onClick);
+            setOnMarkerDragListener(MarkerView::onMarkerDragEnd);
 
             adapter.onCreate(this);
         }
@@ -136,6 +140,12 @@ public class MapView
         return googleMap.addMarker(options);
     }
 
+    @NonNull
+    public Circle addCircle(@NonNull CircleOptions options)
+    {
+        return googleMap.addCircle(options);
+    }
+
     public void animateCamera(@NonNull CameraUpdate update)
     {
         googleMap.animateCamera(update);
@@ -154,14 +164,43 @@ public class MapView
         googleMap.animateCamera(update, durationMs, callback);
     }
 
+    public void moveCamera(@NonNull CameraUpdate update)
+    {
+        googleMap.moveCamera(update);
+    }
+
+    public void setOnCameraMoveListener(@Nullable GoogleMap.OnCameraMoveListener listener)
+    {
+        googleMap.setOnCameraMoveListener(listener);
+    }
+
+    @NonNull
+    public CameraPosition getCameraPosition()
+    {
+        return googleMap.getCameraPosition();
+    }
+
     public void clear()
     {
         googleMap.clear();
     }
 
-    public void moveCamera(@NonNull CameraUpdate update)
+    public void hideMarkers()
     {
-        googleMap.moveCamera(update);
+        switchMarkers(false);
+    }
+
+    public void showMarkers()
+    {
+        switchMarkers(true);
+    }
+
+    private void switchMarkers(boolean visible)
+    {
+        for (MarkerView markerView : markerViews)
+        {
+            markerView.setVisible(visible);
+        }
     }
 
     public void setOnMapClickListener(@NonNull MapView.OnMapClickListener listener)
@@ -178,14 +217,46 @@ public class MapView
     {
         googleMap.setOnMarkerClickListener(marker ->
         {
-            for (MarkerView markerView: markerViews)
+            for (MarkerView markerView : markerViews)
             {
-                if (markerView.getId().equals(marker.getId()))
+                if (markerView.getId()
+                              .equals(marker.getId()))
                 {
                     listener.onMarkerClick(markerView);
+                    return true;
                 }
             }
-            return true;
+            return false;
+        });
+    }
+
+    protected void setOnMarkerDragListener(@NonNull MapView.OnMarkerDragListener listener)
+    {
+        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener()
+        {
+            @Override
+            public void onMarkerDrag(@NonNull Marker marker)
+            {
+            }
+
+            @Override
+            public void onMarkerDragEnd(@NonNull Marker marker)
+            {
+                for (MarkerView markerView : markerViews)
+                {
+                    if (markerView.getId()
+                                  .equals(marker.getId()))
+                    {
+                        listener.onMarkerDragEnd(markerView);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onMarkerDragStart(@NonNull Marker marker)
+            {
+            }
         });
     }
 
@@ -202,6 +273,11 @@ public class MapView
     public interface OnMarkerClickListener
     {
         void onMarkerClick(MarkerView markerView);
+    }
+
+    public interface OnMarkerDragListener
+    {
+        void onMarkerDragEnd(MarkerView markerView);
     }
 
     public static abstract class Adapter
