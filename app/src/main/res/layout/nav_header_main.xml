@@ -12,46 +12,64 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_background"
-        android:gravity="bottom"
-        android:orientation="vertical"
         android:paddingHorizontal="@dimen/horizontal_margin"
         android:paddingVertical="@dimen/vertical_margin"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+        android:background="@drawable/ic_background"
+        android:gravity="bottom">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/avatar_view"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginBottom="@dimen/vertical_margin"
-                android:contentDescription="@string/sample_avatar_desc"
-                android:scaleType="centerCrop"
-                app:shapeAppearance="@style/circleImageViewStyle"
-                app:srcCompat="@drawable/sample_avatar" />
-
-            <TextView
-                android:id="@+id/fullName_view"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{bindingContext.fullname}"
-                android:textAppearance="@style/navHeaderTitleStyle"
-                tools:text="@string/sample_fullname" />
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/floatingActionButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/address_view"
-                android:layout_width="match_parent"
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/avatar_view"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginBottom="@dimen/vertical_margin"
+                    android:contentDescription="@string/sample_avatar_desc"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearance="@style/circleImageViewStyle"
+                    app:srcCompat="@drawable/sample_avatar" />
+
+                <TextView
+                    android:id="@+id/fullName_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{bindingContext.fullname}"
+                    android:textAppearance="@style/navHeaderTitleStyle"
+                    tools:text="@string/sample_fullname" />
+
+                <TextView
+                    android:id="@+id/address_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="@{bindingContext.address}"
+                    android:textAppearance="@style/navSubheaderTitleStyle"
+                    tools:text="@string/sample_address" />
+            </LinearLayout>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floatingActionButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:text="@{bindingContext.address}"
-                android:textAppearance="@style/navSubheaderTitleStyle"
-                tools:text="@string/sample_address" />
-        </LinearLayout>
+                app:elevation="2dp"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/linearLayout3" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

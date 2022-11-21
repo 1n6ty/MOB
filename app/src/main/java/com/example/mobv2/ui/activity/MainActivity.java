@@ -43,6 +43,8 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
     private static final String ip = "http://192.168.0.104:8000";
 
     //WARNING UNSAFE
+    public static final String TOKEN_KEY = "TOKEN_KEY";
+    public static final String REFRESH_KEY = "REFRESH_KEY";
     public static String token = "";
     public static String refresh = "";
     public MOBServerAPI mobServerAPI;
@@ -60,7 +62,7 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
         appDatabase =
                 Room.databaseBuilder(getApplicationContext(), ApplicationDatabase.class, "information_about_session_database")
                     .allowMainThreadQueries() // it can lock the UI because of threads
-//                    .fallbackToDestructiveMigration()  // it will destroy database and create the new
+                    .fallbackToDestructiveMigration()  // it will destroy database and create the new
                     .build();
 
         initViewBinding();

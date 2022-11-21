@@ -93,12 +93,6 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
 
     private void initBodyView()
     {
-        binding.createAddressMarkerButton.setOnClickListener(view ->
-        {
-            Toast.makeText(getContext(), "Not exist", Toast.LENGTH_LONG)
-                 .show();
-            dismiss();
-        });
         binding.createSubAddressMarkerButton.setOnClickListener(view ->
         {
             ((MainActivity) getActivity()).goToFragment(new MarkerCreatorFragment());

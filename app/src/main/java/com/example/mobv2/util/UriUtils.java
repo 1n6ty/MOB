@@ -33,11 +33,11 @@ public class UriUtils
             file.createNewFile();
 
             var byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, byteArrayOutputStream);
-            byte[] bitmapdata = byteArrayOutputStream.toByteArray();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 50 /*ignored for PNG*/, byteArrayOutputStream);
+            byte[] bitmapData = byteArrayOutputStream.toByteArray();
 
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            fileOutputStream.write(bitmapdata);
+            fileOutputStream.write(bitmapData);
             fileOutputStream.flush();
             fileOutputStream.close();
 

@@ -34,6 +34,7 @@ import java.util.Objects;
 public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerInfoImpl>, CreatePostOkCallback
 {
     public static final int ZOOM = 18;
+    public static final int MIN_ZOOM = 16;
     public static final int CIRCLE_RADIUS = 50;  // in meters
     public static final Locale LOCALE = Locale.ENGLISH;
 
@@ -92,19 +93,15 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     {
         mapView.setOnMapClickListener(latLng -> onMapClick());
         mapView.setOnMapLongClickListener(this::onMapLongClick);
-        mapView.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener()
+        mapView.setOnCameraMoveListener(() ->
         {
-            @Override
-            public void onCameraMove()
+            if (mapView.getCameraPosition().zoom < MIN_ZOOM)
             {
-                if (mapView.getCameraPosition().zoom < ZOOM)
-                {
-                    mapView.hideMarkers();
-                }
-                else
-                {
-                    mapView.showMarkers();
-                }
+                mapView.hideMarkers();
+            }
+            else
+            {
+                mapView.showMarkers();
             }
         });
     }
@@ -159,7 +156,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
 
         var createPostCallback = new CreatePostCallback(mainActivity, latLng);
         createPostCallback.setOkCallback(this::parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList);
-        markerCreatorViewModel.setCallback(createPostCallback);
+        markerCreatorViewModel.setCreatePostCallback(createPostCallback);
 
         var address = mainActivity.getOtherAddressByLatLng(latLng);
 
@@ -167,8 +164,8 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     }
 
     @Override
-    public void parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(LinkedTreeMap<String, Object> map,
-                                                                       LatLng latLng)
+    public void parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(@NonNull LinkedTreeMap<String, Object> map,
+                                                                       @NonNull LatLng latLng)
     {
         String postId = String.valueOf(((Double) map.get("id")).intValue());
         double x = latLng.latitude;

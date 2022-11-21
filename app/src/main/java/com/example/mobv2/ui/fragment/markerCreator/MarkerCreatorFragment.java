@@ -20,13 +20,10 @@ import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.MainActivity;
 import com.example.mobv2.ui.fragment.BaseFragment;
 import com.example.mobv2.util.UriUtils;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import serverAPI.MOBServerAPI;
 
 public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBinding>
         implements HavingToolbar, ActivityResultCallback<List<Uri>>
@@ -97,23 +94,23 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
             images.add(new Image(uri.getPath(), uri, Image.IMAGE_OFFLINE));
         }
 
-        ImagesAdapter adapter = new ImagesAdapter((MainActivity) getActivity(), images);
+        var adapter = new ImagesAdapter((MainActivity) getActivity(), images);
         var imagesRecyclerView = binding.imagesRecyclerView;
-        imagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        imagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         imagesRecyclerView.setAdapter(adapter);
     }
 
     private void onConfirmAddingMarkerButtonClick(View view)
     {
-        LatLng latLng = viewModel.getAddress()
-                                 .getLatLng();
-        MOBServerAPI.MOBAPICallback callback = viewModel.getCallback();
+        var latLng = viewModel.getAddress()
+                              .getLatLng();
+        var createPostCallback = viewModel.getCreatePostCallback();
 
         String text = binding.markerTextView.getText()
                                             .toString();
         String title = binding.markerTitleView.getText()
                                               .toString();
-        mainActivity.mobServerAPI.post(callback, text, title, latLng.latitude, latLng.longitude, files.toArray(new File[0]), MainActivity.token);
+        mainActivity.mobServerAPI.post(createPostCallback, text, title, latLng.latitude, latLng.longitude, files.toArray(new File[0]), MainActivity.token);
 
         mainActivity.toPreviousFragment();
     }

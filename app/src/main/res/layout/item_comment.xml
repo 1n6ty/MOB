@@ -56,10 +56,14 @@
 
                 <androidx.coordinatorlayout.widget.CoordinatorLayout
                     android:id="@+id/close_comments_button"
-                    style="@style/postButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:background="@drawable/ripple_effect"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:visibility="gone"
+                    android:paddingHorizontal="@dimen/horizontal_small_margin"
+                    android:paddingVertical="2dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -213,7 +217,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:background="@drawable/ripple_effect"
-                android:text="Show comments branch"
+                android:text="@string/show_comments_branch"
                 android:textAppearance="@style/itemContentTextStyle"
                 android:textSize="@dimen/medium_text_size"
                 app:layout_constraintBottom_toBottomOf="parent"

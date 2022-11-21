@@ -57,7 +57,7 @@
                         style="@style/authPasswordTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Marker's title"
+                        android:hint="@string/marker_title_hint"
                         android:importantForAutofill="no"
                         android:inputType="text" />
 
@@ -67,7 +67,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="top|start"
-                        android:hint="Marker's text"
+                        android:hint="@string/marker_text_hint"
                         android:importantForAutofill="no"
                         android:inputType="textMultiLine"
                         android:minLines="1"
@@ -94,8 +94,8 @@
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/images_recycler_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         tools:itemCount="1"
                         tools:listitem="@layout/item_image" />
                 </LinearLayout>

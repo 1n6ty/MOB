@@ -19,7 +19,7 @@ import localDatabase.dao.UserDao;
         UserImpl.class,
         MarkerInfoImpl.class,
         PostImpl.class,
-        CommentImpl.class}, version = 11)
+        CommentImpl.class}, version = 12)
 public abstract class ApplicationDatabase extends RoomDatabase
 {
     public abstract AddressDao addressDao();

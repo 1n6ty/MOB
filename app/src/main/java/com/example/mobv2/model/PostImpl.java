@@ -161,7 +161,7 @@ public class PostImpl implements Post, HavingCommentsIds, UserContent
             var dataMap = getDataMap(map);
             title = (String) dataMap.get("title");
             text = (String) dataMap.get("content");
-            images = (ArrayList<String>) dataMap.get("img_urls");
+            images = (ArrayList<String>) dataMap.get("image_urls");
 
             commentsIds = new ArrayList<>();
             var rawCommentIds = (ArrayList<Double>) dataMap.get("comment_ids");

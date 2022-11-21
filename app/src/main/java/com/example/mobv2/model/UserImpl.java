@@ -25,9 +25,13 @@ public class UserImpl implements User
     private String surname;
     private String email;
     private String phoneNumber;
+    private String password;
 
     @ColumnInfo(name = "usercurrent")
     private boolean current;
+
+    @ColumnInfo(name = "userlastlogin")
+    private boolean lastLogin;
 
     @Ignore
     public UserImpl()
@@ -166,6 +170,18 @@ public class UserImpl implements User
     }
 
     @Override
+    public String getPassword()
+    {
+        return password;
+    }
+
+    @Override
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+
+    @Override
     public boolean isCurrent()
     {
         return current;
@@ -175,5 +191,17 @@ public class UserImpl implements User
     public void setCurrent(boolean current)
     {
         this.current = current;
+    }
+
+    @Override
+    public boolean isLastLogin()
+    {
+        return lastLogin;
+    }
+
+    @Override
+    public void setLastLogin(boolean lastLogin)
+    {
+        this.lastLogin = lastLogin;
     }
 }

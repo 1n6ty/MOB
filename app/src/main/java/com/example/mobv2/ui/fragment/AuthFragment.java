@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +12,7 @@ import androidx.annotation.Nullable;
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.MarkersAdapter;
 import com.example.mobv2.callback.AuthCallback;
+import com.example.mobv2.callback.AutoAuthCallback;
 import com.example.mobv2.callback.abstraction.AuthOkCallback;
 import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.model.AddressImpl;
@@ -28,6 +28,9 @@ import java.util.Map;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements AuthOkCallback
 {
+    private String loginText;
+    private String passwordText;
+
     public AuthFragment()
     {
         super(R.layout.fragment_auth);
@@ -39,35 +42,38 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     {
         super.onViewCreated(view, savedInstanceState);
 
+        autoAuth();
         initNextButton();
+    }
+
+    private void autoAuth()
+    {
+        AsyncTask.execute(() ->
+        {
+            var lastLoginUser = mainActivity.appDatabase.userDao()
+                                                      .getLastLoginOne();
+            if (lastLoginUser != null && lastLoginUser.getNickName() != null && lastLoginUser.getPassword() != null)
+            {
+                var authCallback = new AutoAuthCallback(mainActivity);
+                authCallback.setOkCallback(this::parseUserInfoFromMapAndAddToLocalDatabase);
+                mainActivity.mobServerAPI.auth(authCallback, lastLoginUser.getNickName(), lastLoginUser.getPassword());
+            }
+        });
     }
 
     private void initNextButton()
     {
-        Button nextButton = binding.nextButton;
-
-        nextButton.setOnClickListener(this::onNextButtonClick);
-
-        // unnecessary
-        binding.skipAuthButton.setOnClickListener(v ->
-        {
-            var authCallback = new AuthCallback(mainActivity);
-            authCallback.setOkCallback(this::parseUserInfoFromMapAndAddToLocalDatabase);
-            mainActivity.mobServerAPI.me(authCallback, MainActivity.token.isEmpty()
-                    ? mainActivity.getPrivatePreferences()
-                                  .getString("TOKEN", "")
-                    : MainActivity.token);
-        });
+        binding.nextButton.setOnClickListener(this::onNextButtonClick);
     }
 
     private void onNextButtonClick(View view)
     {
-        final int DELAY = 3000;
-        String loginText = binding.loginView.getText()
-                                    .toString()
-                                    .trim();
-        String passwordText = binding.passwordView.getText()
-                                          .toString();
+        final int DELAY = 3000; // in milliseconds
+        loginText = binding.loginView.getText()
+                                     .toString()
+                                     .trim();
+        passwordText = binding.passwordView.getText()
+                                           .toString();
 
         View errorView;
         if (loginText.isEmpty()) errorView = binding.errorLoginView;
@@ -87,6 +93,8 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         mainActivity.mobServerAPI.auth(authCallback, loginText, passwordText);
     }
 
+
+    // TODO REWORK
     @Override
     public void parseUserInfoFromMapAndAddToLocalDatabase(LinkedTreeMap<String, Object> map)
     {
@@ -96,47 +104,60 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
             MainActivity.token = (String) map.get("token");
             MainActivity.refresh = (String) map.get("refresh");
 
-            mainActivity.getPrivatePreferences()
-                        .edit()
-                        .putString("TOKEN", MainActivity.token)
-                        .putString("REFRESH", MainActivity.refresh)
-                        .apply();
+            var edit = mainActivity.getPrivatePreferences()
+                                   .edit();
+            edit.putString(MainActivity.TOKEN_KEY, MainActivity.token);
+            edit.putString(MainActivity.REFRESH_KEY, MainActivity.refresh);
+            edit.apply();
         }
 
         var user = new UserImpl.UserBuilder().parseFromMap((Map<String, Object>) map.get("user"));
 
         AsyncTask.execute(() ->
         {
-            var addressDao = mainActivity.appDatabase.addressDao();
             var userDao = mainActivity.appDatabase.userDao();
-            List<AddressImpl> addresses = addressDao.getAll();
-            if (!user.compareById(userDao.getCurrentOne()))
+            var users = userDao.getAll();
+            var addressDao = mainActivity.appDatabase.addressDao();
+            var addresses = addressDao.getAll();
+
+            if (!user.compareById(userDao.getLastLoginOne()))
             {
                 for (AddressImpl address : addresses)
                     addressDao.delete(address);
             }
+            var lastLogin = userDao.getLastLoginOne();
+            if (lastLogin != null)
+            {
+                lastLogin.setLastLogin(false);
+                userDao.update(lastLogin);
+            }
 
+            if (binding.rememberMeCheckBox.isChecked())
+            {
+                user.setPassword(passwordText);
+            }
+
+            user.setLastLogin(true);
             user.setCurrent(true);
             userDao.insert(user);
 
             Object addressesObject = map.get("addresses");
-            if (!addressesObject.equals("none"))
+            if (addressesObject.equals("none")) return;
+
+            var addressesMapList = (List<Map<String, Object>>) addressesObject;
+
+            for (var addressMap : addressesMapList)
             {
-                var addressesMapList = (List<Map<String, Object>>) addressesObject;
-
-                for (Map<String, Object> addressMap : addressesMapList)
+                var address = new AddressImpl.AddressBuilder().parseFromMap(addressMap);
+                var latLng = getLatLngByAddress(address);
+                address.setLatLng(latLng);
+                var currentAddress = addressDao.getCurrentOne();
+                if (address.compareById(currentAddress))
                 {
-                    AddressImpl address = new AddressImpl.AddressBuilder().parseFromMap(addressMap);
-                    LatLng latLng = getLatLngByAddress(address);
-                    address.setLatLng(latLng);
-                    var currentAddress = addressDao.getCurrentOne();
-                    if (address.compareById(currentAddress))
-                    {
-                        address.setCurrent(currentAddress.isCurrent());
-                    }
-
-                    addressDao.insert(address);
+                    address.setCurrent(currentAddress.isCurrent());
                 }
+
+                addressDao.insert(address);
             }
         });
 
@@ -147,7 +168,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     {
         try
         {
-            Geocoder geocoder = new Geocoder(mainActivity, MarkersAdapter.LOCALE);
+            var geocoder = new Geocoder(mainActivity, MarkersAdapter.LOCALE);
             android.location.Address mapAddress =
                     geocoder.getFromLocationName(address.toString(), 1)
                             .get(0);

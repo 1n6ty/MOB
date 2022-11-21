@@ -13,8 +13,8 @@ import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.ObservableInt;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.mobv2.R;
 import com.example.mobv2.adapter.ImagesAdapter;
@@ -157,7 +157,7 @@ public class PostItem implements Item<ItemPostBinding>
                     images.add(new Image("", url, Image.IMAGE_ONLINE));
                 }
                 ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                imagesRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(Math.min(images.size(), 3), StaggeredGridLayoutManager.VERTICAL));
+                imagesRecyclerView.setLayoutManager(new GridLayoutManager(mainActivity, Math.min(images.size(), 3)));
                 imagesRecyclerView.setAdapter(adapter);
                 break;
         }

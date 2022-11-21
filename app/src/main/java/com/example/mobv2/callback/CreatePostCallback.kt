@@ -16,7 +16,7 @@ class CreatePostCallback(private val mainActivity: MainActivity,
     override fun funcOk(obj: LinkedTreeMap<String, Any>)
     {
         Log.v("DEBUG", obj.toString())
-        val response = obj["response"] as LinkedTreeMap<String, Any>?
+        val response = obj["response"] as LinkedTreeMap<String, Any>
 
         okCallback?.parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList(response, latLng)
     }

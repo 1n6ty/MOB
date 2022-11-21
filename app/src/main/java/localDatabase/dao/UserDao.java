@@ -20,6 +20,9 @@ public interface UserDao
     @Query("SELECT * FROM userimpl WHERE userid = :id")
     UserImpl getById(String id);
 
+    @Query("SELECT * FROM userimpl WHERE userlastlogin")
+    UserImpl getLastLoginOne();
+
     @Query("SELECT * FROM userimpl WHERE usercurrent")
     UserImpl getCurrentOne();
 
@@ -29,7 +32,7 @@ public interface UserDao
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(UserImpl user);
 
-    @Update(onConflict = OnConflictStrategy.IGNORE)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void update(UserImpl user);
 
     @Delete

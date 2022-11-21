@@ -17,7 +17,7 @@ class GetCommentCallback(private val mainActivity: MainActivity) : MOBAPICallbac
     override fun funcOk(obj: LinkedTreeMap<String, Any>)
     {
         Log.v("DEBUG", obj.toString())
-        val response = obj["response"] as LinkedTreeMap<String, Any>?
+        val response = obj["response"] as LinkedTreeMap<String, Any>
 
         okCallback?.parseCommentFromMapAndAddToComments(response)
     }

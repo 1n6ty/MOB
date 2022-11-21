@@ -225,7 +225,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     {
         var comment = CommentImpl.createNewComment(commentId, mainActivity.appDatabase.userDao()
                                                                                       .getCurrentOne(), messageText);
-        if (innerCommentsAdapter == null) initAdapterForInnerCommentsRecyclerView();
+        binding.showCommentsButton.callOnClick();
         innerCommentsAdapter.addElement(comment);
         commentItemHelper.getCommentIds()
                          .add(commentId);

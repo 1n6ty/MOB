@@ -111,7 +111,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     }
 
     @Override
-    public void parseCommentFromMapAndAddToComments(LinkedTreeMap<String, Object> map)
+    public void parseCommentFromMapAndAddToComments(@NonNull LinkedTreeMap<String, Object> map)
     {
         var comment = new CommentImpl.CommentBuilder().parseFromMap(map);
         mainActivity.appDatabase.commentDao()

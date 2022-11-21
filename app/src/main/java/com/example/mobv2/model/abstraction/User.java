@@ -20,7 +20,15 @@ public interface User extends Comparable<User>
 
     String getPhoneNumber();
 
+    String getPassword();
+
+    void setPassword(String password);
+
     boolean isCurrent();
 
     void setCurrent(boolean current);
+
+    boolean isLastLogin();
+
+    void setLastLogin(boolean lastLogin);
 }

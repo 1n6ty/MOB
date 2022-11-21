@@ -40,6 +40,7 @@
     <string name="auth_phone_hint">Enter your login</string>
     <string name="auth_password_hint">Enter your password</string>
     <string name="auth_button">Next -&gt;</string>
+    <string name="remember_me_check_box">Remember me</string>
 
     <!--  post menu item titles  -->
     <string name="menu_copy_text">Copy</string>
@@ -72,5 +73,11 @@
     <string name="bs_long_map_coordinates">Coordinates:</string>
     <string name="bs_long_map_address">Address:</string>
     <string name="bs_long_map_add_marker">Add marker</string>
+    <string name="bs_long_map_create_sub_address_marker">Create sub address marker</string>
+    <string name="bs_long_map_create_address_marker">Create address marker</string>
 
+    <string name="marker_title_hint">Marker\'s title</string>
+    <string name="marker_text_hint">Marker\'s text</string>
+
+    <string name="show_comments_branch">Show comments branch</string>
 </resources>
