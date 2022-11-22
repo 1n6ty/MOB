@@ -21,7 +21,6 @@ class AuthCallback(private val mainActivity: MainActivity) : MOBAPICallback,
         val response = obj["response"] as LinkedTreeMap<String, Any>?
 
         okCallback?.parseUserInfoFromMapAndAddToLocalDatabase(response)
-        mainActivity.replaceFragment(MainFragment())
     }
 
     override fun funcBad(obj: LinkedTreeMap<String, Any>)

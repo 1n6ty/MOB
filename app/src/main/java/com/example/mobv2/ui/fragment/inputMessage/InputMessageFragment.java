@@ -1,9 +1,11 @@
 package com.example.mobv2.ui.fragment.inputMessage;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -75,19 +77,25 @@ public class InputMessageFragment extends BaseFragment<FragmentInputMessageBindi
     private void onSendButtonClick(View view)
     {
         var messageView = binding.messageView;
-        var messageText = messageView.getText()
-                                     .toString();
-        CommentCallback callback = new CommentCallback(mainActivity, messageView.getText()
-                                                                                .toString());
-        callback.setOkCallback(viewModel.createCommentByIdAndAddToCommentIds);
-        mainActivity.mobServerAPI.commentComment(callback, messageText, viewModel.parentId, MainActivity.token);
 
-        mainActivity.toPreviousFragment();
+        CommentCallback commentCallback = new CommentCallback(mainActivity, messageView.getText()
+                                                                                       .toString());
+        commentCallback.setOkCallback((commentId, messageText) ->
+        {
+            viewModel.commentOkCallback.createCommentByIdAndTextAndAddToCommentIds(commentId, messageText);
+            mainActivity.toPreviousFragment();
+        });
+
+        mainActivity.mobServerAPI.commentComment(commentCallback, messageView.getText()
+                                                                             .toString(), viewModel.parentId, MainActivity.token);
     }
 
     private void initMessageView()
     {
         binding.messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, binding.sendButton));
+        binding.messageView.requestFocus(View.FOCUS_DOWN);
+        var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(binding.messageView, InputMethodManager.SHOW_IMPLICIT);
     }
 
     @Override

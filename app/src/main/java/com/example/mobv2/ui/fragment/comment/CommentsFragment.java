@@ -121,7 +121,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
             case R.id.menu_posts_reverse:
                 return commentsAdapter.reverse();
             case R.id.menu_sort_by_rates:
-                return commentsAdapter.sortByAppreciations();
+                return commentsAdapter.sortByRates();
             case R.id.menu_sort_by_date:
                 return commentsAdapter.sortByDate();
             case R.id.menu_sort_by_comments:

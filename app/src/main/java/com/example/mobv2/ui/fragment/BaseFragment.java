@@ -23,8 +23,7 @@ import com.example.mobv2.R;
 import com.example.mobv2.ui.abstraction.Updatable;
 import com.example.mobv2.ui.activity.MainActivity;
 
-public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
-    implements Updatable
+public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment implements Updatable
 {
     protected MainActivity mainActivity;
     protected T binding;
@@ -36,15 +35,21 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment
         this.layoutId = layoutId;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        mainActivity = (MainActivity) getActivity();
+        updateWindow();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState)
     {
-        mainActivity = (MainActivity) getActivity();
-        updateWindow();
-
         binding = DataBindingUtil.inflate(inflater, layoutId, container, false);
         return binding.getRoot();
     }

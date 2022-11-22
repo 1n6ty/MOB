@@ -212,7 +212,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
                 new ViewModelProvider(mainActivity).get(InputMessageFragmentViewModel.class);
 
         viewModel.setParentId(commentItemHelper.getId());
-        viewModel.setCreateCommentByIdAndAddToCommentIds(this::createCommentByIdAndTextAndAddToCommentIds);
+        viewModel.setCommentOkCallback(this::createCommentByIdAndTextAndAddToCommentIds);
         if (!viewModel.getActive())
         {
             mainActivity.goToFragment(new InputMessageFragment(), 0, 0);
@@ -229,6 +229,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         innerCommentsAdapter.addElement(comment);
         commentItemHelper.getCommentIds()
                          .add(commentId);
+
+//        binding.commentsRecyclerView.scrollTo(binding.commentsRecyclerView.get);
     }
 
     private void initShowReactionsButton()

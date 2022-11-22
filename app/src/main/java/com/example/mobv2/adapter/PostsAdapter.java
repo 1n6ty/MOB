@@ -141,7 +141,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     }
 
     @Override
-    public boolean sortByAppreciations()
+    public boolean sortByRates()
     {
         Collections.sort(postItemList, (postItem, nextPostItem) ->
         {

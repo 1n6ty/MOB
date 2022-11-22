@@ -7,5 +7,5 @@ class InputMessageFragmentViewModel : ObservableViewModel()
 {
     var active: Boolean = false
     lateinit var parentId: String
-    lateinit var createCommentByIdAndAddToCommentIds: CommentOkCallback
+    lateinit var commentOkCallback: CommentOkCallback
 }

@@ -191,7 +191,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     }
 
     @Override
-    public boolean sortByAppreciations()
+    public boolean sortByRates()
     {
         Collections.sort(commentItemList, (commentItem, nextCommentItem) ->
         {

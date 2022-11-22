@@ -19,6 +19,7 @@ import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.Address;
 import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.fragment.main.MainFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -28,7 +29,6 @@ import java.util.Map;
 
 public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements AuthOkCallback
 {
-    private String loginText;
     private String passwordText;
 
     public AuthFragment()
@@ -51,12 +51,12 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         AsyncTask.execute(() ->
         {
             var lastLoginUser = mainActivity.appDatabase.userDao()
-                                                      .getLastLoginOne();
+                                                        .getLastLoginOne();
             if (lastLoginUser != null && lastLoginUser.getNickName() != null && lastLoginUser.getPassword() != null)
             {
-                var authCallback = new AutoAuthCallback(mainActivity);
-                authCallback.setOkCallback(this::parseUserInfoFromMapAndAddToLocalDatabase);
-                mainActivity.mobServerAPI.auth(authCallback, lastLoginUser.getNickName(), lastLoginUser.getPassword());
+                var autoAuthCallback = new AutoAuthCallback(mainActivity);
+                autoAuthCallback.setOkCallback(this::parseUserInfoFromMapAndAddToLocalDatabase);
+                mainActivity.mobServerAPI.auth(autoAuthCallback, lastLoginUser.getNickName(), lastLoginUser.getPassword());
             }
         });
     }
@@ -69,16 +69,25 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     private void onNextButtonClick(View view)
     {
         final int DELAY = 3000; // in milliseconds
-        loginText = binding.loginView.getText()
-                                     .toString()
-                                     .trim();
+        String loginText = binding.loginView.getText()
+                                            .toString()
+                                            .trim();
         passwordText = binding.passwordView.getText()
                                            .toString();
 
         View errorView;
-        if (loginText.isEmpty()) errorView = binding.errorLoginView;
-        else if (passwordText.isEmpty()) errorView = binding.errorPasswordView;
-        else errorView = null;
+        if (loginText.isEmpty())
+        {
+            errorView = binding.errorLoginView;
+        }
+        else if (passwordText.isEmpty())
+        {
+            errorView = binding.errorPasswordView;
+        }
+        else
+        {
+            errorView = null;
+        }
 
         if (errorView != null)
         {
@@ -116,7 +125,6 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         AsyncTask.execute(() ->
         {
             var userDao = mainActivity.appDatabase.userDao();
-            var users = userDao.getAll();
             var addressDao = mainActivity.appDatabase.addressDao();
             var addresses = addressDao.getAll();
 
@@ -130,9 +138,10 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
             {
                 lastLogin.setLastLogin(false);
                 userDao.update(lastLogin);
+                user.setPassword(lastLogin.getPassword());
             }
 
-            if (binding.rememberMeCheckBox.isChecked())
+            if (binding.rememberMeCheckBox != null && binding.rememberMeCheckBox.isChecked())
             {
                 user.setPassword(passwordText);
             }
@@ -162,16 +171,17 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         });
 
         mainActivity.startRefreshingToken();
+        mainActivity.replaceFragment(new MainFragment());
     }
 
-    private LatLng getLatLngByAddress(Address address)
+    @Nullable
+    private LatLng getLatLngByAddress(@NonNull Address address)
     {
         try
         {
             var geocoder = new Geocoder(mainActivity, MarkersAdapter.LOCALE);
-            android.location.Address mapAddress =
-                    geocoder.getFromLocationName(address.toString(), 1)
-                            .get(0);
+            android.location.Address mapAddress = geocoder.getFromLocationName(address.toString(), 1)
+                                                          .get(0);
 
             return new LatLng(mapAddress.getLatitude(), mapAddress.getLongitude());
         }
