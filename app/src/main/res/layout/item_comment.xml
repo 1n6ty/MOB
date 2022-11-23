@@ -98,7 +98,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@{fullName}"
-                        android:textAppearance="@style/postItemHeaderTextStyle"
+                        android:textAppearance="@style/commentItemHeaderTextStyle"
                         tools:text="@string/sample_fullname" />
 
                     <TextView
@@ -167,7 +167,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginLeft="@dimen/horizontal_small_margin"
-                            android:text="Reply"
+                            android:text="@string/reply"
                             android:textAppearance="@style/ratesTextStyle"
                             android:textColor="?colorTertiaryText"
                             app:layout_constraintBottom_toBottomOf="parent"

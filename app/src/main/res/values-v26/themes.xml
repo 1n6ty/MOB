@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MOBv2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+    <style name="Theme.MOBv2.PopupOverlay" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="android:textColor">?colorPopupMenuText</item>
         <item name="tint">?colorPopupMenuIcon</item>
         <item name="popupMenuBackground">?backgroundPopupMenu</item>
         <item name="android:paddingLeft">@dimen/vertical_very_small_margin</item>
-        <item name="android:width">150dp</item>
+        <item name="android:width">180dp</item>
     </style>
 
     <!-- Popup Other Style -->
-    <style name="MyPopupOtherStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <!-- Used for the buttons -->
+    <!--<style name="MyPopupOtherStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        &lt;!&ndash; Used for the buttons &ndash;&gt;
         <item name="colorAccent">@color/gray_300</item>
-        <!-- Used for the title and text -->
+        &lt;!&ndash; Used for the title and text &ndash;&gt;
         <item name="android:textColorPrimary">@color/white</item>
-        <!-- Used for the background -->
-        <!--        <item name="android:background">@color/black</item>-->
-    </style>
+        &lt;!&ndash; Used for the background &ndash;&gt;
+        &lt;!&ndash;        <item name="android:background">@color/black</item>&ndash;&gt;
+    </style>-->
 </resources>

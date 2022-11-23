@@ -21,7 +21,6 @@ class AutoAuthCallback(private val mainActivity: MainActivity) : MOBServerAPI.MO
         val response = obj["response"] as LinkedTreeMap<String, Any>?
 
         okCallback?.parseUserInfoFromMapAndAddToLocalDatabase(response)
-        mainActivity.replaceFragment(MainFragment())
     }
 
     override fun funcBad(obj: LinkedTreeMap<String, Any>)

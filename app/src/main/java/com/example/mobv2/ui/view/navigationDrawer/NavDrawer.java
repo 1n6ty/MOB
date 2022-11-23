@@ -57,7 +57,7 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
         headerView = navigationView.getHeaderView(0);
 
-        var binding = NavHeaderMainBinding.bind(navigationView.getHeaderView(0));
+        var binding = NavHeaderMainBinding.bind(headerView);
         var mainFragmentViewModel =
                 new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
         binding.setBindingContext(mainFragmentViewModel);

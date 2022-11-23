@@ -138,11 +138,17 @@
     <style name="postItemHeaderTextStyle">
         <item name="android:textColor">?colorPrimaryText</item>
         <item name="android:textSize">@dimen/medium_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="commentItemHeaderTextStyle">
+        <item name="android:textColor">?colorSecondaryText</item>
+        <item name="android:textSize">@dimen/pre_medium_text_size</item>
     </style>
 
     <style name="itemContentTextStyle">
         <item name="android:textColor">?colorSecondaryText</item>
-        <item name="android:textSize">@dimen/pre_medium_text_size</item>
+        <item name="android:textSize">@dimen/medium_text_size</item>
     </style>
 
     <style name="itemDateTextStyle">

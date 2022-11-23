@@ -32,11 +32,9 @@ import com.example.mobv2.ui.activity.MainActivity;
 import com.example.mobv2.ui.fragment.comment.CommentsFragment;
 import com.example.mobv2.ui.fragment.comment.CommentsFragmentViewModel;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class PostItem implements Item<ItemPostBinding>
 {
@@ -82,7 +80,7 @@ public class PostItem implements Item<ItemPostBinding>
         var user = postItemHelper.getUser();
 
         binding.setFullName(user.getFullName());
-        binding.setDate(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(postItemHelper.getDate()));
+        binding.setDate(postItemHelper.getDateString());
         binding.setCommentsCount(postItemHelper.getCommentsCount());
         binding.setRatesCount(postItemHelper.getRatesCount());
 
@@ -377,6 +375,41 @@ public class PostItem implements Item<ItemPostBinding>
         public Date getDate()
         {
             return post.getDate();
+        }
+
+        public String getDateString()
+        {
+            int[] months = {R.string.january,
+                    R.string.february,
+                    R.string.march,
+                    R.string.april,
+                    R.string.may,
+                    R.string.june,
+                    R.string.july,
+                    R.string.august,
+                    R.string.september,
+                    R.string.october,
+                    R.string.november,
+                    R.string.december,};
+            String dateString = "";
+
+            if (post.getDate().equals(new Date()))
+            {
+                dateString += "Сегодня в ";
+                dateString += post.getDate().getDay() + " ";
+                dateString += post.getDate().getDay() + " ";
+                dateString += post.getDate().getDay() + " ";
+            }
+
+            else
+            {
+                dateString += post.getDate().getDate() + " ";
+                dateString += mainActivity.getString(months[ post.getDate().getMonth()]).substring(0, 3) + " ";
+                dateString += post.getDate().getYear() + " ";
+            }
+
+
+            return dateString;
         }
 
         public String getTitle()

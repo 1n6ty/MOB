@@ -29,10 +29,10 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/vertical_very_small_margin"
+        android:layout_marginBottom="@dimen/vertical_small_margin"
         android:background="?backgroundSecondaryWindow"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="2dp">
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"

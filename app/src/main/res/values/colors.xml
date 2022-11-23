@@ -13,6 +13,7 @@
     <color name="gray_300">#AAAAAA</color>
     <color name="gray_500">#7E7E7E</color>
     <color name="gray_700">#494949</color>
+    <color name="gray_800">#272727</color>
     <color name="black">#000000</color>
 
     <!--  alpha colors  -->

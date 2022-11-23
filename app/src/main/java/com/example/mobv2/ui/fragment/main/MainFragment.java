@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,8 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private MarkersAdapter markersAdapter;
     private MapView mapView;
+
+    private Menu menu;
 
     public MainFragment()
     {
@@ -234,9 +237,10 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private void setPostsToolbarListeners()
     {
         var postsToolbar = binding.postsToolbar;
-        postsToolbar.setNavigationOnClickListener(view -> markersAdapter.onMapClick());
 
-        binding.postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+        menu = postsToolbar.getMenu();
+        postsToolbar.setNavigationOnClickListener(view -> markersAdapter.onMapClick());
+       postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     @Override
@@ -244,6 +248,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     {
         PostsAdapter postsAdapter = (PostsAdapter) binding.postsRecyclerView.getAdapter();
         if (postsAdapter == null) return false;
+
+        menu.findItem(R.id.menu_show_more).setTitle(item.getTitle());
+//        menu.findItem(R.id.menu_show_more).
         switch (item.getItemId())
         {
             case R.id.menu_posts_refresh:

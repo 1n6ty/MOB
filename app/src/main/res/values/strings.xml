@@ -1,19 +1,33 @@
 <resources>
     <string name="check_internet_connection">"Check your Internet connection"</string>
-    <string name="user_is_not_exist">This user is not exist</string>
+    <string name="user_does_not_exist">This user does not exist</string>
     <string name="field_is_necessary"><u>Field is necessary</u></string>
 
-    <string name="app_name">MOB</string>
+    <string name="app_name" translatable="false">Improve.Map</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <!--  months  -->
+    <string name="january">January</string>
+    <string name="february">February</string>
+    <string name="march">March</string>
+    <string name="april">April</string>
+    <string name="may">May</string>
+    <string name="june">June</string>
+    <string name="july">July</string>
+    <string name="august">August</string>
+    <string name="september">September</string>
+    <string name="october">October</string>
+    <string name="november">November</string>
+    <string name="december">December</string>
+
     <!--  nav drawer header  -->
-    <string name="sample_fullname">Lary Davise</string>
-    <string name="sample_phone_number">+78005553535</string>
-    <string name="sample_avatar_desc">User\'s avatar</string>
-    <string name="sample_nickname">\@user</string>
-    <string name="sample_address">Russia, Kursk, Verhnyaya Lugovaya, 59</string>
-    <string name="sample_date">15.04.2022</string>
+    <string name="sample_fullname" translatable="false">Lary Davise</string>
+    <string name="sample_phone_number" translatable="false">+78005553535</string>
+    <string name="sample_avatar_desc" translatable="false">User\'s avatar</string>
+    <string name="sample_nickname" translatable="false">\@user</string>
+    <string name="sample_address" translatable="false">Russia, Kursk, Verhnyaya Lugovaya, 59</string>
+    <string name="sample_date" translatable="false">15.04.2022</string>
 
     <!--  nav drawer item titles  -->
     <string name="menu_edit_profile">Edit Profile</string>
@@ -55,17 +69,17 @@
     <string name="menu_sort_by_comments">Sort by comments</string>
 
     <!--  menu item reactions  -->
-    <string name="menu_reaction_count">200</string>
-    <string name="menu_reaction_like">👍</string>
-    <string name="menu_reaction_dislike">👎</string>
-    <string name="menu_reaction_love">❤</string>
+    <string name="menu_reaction_count" translatable="false">200</string>
+    <string name="menu_reaction_like" translatable="false">👍</string>
+    <string name="menu_reaction_dislike" translatable="false">👎</string>
+    <string name="menu_reaction_love" translatable="false">❤</string>
 
     <!--  change addresses fragment  -->
-    <string name="address_primary">Russia, Kursk</string>
-    <string name="address_secondary">Centralniy okrug, Verhnyaya Lugovaya, 59</string>
+    <string name="address_primary" translatable="false">Russia, Kursk</string>
+    <string name="address_secondary" translatable="false">Centralniy okrug, Verhnyaya Lugovaya, 59</string>
 
     <!--  comments fragment  -->
-    <string name="sample_comment">Pastry dragée danish jujubes icing tootsie roll. Marshmallow jelly beans toffee shortbread cupcake.</string>
+    <string name="sample_comment" translatable="false">Pastry dragée danish jujubes icing tootsie roll. Marshmallow jelly beans toffee shortbread cupcake.</string>
     <string name="comments_count">Comments:</string>
     <string name="write_some_letters">Write some letters...</string>
 
@@ -80,4 +94,5 @@
     <string name="marker_text_hint">Marker\'s text</string>
 
     <string name="show_comments_branch">Show comments branch</string>
+    <string name="reply">Reply</string>
 </resources>

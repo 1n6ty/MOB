@@ -2,7 +2,6 @@ package com.example.mobv2.ui.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -50,26 +49,26 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
             switch (item.getItemId())
             {
                 case R.id.menu_set_new_photo:
-                    break;
+                    return true;
                 case R.id.menu_save_to_gallery:
-                    break;
+                    return true;
                 case R.id.menu_delete_photo:
-                    break;
+                    return true;
                 case R.id.menu_log_out:
-                    return logOutMenuItemClick(item);
+                    return logOut();
+                default:
+                    return false;
             }
-
-            return true;
         });
     }
 
-    private boolean logOutMenuItemClick(MenuItem item)
+    private boolean logOut()
     {
         var userDao = mainActivity.appDatabase.userDao();
         var lastLoginUser = userDao.getLastLoginOne();
         lastLoginUser.setLastLogin(false);
         userDao.update(lastLoginUser);
-        mainActivity.recreate();
+        mainActivity.replaceFragment(new AuthFragment());
         return true;
     }
 

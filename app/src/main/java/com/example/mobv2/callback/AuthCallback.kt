@@ -5,7 +5,6 @@ import android.widget.Toast
 import com.example.mobv2.R
 import com.example.mobv2.callback.abstraction.AuthOkCallback
 import com.example.mobv2.ui.activity.MainActivity
-import com.example.mobv2.ui.fragment.main.MainFragment
 import com.example.mobv2.util.abstraction.responseStateCallback.HasOkStateCallback
 import com.google.gson.internal.LinkedTreeMap
 import serverAPI.MOBServerAPI.MOBAPICallback
@@ -26,7 +25,7 @@ class AuthCallback(private val mainActivity: MainActivity) : MOBAPICallback,
     override fun funcBad(obj: LinkedTreeMap<String, Any>)
     {
         Log.v("DEBUG", obj.toString())
-        Toast.makeText(mainActivity, R.string.user_is_not_exist, Toast.LENGTH_LONG)
+        Toast.makeText(mainActivity, R.string.user_does_not_exist, Toast.LENGTH_LONG)
             .show()
     }
 

@@ -31,8 +31,8 @@
         <item name="backgroundSecondaryFab">@color/blue_500</item>
         <item name="colorSecondaryFabIcon">@color/white</item>
         <item name="backgroundClickedFab">@color/gray_200</item>
-        <item name="colorPrimaryText">@color/gray_700</item>
-        <item name="colorSecondaryText">@color/gray_500</item>
+        <item name="colorPrimaryText">@color/gray_800</item>
+        <item name="colorSecondaryText">@color/gray_700</item>
         <item name="colorTertiaryText">@color/gray_300</item>
         <item name="colorWrongText">@color/gray_500</item>
         <item name="backgroundSelectedAddress">@color/blue_100_alpha_40</item>

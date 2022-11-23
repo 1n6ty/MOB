@@ -141,7 +141,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
                 user.setPassword(lastLogin.getPassword());
             }
 
-            if (binding.rememberMeCheckBox != null && binding.rememberMeCheckBox.isChecked())
+            if (binding.rememberMeCheckBox.isChecked())
             {
                 user.setPassword(passwordText);
             }

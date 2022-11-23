@@ -4,7 +4,7 @@
 
     <item
         android:icon="@drawable/ic_show_more"
-        android:iconTint="?colorToolbarIcon"
+        app:iconTint="?colorToolbarIcon"
         android:title=""
         app:showAsAction="ifRoom">
         <menu>
