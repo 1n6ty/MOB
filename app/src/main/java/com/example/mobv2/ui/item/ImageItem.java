@@ -1,27 +1,25 @@
-package com.example.mobv2.ui.view.item;
+package com.example.mobv2.ui.item;
 
 import android.net.Uri;
+import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
 
+import com.example.mobv2.R;
 import com.example.mobv2.adapter.ImagesAdapter;
 import com.example.mobv2.databinding.ItemImageBinding;
 import com.example.mobv2.model.Image;
 import com.example.mobv2.ui.abstraction.Item;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.imageViewerFragment.ImageViewerFragment;
-import com.example.mobv2.ui.fragment.imageViewerFragment.ImageViewerFragmentViewModel;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.fragment.ImageViewerFragment;
 
 import java.util.List;
 
 public class ImageItem implements Item<ItemImageBinding>
 {
+    public final ImageItemHelper imageItemHelper;
     private final MainActivity mainActivity;
     private final ImagesAdapter imagesAdapter;
-
-    public final ImageItemHelper imageItemHelper;
-
     private ItemImageBinding binding;
 
     public ImageItem(MainActivity mainActivity,
@@ -37,25 +35,29 @@ public class ImageItem implements Item<ItemImageBinding>
     public void refreshItemBinding(@NonNull ItemImageBinding binding)
     {
         this.binding = binding;
+
         var parentView = binding.getRoot();
 
-        parentView.setOnClickListener(view ->
-        {
-            var viewModel =
-                    new ViewModelProvider(mainActivity).get(ImageViewerFragmentViewModel.class);
-            viewModel.setImageItemList(imageItemHelper.imageItemList);
-            mainActivity.goToFragment(new ImageViewerFragment(), android.R.animator.fade_in);
-        });
+        parentView.setOnClickListener(this::onImageItemClick);
 
         var image = imageItemHelper.image;
         if (image.getType() == Image.IMAGE_ONLINE)
         {
-            MainActivity.loadImageInView((String) image.getPath(), parentView, binding.postImageView);
+            MainActivity.loadImageInView((String) image.getPath(), parentView,
+                    binding.postImageView);
         }
         else if (image.getType() == Image.IMAGE_OFFLINE)
         {
             binding.postImageView.setImageURI((Uri) image.getPath());
         }
+    }
+
+    private void onImageItemClick(View view)
+    {
+        var imageViewerFragment = new ImageViewerFragment();
+        imageViewerFragment.setImageItemList(imageItemHelper.imageItemList);
+        mainActivity.goToFragmentWithSharedElement(imageViewerFragment, binding.postImageView,
+                mainActivity.getString(R.string.viewer_image_transition));
     }
 
     public class ImageItemHelper

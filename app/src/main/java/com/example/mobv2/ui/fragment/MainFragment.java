@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.fragment.main;
+package com.example.mobv2.ui.fragment;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -28,10 +28,10 @@ import com.example.mobv2.callback.abstraction.GetMarkersOkCallback;
 import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.model.MarkerInfoImpl;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
 import com.example.mobv2.ui.callback.PostsSheetCallback;
-import com.example.mobv2.ui.fragment.BaseFragment;
-import com.example.mobv2.ui.view.MapView;
+import com.example.mobv2.ui.view.Map;
 import com.example.mobv2.ui.view.navigationDrawer.NavDrawer;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,15 +41,16 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.internal.LinkedTreeMap;
 
 public class MainFragment extends BaseFragment<FragmentMainBinding>
-        implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback, GetMarkersOkCallback
+        implements HavingToolbar, Toolbar.OnMenuItemClickListener, OnMapReadyCallback,
+        GetMarkersOkCallback
 {
-    private MainFragmentViewModel viewModel;
+    private MainActivityViewModel viewModel;
 
     private NavDrawer navDrawer;
     private BottomSheetBehavior<View> sheetBehavior;
 
     private MarkersAdapter markersAdapter;
-    private MapView mapView;
+    private Map map;
 
     private Menu menu;
 
@@ -74,7 +75,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
     private void initViewModel()
     {
-        viewModel = new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
+        viewModel = new ViewModelProvider(mainActivity).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -92,19 +93,20 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public void initToolbar()
     {
         var toolbar = binding.toolbar;
-        super.initToolbar(toolbar, "", v -> navDrawer.open());
+        super.initToolbar(toolbar, "", view -> navDrawer.open());
 
-        navDrawer = new NavDrawer(mainActivity);
+        navDrawer = new NavDrawer(mainActivity, binding);
 
         AsyncTask.execute(() ->
         {
-            var user = mainActivity.appDatabase.userDao()
-                                               .getCurrentOne();
-            var address = mainActivity.appDatabase.addressDao()
-                                                  .getCurrentOne();
+            var user = mainActivity.appDatabase.userDao().getCurrentOne();
+            var address = mainActivity.appDatabase.addressDao().getCurrentOne();
 
-            viewModel.setFullname(user.getFullName());
-            viewModel.setAddress(address == null ? "No selected address" : address.toString());
+            viewModel.setFullName(user.getFullName());
+            viewModel.setNickName(user.getNickName());
+            viewModel.setPhoneNumber(user.getPhoneNumber());
+            viewModel.setEmail(user.getEmail());
+            viewModel.setFullAddress(address == null ? "No selected address" : address.toString());
 
             MainActivity.loadImageInView(user.getAvatarUrl(), getView(), new CustomTarget<Bitmap>()
             {
@@ -142,42 +144,42 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap)
     {
-        mapView = new MapView(googleMap);
-        markersAdapter =
-                new MarkersAdapter(mainActivity, new MarkersAdapter.MarkersAdapterHelper(sheetBehavior, binding.postsToolbar, binding.postsRecyclerView));
-        mapView.setAdapter(markersAdapter);
+        map = new Map(googleMap);
+        markersAdapter = new MarkersAdapter(mainActivity,
+                new MarkersAdapter.MarkersAdapterHelper(sheetBehavior, binding.postsToolbar,
+                        binding.postsRecyclerView));
+        map.setAdapter(markersAdapter);
 
         fillMap();
     }
 
     private void fillMap()
     {
-        var currentAddress = mainActivity.appDatabase.addressDao()
-                                                     .getCurrentOne();
+        var currentAddress = mainActivity.appDatabase.addressDao().getCurrentOne();
         if (currentAddress != null)
         {
             var addressString = currentAddress.toString();
 
-            if (addressString.isEmpty()) return;
-
             // add address marker
-            markersAdapter.addElement(new MarkerInfoImpl(addressString, currentAddress.getLatLng(), MarkerInfoImpl.ADDRESS_MARKER));
+            markersAdapter.addElement(new MarkerInfoImpl(addressString, currentAddress.getLatLng(),
+                    MarkerInfoImpl.ADDRESS_MARKER));
 
-            int fillColor =
-                    mainActivity.getAttributeColorWithAlpha(androidx.appcompat.R.attr.colorAccent, 0.1f);
-            int strokeColor =
-                    mainActivity.getAttributeColor(androidx.appcompat.R.attr.colorPrimary);
+            int fillColor = mainActivity.getAttributeColorWithAlpha(
+                    androidx.appcompat.R.attr.colorAccent, 0.1f);
+            int strokeColor = mainActivity.getAttributeColor(
+                    androidx.appcompat.R.attr.colorPrimary);
 
-            mapView.addCircle(new CircleOptions().center(currentAddress.getLatLng())
-                                                 .radius(MarkersAdapter.CIRCLE_RADIUS)
-                                                 .fillColor(fillColor)
-                                                 .strokeWidth(2.5f)
-                                                 .strokeColor(strokeColor));
+            map.addCircle(new CircleOptions().center(currentAddress.getLatLng())
+                                             .radius(MarkersAdapter.CIRCLE_RADIUS)
+                                             .fillColor(fillColor)
+                                             .strokeWidth(2.5f)
+                                             .strokeColor(strokeColor));
 
             // add other markers
             var callback = new GetMarkersCallback(mainActivity);
             callback.setOkCallback(this::parseMarkerInfosFromMapAndAddToMarkerInfoList);
-            callback.setFailCallback(this::getMarkerInfosByCurrentAddressIdFromLocalDbAndAddToMarkerInfoList);
+            callback.setFailCallback(
+                    this::getMarkerInfosByCurrentAddressIdFromLocalDbAndAddToMarkerInfoList);
 
             mainActivity.mobServerAPI.getMarks(callback, MainActivity.token);
             markersAdapter.animateCameraTo(currentAddress.getLatLng());
@@ -185,18 +187,16 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     }
 
     @Override
-    public void parseMarkerInfosFromMapAndAddToMarkerInfoList(LinkedTreeMap<String, Object> map)
+    public void parseMarkerInfosFromMapAndAddToMarkerInfoList(@NonNull LinkedTreeMap<String, Object> map)
     {
         for (var postId : map.keySet())
         {
             var markerMap = (LinkedTreeMap<String, Object>) map.get(postId);
             markerMap.put("post_id", postId);
             var markerInfo = new MarkerInfoImpl.MarkerInfoBuilder().parseFromMap(markerMap);
-            markerInfo.setAddressId(mainActivity.appDatabase.addressDao()
-                                                            .getCurrentId());
+            markerInfo.setAddressId(mainActivity.appDatabase.addressDao().getCurrentId());
 
-            mainActivity.appDatabase.markerInfoDao()
-                                    .insert(markerInfo);
+            mainActivity.appDatabase.markerInfoDao().insert(markerInfo);
             markersAdapter.addElement(markerInfo);
         }
     }
@@ -204,12 +204,12 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     private void getMarkerInfosByCurrentAddressIdFromLocalDbAndAddToMarkerInfoList()
     {
         var markerInfos = mainActivity.appDatabase.markerInfoDao()
-                                                  .getAllByAddressId(mainActivity.appDatabase.addressDao()
-                                                                                             .getCurrentId());
+                                                  .getAllByAddressId(
+                                                          mainActivity.appDatabase.addressDao()
+                                                                                  .getCurrentId());
         if (markerInfos == null || markerInfos.isEmpty())
         {
-            Toast.makeText(mainActivity, "Markers are not uploaded", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(mainActivity, "Markers are not uploaded", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -226,11 +226,9 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         sheetBehavior = BottomSheetBehavior.from(binding.framePosts);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(mainActivity, binding.framePosts, binding.bottomAppbarLayout));
+        sheetBehavior.addBottomSheetCallback(new PostsSheetCallback(mainActivity, binding));
 
-        sheetBehavior.setPeekHeight(mainActivity.getWindow()
-                                                .getDecorView()
-                                                .getHeight() / 6);
+        sheetBehavior.setPeekHeight(mainActivity.getWindow().getDecorView().getHeight() / 6);
         sheetBehavior.setHalfExpandedRatio(0.5f);
     }
 
@@ -240,17 +238,18 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         menu = postsToolbar.getMenu();
         postsToolbar.setNavigationOnClickListener(view -> markersAdapter.onMapClick());
-       postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+        postsToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item)
     {
         PostsAdapter postsAdapter = (PostsAdapter) binding.postsRecyclerView.getAdapter();
-        if (postsAdapter == null) return false;
+        if (postsAdapter == null)
+        {
+            return false;
+        }
 
-        menu.findItem(R.id.menu_show_more).setTitle(item.getTitle());
-//        menu.findItem(R.id.menu_show_more).
         switch (item.getItemId())
         {
             case R.id.menu_posts_refresh:
@@ -272,10 +271,12 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     @Deprecated
     private void setAddressInToken()
     {
-        var address = mainActivity.appDatabase.addressDao()
-                                              .getCurrentOne();
+        var address = mainActivity.appDatabase.addressDao().getCurrentOne();
         if (address != null)
-            mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), address.getId(), MainActivity.token);
+        {
+            mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
+                    address.getId(), MainActivity.token);
+        }
     }
 
     @Override
@@ -285,13 +286,11 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         AsyncTask.execute(() ->
         {
-            var user = mainActivity.appDatabase.userDao()
-                                               .getCurrentOne();
-            var address = mainActivity.appDatabase.addressDao()
-                                                  .getCurrentOne();
+            var user = mainActivity.appDatabase.userDao().getCurrentOne();
+            var address = mainActivity.appDatabase.addressDao().getCurrentOne();
 
-            viewModel.setFullname(user.getFullName());
-            viewModel.setAddress(address == null ? "No selected address" : address.toString());
+            viewModel.setFullName(user.getFullName());
+            viewModel.setFullAddress(address == null ? "No selected address" : address.toString());
         });
 
         if (viewModel.isAddressChanged())
@@ -312,7 +311,10 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
         var userDao = mainActivity.appDatabase.userDao();
         var user = userDao.getCurrentOne();
-        user.setCurrent(false);
-        userDao.update(user);
+        if (user != null)
+        {
+            user.setCurrent(false);
+            userDao.update(user);
+        }
     }
 }

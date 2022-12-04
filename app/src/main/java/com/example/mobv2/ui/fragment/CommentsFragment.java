@@ -1,15 +1,16 @@
-package com.example.mobv2.ui.fragment.comment;
+package com.example.mobv2.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.mobv2.R;
@@ -19,25 +20,25 @@ import com.example.mobv2.callback.abstraction.CommentOkCallback;
 import com.example.mobv2.databinding.FragmentCommentsBinding;
 import com.example.mobv2.model.CommentImpl;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.BaseFragment;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.item.PostItem;
 import com.example.mobv2.util.MessageViewTextWatcher;
-
-import localDatabase.dao.CommentDao;
-import localDatabase.dao.UserDao;
 
 public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
         implements HavingToolbar, Toolbar.OnMenuItemClickListener, CommentOkCallback
 {
-    private CommentsFragmentViewModel viewModel;
-    private CommentDao commentDao;
-    private UserDao userDao;
-
     private CommentsAdapter commentsAdapter;
+
+    private PostItem postItem;
 
     public CommentsFragment()
     {
         super(R.layout.fragment_comments);
+    }
+
+    public void setPostItem(PostItem postItem)
+    {
+        this.postItem = postItem;
     }
 
     @Nullable
@@ -48,28 +49,9 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     {
         var view = super.onCreateView(inflater, container, savedInstanceState);
 
-        initCommentDao();
-        initUserDao();
-
-        initViewModel();
-        binding.setBindingContext(viewModel);
+        binding.setPostItemHelper(postItem.postItemHelper);
 
         return view;
-    }
-
-    private void initCommentDao()
-    {
-        commentDao = mainActivity.appDatabase.commentDao();
-    }
-
-    private void initUserDao()
-    {
-        userDao = mainActivity.appDatabase.userDao();
-    }
-
-    private void initViewModel()
-    {
-        viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
     }
 
     @Override
@@ -90,16 +72,13 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     public void initToolbar()
     {
-        var postItem = viewModel.postItem;
-        super.initToolbar(binding.toolbar, postItem.postItemHelper.getTitle());
+        super.initToolbar(binding.toolbar, "");
     }
 
     private void initPostView()
     {
-        var postItem = viewModel.postItem;
         postItem.refreshItemBinding(binding.itemPost);
-        postItem.getShowCommentsButton()
-                .setVisibility(View.GONE);
+        postItem.getShowCommentsButton().setVisibility(View.GONE);
         postItem.hideDeleteMenuItem();
         postItem.hideEditMenuItem();
         postItem.hideForwardMenuItem();
@@ -113,9 +92,11 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     @Override
     public boolean onMenuItemClick(MenuItem item)
     {
-        CommentsAdapter commentsAdapter =
-                (CommentsAdapter) binding.commentsRecyclerView.getAdapter();
-        if (commentsAdapter == null) return false;
+        CommentsAdapter commentsAdapter = (CommentsAdapter) binding.commentsRecyclerView.getAdapter();
+        if (commentsAdapter == null)
+        {
+            return false;
+        }
         switch (item.getItemId())
         {
             case R.id.menu_posts_reverse:
@@ -133,11 +114,10 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     private void initCommentsRecycler()
     {
-        var postItem = viewModel.postItem;
         var commentsRecyclerView = binding.commentsRecyclerView;
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        commentsAdapter =
-                new CommentsAdapter(mainActivity, binding.nestedScrollView, postItem.postItemHelper);
+        commentsAdapter = new CommentsAdapter(mainActivity, binding.nestedScrollView,
+                postItem.postItemHelper);
         commentsRecyclerView.setAdapter(commentsAdapter);
     }
 
@@ -152,33 +132,40 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
 
     private void onSendButtonClick(View view)
     {
-        var postView = viewModel.postItem;
         var messageText = binding.messageView.getText();
         CommentCallback callback = new CommentCallback(mainActivity, messageText.toString());
         callback.setOkCallback(this::createCommentByIdAndTextAndAddToCommentIds);
-        mainActivity.mobServerAPI.commentPost(callback, messageText.toString(), postView.postItemHelper.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.commentPost(callback, messageText.toString(),
+                postItem.postItemHelper.getId(), MainActivity.token);
     }
 
     @Override
     public void createCommentByIdAndTextAndAddToCommentIds(String commentId,
                                                            String messageText)
     {
-        var postView = viewModel.postItem;
+        var comment = CommentImpl.createNewComment(commentId,
+                mainActivity.appDatabase.userDao().getCurrentOne(), messageText);
 
-        var comment =
-                CommentImpl.createNewComment(commentId, userDao.getCurrentOne(), messageText);
-
-        commentDao.insert(comment);
+        mainActivity.appDatabase.commentDao().insert(comment);
         commentsAdapter.addElement(comment);
-        postView.postItemHelper.getCommentIds()
-                               .add(commentId);
+        postItem.postItemHelper.getCommentIds().add(commentId);
 
-        binding.messageView.getText()
-                           .clear();
+        onCommentCreated();
+    }
+
+    private void onCommentCreated()
+    {
+        var messageView = binding.messageView;
+        messageView.getText().clear();
+        messageView.clearFocus();
+        var imm = (InputMethodManager) mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+
     }
 
     private void initMessageView()
     {
-        binding.messageView.addTextChangedListener(new MessageViewTextWatcher(mainActivity, binding.sendButton));
+        binding.messageView.addTextChangedListener(
+                new MessageViewTextWatcher(mainActivity, binding.sendButton));
     }
 }

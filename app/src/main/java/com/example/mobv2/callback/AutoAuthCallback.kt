@@ -4,8 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.mobv2.R
 import com.example.mobv2.callback.abstraction.AuthOkCallback
-import com.example.mobv2.ui.activity.MainActivity
-import com.example.mobv2.ui.fragment.main.MainFragment
+import com.example.mobv2.ui.activity.mainActivity.MainActivity
 import com.example.mobv2.util.abstraction.responseStateCallback.HasOkStateCallback
 import com.google.gson.internal.LinkedTreeMap
 import serverAPI.MOBServerAPI

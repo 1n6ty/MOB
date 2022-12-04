@@ -14,12 +14,12 @@ import com.example.mobv2.adapter.abstraction.AbleToAdd;
 import com.example.mobv2.callback.CreatePostCallback;
 import com.example.mobv2.callback.abstraction.CreatePostOkCallback;
 import com.example.mobv2.model.MarkerInfoImpl;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.markerCreator.MapSkillsBottomSheetFragment;
 import com.example.mobv2.ui.fragment.markerCreator.MarkerCreatorViewModel;
-import com.example.mobv2.ui.view.MapView;
+import com.example.mobv2.ui.view.Map;
 import com.example.mobv2.ui.view.MarkerView;
-import com.example.mobv2.ui.view.item.MarkerInfoItem;
+import com.example.mobv2.ui.item.MarkerInfoItem;
 import com.example.mobv2.util.MarkerAddition;
 import com.example.mobv2.util.MyObservableArrayList;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,20 +28,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.util.Locale;
 import java.util.Objects;
 
-public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerInfoImpl>, CreatePostOkCallback
+public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoImpl>, CreatePostOkCallback
 {
     public static final int ZOOM = 18;
     public static final int MIN_ZOOM = 16;
     public static final int CIRCLE_RADIUS = 50;  // in meters
-    public static final Locale LOCALE = Locale.ENGLISH;
 
     private final MainActivity mainActivity;
     private final MyObservableArrayList<MarkerInfoItem> markerInfoItemList;
     private final MarkersAdapterHelper markersAdapterHelper;
-    private MapView mapView;
+    private Map map;
 //    private MarkerInfoItem bufferMarkerInfoItem;
 
     public MarkersAdapter(MainActivity mainActivity,
@@ -82,26 +80,26 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
     }
 
     @Override
-    public void onCreate(MapView mapView)
+    public void onCreate(Map map)
     {
-        this.mapView = mapView;
+        this.map = map;
 
         setGoogleMapListeners();
     }
 
     private void setGoogleMapListeners()
     {
-        mapView.setOnMapClickListener(latLng -> onMapClick());
-        mapView.setOnMapLongClickListener(this::onMapLongClick);
-        mapView.setOnCameraMoveListener(() ->
+        map.setOnMapClickListener(latLng -> onMapClick());
+        map.setOnMapLongClickListener(this::onMapLongClick);
+        map.setOnCameraMoveListener(() ->
         {
-            if (mapView.getCameraPosition().zoom < MIN_ZOOM)
+            if (map.getCameraPosition().zoom < MIN_ZOOM)
             {
-                mapView.hideMarkers();
+                map.hideMarkers();
             }
             else
             {
-                mapView.showMarkers();
+                map.showMarkers();
             }
         });
     }
@@ -127,7 +125,7 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
         initMarkerCreatorViewModel(latLng);
 
         var pointerMarker =
-                mapView.addMarker(new MarkerAddition(latLng.latitude, latLng.longitude).create());
+                map.addMarker(new MarkerAddition(latLng.latitude, latLng.longitude).create());
 
         animateCameraTo(latLng, new GoogleMap.CancelableCallback()
         {
@@ -282,13 +280,13 @@ public class MarkersAdapter extends MapView.Adapter implements AbleToAdd<MarkerI
 
     public void animateCameraTo(@NonNull LatLng latLng)
     {
-        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, mapView.getCameraPosition().zoom)));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, map.getCameraPosition().zoom)));
     }
 
     public void animateCameraTo(@NonNull LatLng latLng,
                                 GoogleMap.CancelableCallback callback)
     {
-        mapView.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, mapView.getCameraPosition().zoom)), callback);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, map.getCameraPosition().zoom)), callback);
     }
 
     public void scrollToStartPosition()

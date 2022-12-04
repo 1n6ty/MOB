@@ -11,8 +11,8 @@ import com.example.mobv2.R;
 import com.example.mobv2.adapter.abstraction.AbleToAdd;
 import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.model.AddressImpl;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.view.item.AddressItem;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.item.AddressItem;
 import com.example.mobv2.util.MyObservableArrayList;
 
 public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder> implements AbleToAdd<AddressImpl>

@@ -1,134 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
-    android:focusable="true">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <data>
+
+        <variable
+            name="bindingContext"
+            type="com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?backgroundPrimaryWindow">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/appBarLayout"
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                style="@style/toolbarStyle"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                app:menu="@menu/menu_edit_profile"
+                app:navigationIcon="@drawable/ic_arrow"
+                app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-                <androidx.coordinatorlayout.widget.CoordinatorLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?backgroundSecondaryWindow"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/horizontal_margin"
+            android:paddingTop="@dimen/vertical_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
 
-                    <ImageView
-                        android:id="@+id/avatar_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        app:srcCompat="@drawable/sample_avatar" />
-
-                    <com.google.android.material.appbar.MaterialToolbar
-                        android:id="@+id/toolbar"
-                        style="@style/collapsingToolbarStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:layout_marginTop="@dimen/toolbar_rest_margin_top"
-                        app:menu="@menu/menu_edit_profile_toolbar"
-                        app:navigationIcon="@drawable/ic_arrow"
-                        app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
-
-                </androidx.coordinatorlayout.widget.CoordinatorLayout>
-            </com.google.android.material.appbar.AppBarLayout>
-
-            <androidx.core.widget.NestedScrollView
+            <EditText
+                android:id="@+id/nickname_edit_text"
+                style="@style/authPasswordTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?backgroundSecondaryWindow"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/vertical_medium_margin"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+                android:layout_marginTop="@dimen/vertical_small_margin"
+                android:autofillHints="username"
+                android:hint="@string/preference_summary_nickname"
+                android:inputType="text"
+                android:text="@={bindingContext.nickName}" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+            <EditText
+                android:id="@+id/phone_number_edit_text"
+                style="@style/authPasswordTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_small_margin"
+                android:autofillHints="phone"
+                android:hint="@string/preference_summary_phone_number"
+                android:inputType="phone"
+                android:text="@={bindingContext.phoneNumber}" />
 
-                    <LinearLayout
-                        android:id="@+id/settings_phone_number_view"
-                        style="@style/settingsItemStyle">
+            <EditText
+                android:id="@+id/email_edit_text"
+                style="@style/authPasswordTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_small_margin"
+                android:autofillHints="emailAddress"
+                android:hint="@string/preference_summary_email"
+                android:inputType="textEmailAddress"
+                android:text="@={bindingContext.email}" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <TextView
-                            android:id="@+id/login_view"
-                            style="@style/settingsItemHeaderTextStyle"
-                            tools:text="+78005553535" />
-
-                        <TextView
-                            style="@style/settingsItemSubheaderTextStyle"
-                            android:text="@string/preference_summary_phone_number" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/settings_nickname_view"
-                        style="@style/settingsItemStyle">
-
-                        <TextView
-                            android:id="@+id/nickname_view"
-                            style="@style/settingsItemHeaderTextStyle"
-                            tools:text="\@abobus" />
-
-                        <TextView
-                            style="@style/settingsItemSubheaderTextStyle"
-                            android:text="@string/preference_summary_nickname" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/settings_bio_view"
-                        style="@style/settingsItemStyle">
-
-                        <TextView
-                            style="@style/settingsItemHeaderTextStyle"
-                            android:text="@string/preference_title_bio" />
-
-                        <TextView
-                            style="@style/settingsItemSubheaderTextStyle"
-                            android:text="@string/preference_summary_bio" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/settings_addresses_view"
-                        style="@style/settingsItemStyle">
-
-                        <TextView
-                            style="@style/settingsItemHeaderTextStyle"
-                            android:text="@string/preference_title_home" />
-
-                        <TextView
-                            style="@style/settingsItemSubheaderTextStyle"
-                            android:text="@string/preference_summary_home" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.core.widget.NestedScrollView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/vertical_margin"
-            android:scaleType="centerCrop"
-            app:backgroundTint="?backgroundPrimaryFab"
-            app:elevation="2dp"
-            app:layout_anchor="@id/appBarLayout"
-            app:layout_anchorGravity="bottom|end"
-            app:srcCompat="@drawable/ic_add_photo"
-            app:tint="?colorPrimaryFabIcon" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

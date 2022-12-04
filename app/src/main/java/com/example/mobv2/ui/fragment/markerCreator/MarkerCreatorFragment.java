@@ -17,7 +17,7 @@ import com.example.mobv2.adapter.ImagesAdapter;
 import com.example.mobv2.databinding.FragmentMarkerCreatorBinding;
 import com.example.mobv2.model.Image;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.BaseFragment;
 import com.example.mobv2.util.UriUtils;
 
@@ -28,8 +28,8 @@ import java.util.List;
 public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBinding>
         implements HavingToolbar, ActivityResultCallback<List<Uri>>
 {
-    private final ActivityResultLauncher<String> launcher =
-            registerForActivityResult(new ActivityResultContracts.GetMultipleContents(), this);
+    private final ActivityResultLauncher<String> launcher = registerForActivityResult(
+            new ActivityResultContracts.GetMultipleContents(), this);
 
     private final List<File> files;
 
@@ -76,7 +76,8 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
 
     private void initConfirmAddingMarkerButton()
     {
-        binding.confirmAddingMarkerButton.setOnClickListener(this::onConfirmAddingMarkerButtonClick);
+        binding.confirmAddingMarkerButton.setOnClickListener(
+                this::onConfirmAddingMarkerButtonClick);
     }
 
     public void onActivityResult(List<Uri> result)
@@ -96,21 +97,19 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
 
         var adapter = new ImagesAdapter((MainActivity) getActivity(), images);
         var imagesRecyclerView = binding.imagesRecyclerView;
-        imagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        imagesRecyclerView.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         imagesRecyclerView.setAdapter(adapter);
     }
 
     private void onConfirmAddingMarkerButtonClick(View view)
     {
-        var latLng = viewModel.getAddress()
-                              .getLatLng();
-        var createPostCallback = viewModel.getCreatePostCallback();
+        var latLng = viewModel.getAddress().getLatLng();
 
-        String text = binding.markerTextView.getText()
-                                            .toString();
-        String title = binding.markerTitleView.getText()
-                                              .toString();
-        mainActivity.mobServerAPI.post(createPostCallback, text, title, latLng.latitude, latLng.longitude, files.toArray(new File[0]), MainActivity.token);
+        String text = binding.markerTextView.getText().toString();
+        String title = binding.markerTitleView.getText().toString();
+        mainActivity.mobServerAPI.post(viewModel.createPostCallback, text, title, latLng.latitude,
+                latLng.longitude, files.toArray(new File[0]), MainActivity.token);
 
         mainActivity.toPreviousFragment();
     }

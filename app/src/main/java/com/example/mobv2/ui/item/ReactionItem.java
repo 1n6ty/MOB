@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.view.item;
+package com.example.mobv2.ui.item;
 
 import android.view.View;
 
@@ -14,7 +14,7 @@ import com.example.mobv2.model.PostImpl;
 import com.example.mobv2.model.Reaction;
 import com.example.mobv2.model.abstraction.UserContent;
 import com.example.mobv2.ui.abstraction.Item;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 
 import java.util.List;
 

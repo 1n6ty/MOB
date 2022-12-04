@@ -5,7 +5,7 @@ import android.text.TextWatcher;
 import android.widget.ImageButton;
 
 import com.example.mobv2.R;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 
 public class MessageViewTextWatcher implements TextWatcher
 {

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class MapView
+public class Map
 {
     private static final MarkerOptions MARKER_OPTIONS_DEFAULT =
             new MarkerOptions().position(new LatLng(0, 0));
@@ -28,9 +28,9 @@ public class MapView
     private final AdapterHelper adapterHelper;
     private final List<MarkerView> markerViews = new ArrayList<>();
 
-    private final MapViewDataObserver observer = new MapViewDataObserver();
+    private final MapDataObserver observer = new MapDataObserver();
 
-    public MapView(GoogleMap googleMap)
+    public Map(GoogleMap googleMap)
     {
         this.googleMap = googleMap;
 
@@ -203,17 +203,17 @@ public class MapView
         }
     }
 
-    public void setOnMapClickListener(@NonNull MapView.OnMapClickListener listener)
+    public void setOnMapClickListener(@NonNull Map.OnMapClickListener listener)
     {
         googleMap.setOnMapClickListener(listener);
     }
 
-    public void setOnMapLongClickListener(@NonNull MapView.OnMapLongClickListener listener)
+    public void setOnMapLongClickListener(@NonNull Map.OnMapLongClickListener listener)
     {
         googleMap.setOnMapLongClickListener(listener);
     }
 
-    protected void setOnMarkerClickListener(@NonNull MapView.OnMarkerClickListener listener)
+    protected void setOnMarkerClickListener(@NonNull Map.OnMarkerClickListener listener)
     {
         googleMap.setOnMarkerClickListener(marker ->
         {
@@ -230,7 +230,7 @@ public class MapView
         });
     }
 
-    protected void setOnMarkerDragListener(@NonNull MapView.OnMarkerDragListener listener)
+    protected void setOnMarkerDragListener(@NonNull Map.OnMarkerDragListener listener)
     {
         googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener()
         {
@@ -284,7 +284,7 @@ public class MapView
     {
         private final AdapterDataObservable observable = new AdapterDataObservable();
 
-        public abstract void onCreate(MapView mapView);
+        public abstract void onCreate(Map map);
 
         public abstract void onBindMarkerView(MarkerView markerView,
                                               int position);
@@ -424,7 +424,7 @@ public class MapView
         }
     }
 
-    private class MapViewDataObserver extends AdapterDataObserver
+    private class MapDataObserver extends AdapterDataObserver
     {
         @Override
         public void onChanged()

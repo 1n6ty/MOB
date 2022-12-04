@@ -53,18 +53,18 @@ public class MOBServerAPI
                 body.put("status_code", response.code());
                 if (response.isSuccessful())
                 {
-                    body.put("response", response.body()
-                                                 .get("response"));
+                    body.put("response", response.body().get("response"));
                     obj.funcOk(body);
                 }
                 else
                 {
                     try
                     {
-                        LinkedTreeMap<String, Object> msg = new Gson().fromJson(response.errorBody()
-                                                                                        .string(), new TypeToken<LinkedTreeMap<String, Object>>()
-                        {
-                        }.getType());
+                        LinkedTreeMap<String, Object> msg = new Gson().fromJson(
+                                response.errorBody().string(),
+                                new TypeToken<LinkedTreeMap<String, Object>>()
+                                {
+                                }.getType());
                         body.put("msg", msg.get("msg"));
                     }
                     catch (IOException e)
@@ -87,7 +87,8 @@ public class MOBServerAPI
     public MOBServerAPI(String baseUrl)
     {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl)
-                                                  .addConverterFactory(GsonConverterFactory.create())
+                                                  .addConverterFactory(
+                                                          GsonConverterFactory.create())
                                                   .build();
         MOBAPI = retrofit.create(MOBInterface.class);
     }
@@ -322,17 +323,17 @@ public class MOBServerAPI
             MultipartBody.Part[] imgs = new MultipartBody.Part[files.length];
             for (int i = 0; i < files.length; i++)
             {
-                imgs[i] =
-                        MultipartBody.Part.createFormData("images", files[i].getName(), RequestBody.create(MediaType.parse("image/*"), files[i]));
+                imgs[i] = MultipartBody.Part.createFormData("images", files[i].getName(),
+                        RequestBody.create(MediaType.parse("image/*"), files[i]));
             }
-            Call<LinkedTreeMap<String, Object>> call =
-                    MOBAPI.createPostWithImage(title, content, markX, markY, imgs, token);
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.createPostWithImage(title, content,
+                    markX, markY, imgs, token);
             call.enqueue(createResponseCallback(obj));
         }
         else
         {
-            Call<LinkedTreeMap<String, Object>> call =
-                    MOBAPI.createPostWithoutImage(title, content, markX, markY, token);
+            Call<LinkedTreeMap<String, Object>> call = MOBAPI.createPostWithoutImage(title, content,
+                    markX, markY, token);
             call.enqueue(createResponseCallback(obj));
         }
     }
@@ -405,8 +406,8 @@ public class MOBServerAPI
         }
         if (file != null)
         {
-            MultipartBody.Part img =
-                    MultipartBody.Part.createFormData("new_profile_img", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+            MultipartBody.Part img = MultipartBody.Part.createFormData("new_profile_img",
+                    file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
             Call<LinkedTreeMap<String, Object>> call = MOBAPI.editUserProfileImg(img, token);
             call.enqueue(createResponseCallback(obj));
         }
@@ -476,8 +477,8 @@ public class MOBServerAPI
                                String reaction,
                                String token)
     {
-        Call<LinkedTreeMap<String, Object>> call =
-                MOBAPI.commentUnreact(commentId, reaction, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.commentUnreact(commentId, reaction,
+                token);
         call.enqueue(createResponseCallback(obj));
     }
 
@@ -504,8 +505,8 @@ public class MOBServerAPI
                               String house,
                               String token)
     {
-        Call<LinkedTreeMap<String, Object>> call =
-                MOBAPI.createAddress(country, city, street, house, token);
+        Call<LinkedTreeMap<String, Object>> call = MOBAPI.createAddress(country, city, street,
+                house, token);
         call.enqueue(createResponseCallback(obj));
     }
 

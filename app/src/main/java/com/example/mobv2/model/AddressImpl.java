@@ -145,7 +145,7 @@ public class AddressImpl implements Address, Comparable<Address>
         private void parseOwnerFromMap(Map<String, Object> map)
         {
             var userMap = (LinkedTreeMap<String, Object>) map.get("owner");
-            owner = new UserImpl.UserBuilder().parseFromMap(userMap);
+            owner = new UserImpl.UserParser().parseFromMap(userMap);
         }
     }
 

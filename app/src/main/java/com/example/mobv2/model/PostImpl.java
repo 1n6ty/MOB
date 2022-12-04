@@ -5,7 +5,6 @@ import androidx.databinding.ObservableInt;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -31,9 +30,6 @@ import localDatabase.typeConverter.StringListConverter;
 @Entity
 public class PostImpl implements Post, HavingCommentsIds, UserContent
 {
-    @Ignore
-    public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
-
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "postid")
@@ -56,14 +52,6 @@ public class PostImpl implements Post, HavingCommentsIds, UserContent
     @TypeConverters(StringListConverter.class)
     private final List<String> negativeRates;
 
-    @Ignore
-    private final ObservableInt commentsCount;
-    @Ignore
-    private final ObservableInt ratesCount;
-
-    @Ignore
-    private final int type;
-
     public PostImpl(String id,
                     UserImpl user,
                     Date date,
@@ -82,26 +70,9 @@ public class PostImpl implements Post, HavingCommentsIds, UserContent
         this.text = text;
         this.images = images;
         this.reactions = reactions;
-
-        if (images == null || images.isEmpty()) type = POST_ONLY_TEXT;
-        else if (text == null || text.isEmpty()) type = POST_ONLY_IMAGES;
-        else type = POST_FULL;
-
-        this.commentIds = new MyObservableArrayList<>(commentIds);
-        this.positiveRates = new MyObservableArrayList<>(positiveRates);
-        this.negativeRates = new MyObservableArrayList<>(negativeRates);
-
-        // TODO FIX IT PLEASE
-        commentsCount = new ObservableInt(commentIds.size());
-        ((MyObservableArrayList<String>) this.commentIds)
-                .setOnListChangedCallback(new Operation(commentsCount, 1, -1));
-
-        ratesCount = new ObservableInt(positiveRates.size() - negativeRates.size());
-        ((MyObservableArrayList<String>) this.positiveRates)
-                .setOnListChangedCallback(new Operation(ratesCount, 1, -1));
-
-        ((MyObservableArrayList<String>) this.negativeRates)
-                .setOnListChangedCallback(new Operation(ratesCount, -1, 1));
+        this.commentIds = commentIds;
+        this.positiveRates = positiveRates;
+        this.negativeRates = negativeRates;
     }
 
     public static final class PostBuilder implements ParsableFromMap<PostImpl>
@@ -140,7 +111,7 @@ public class PostImpl implements Post, HavingCommentsIds, UserContent
         private void parseUserFromMap(Map<String, Object> map)
         {
             var userMap = (LinkedTreeMap<String, Object>) map.get("user");
-            user = new UserImpl.UserBuilder().parseFromMap(userMap);
+            user = new UserImpl.UserParser().parseFromMap(userMap);
         }
 
         private void parseDateFromMap(Map<String, Object> map)
@@ -260,21 +231,6 @@ public class PostImpl implements Post, HavingCommentsIds, UserContent
     public List<String> getNegativeRates()
     {
         return negativeRates;
-    }
-
-    public ObservableInt getCommentsCount()
-    {
-        return commentsCount;
-    }
-
-    public ObservableInt getRatesCount()
-    {
-        return ratesCount;
-    }
-
-    public int getType()
-    {
-        return type;
     }
 
     public static class Operation extends MyObservableArrayList.OnListChangedCallback<String>

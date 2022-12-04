@@ -6,16 +6,20 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.R;
+import com.example.mobv2.callback.EditUserCallback;
+import com.example.mobv2.callback.abstraction.EditUserOkCallback;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
-import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
 
-public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding> implements HavingToolbar
+public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
+        implements HavingToolbar
 {
-    private UserImpl user;
+    private MainActivityViewModel viewModel;
 
     public EditProfileFragment()
     {
@@ -28,76 +32,51 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     {
         super.onViewCreated(view, savedInstanceState);
 
-        user = mainActivity.appDatabase.userDao()
-                                       .getCurrentOne();
+        viewModel = new ViewModelProvider(mainActivity).get(MainActivityViewModel.class);
+        binding.setBindingContext(viewModel);
 
         initToolbar();
-
-        initSettingsPhoneNumberView();
-        initSettingsNicknameView();
-        initSettingsAddressesView();
-    }
-
-    public void initToolbar()
-    {
-        MainActivity.loadImageInView(user.getAvatarUrl(), getView(), binding.avatarView);
-
-        AsyncTask.execute(() -> super.initToolbar(binding.toolbar, user.getFullName()));
-
-        binding.toolbar.setOnMenuItemClickListener(item ->
-        {
-            switch (item.getItemId())
-            {
-                case R.id.menu_set_new_photo:
-                    return true;
-                case R.id.menu_save_to_gallery:
-                    return true;
-                case R.id.menu_delete_photo:
-                    return true;
-                case R.id.menu_log_out:
-                    return logOut();
-                default:
-                    return false;
-            }
-        });
-    }
-
-    private boolean logOut()
-    {
-        var userDao = mainActivity.appDatabase.userDao();
-        var lastLoginUser = userDao.getLastLoginOne();
-        lastLoginUser.setLastLogin(false);
-        userDao.update(lastLoginUser);
-        mainActivity.replaceFragment(new AuthFragment());
-        return true;
-    }
-
-    private void initSettingsPhoneNumberView()
-    {
-        binding.settingsPhoneNumberView.setOnClickListener(view ->
-        {
-        });
-        AsyncTask.execute(() -> binding.loginView.setText(user.getPhoneNumber()));
-    }
-
-    private void initSettingsNicknameView()
-    {
-        binding.settingsNicknameView.setOnClickListener(view ->
-        {
-        });
-        AsyncTask.execute(() -> binding.nicknameView.setText(user.getNickName()));
-    }
-
-    private void initSettingsAddressesView()
-    {
-        binding.settingsAddressesView.setOnClickListener(view -> mainActivity.goToFragment(new ChangeAddressesFragment()));
+        initBody();
     }
 
     @Override
-    public void update()
+    public void initToolbar()
     {
-        super.update();
-        user = mainActivity.appDatabase.userDao()
-                                       .getCurrentOne();
+        binding.toolbar.findViewById(R.id.menu_edit_confirm).setOnClickListener(view ->
+        {
+            var user = mainActivity.appDatabase.userDao().getCurrentOne();
+            var callback = new EditUserCallback(mainActivity);
+            callback.setOkCallback(new EditUserOkCallback()
+            {
+                @Override
+                public void editUserInLocalDatabase()
+                {
+                    user.edit()
+                        .setNickname(viewModel.getNickName())
+                        .setPhoneNumber(viewModel.getPhoneNumber())
+                        .setEmail(viewModel.getEmail());
+                    mainActivity.appDatabase.userDao().update(user);
+                    mainActivity.toPreviousFragment();
+                }
+            });
+
+            mainActivity.mobServerAPI.editUser(callback, null, viewModel.getNickName(), null,
+                    viewModel.getEmail().equals(user.getEmail()) ? null : viewModel.getEmail(),
+                    null, viewModel.getPhoneNumber().equals(user.getPhoneNumber()) ? null
+                                                                                   : viewModel.getPhoneNumber(),
+                    null, MainActivity.token);
+        });
+        super.initToolbar(binding.toolbar, getString(R.string.edit_profile));
+    }
+
+    public void initBody()
+    {
+        AsyncTask.execute(() ->
+        {
+            var user = mainActivity.appDatabase.userDao().getCurrentOne();
+            viewModel.setNickName(user.getNickName());
+            viewModel.setPhoneNumber(user.getPhoneNumber());
+            viewModel.setEmail(user.getEmail());
+        });
     }
 }

@@ -51,6 +51,15 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
         initToolbar();
 
         initAddressesRecycler();
+
+        binding.addAddressButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                mainActivity.goToFragment(new MainFragment());
+            }
+        });
     }
 
     public void initToolbar()
@@ -72,8 +81,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
             addressAdapter.addElement(address);
         }
 
-        binding.noAddressesView.setVisibility(addressAdapter.getItemCount() < 1
-                ? View.VISIBLE
-                : View.INVISIBLE);
+        binding.noAddressesView.setVisibility(
+                addressAdapter.getItemCount() < 1 ? View.VISIBLE : View.INVISIBLE);
     }
 }

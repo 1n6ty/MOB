@@ -2,7 +2,6 @@
 
     <!-- Base application theme. -->
     <style name="Theme.MOBv2.Day" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
         <item name="colorPrimary">?backgroundToolbar</item>
         <item name="colorOnSecondary">?backgroundClickedFab</item>
 

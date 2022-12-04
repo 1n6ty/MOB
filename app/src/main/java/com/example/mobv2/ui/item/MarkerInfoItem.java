@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.view.item;
+package com.example.mobv2.ui.item;
 
 import android.widget.Toast;
 
@@ -13,14 +13,14 @@ import com.example.mobv2.callback.abstraction.GetPostOkCallback;
 import com.example.mobv2.model.MarkerInfoImpl;
 import com.example.mobv2.model.PostImpl;
 import com.example.mobv2.ui.abstraction.Item;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.view.MapView;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.view.Map;
 import com.example.mobv2.ui.view.MarkerView;
 import com.example.mobv2.util.BitmapConverter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
-public class MarkerInfoItem implements Item<MarkerView>, MarkerView.OnMarkerClickListener, MapView.OnMarkerDragListener, GetPostOkCallback
+public class MarkerInfoItem implements Item<MarkerView>, MarkerView.OnMarkerClickListener, Map.OnMarkerDragListener, GetPostOkCallback
 {
     private final int[][] drawableIds =
             new int[][]{{R.drawable.ic_marker_address_36dp, R.drawable.ic_marker_address_48dp},

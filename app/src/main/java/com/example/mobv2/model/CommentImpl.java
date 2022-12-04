@@ -128,7 +128,7 @@ public class CommentImpl implements Comment, HavingCommentsIds, UserContent
         private void parseUserFromMap(Map<String, Object> map)
         {
             var userMap = (LinkedTreeMap<String, Object>) map.get("user");
-            user = new UserImpl.UserBuilder().parseFromMap(userMap);
+            user = new UserImpl.UserParser().parseFromMap(userMap);
         }
 
         private void parseDateFromMap(Map<String, Object> map)

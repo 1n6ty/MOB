@@ -12,8 +12,8 @@ import com.example.mobv2.adapter.abstraction.AbleToAdd;
 import com.example.mobv2.databinding.ItemReactionBinding;
 import com.example.mobv2.model.Reaction;
 import com.example.mobv2.model.abstraction.UserContent;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.view.item.ReactionItem;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.item.ReactionItem;
 import com.example.mobv2.util.MyObservableArrayList;
 
 import java.util.List;

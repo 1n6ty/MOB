@@ -1,7 +1,7 @@
 package com.example.mobv2.callback
 
 import android.util.Log
-import com.example.mobv2.ui.activity.MainActivity
+import com.example.mobv2.ui.activity.mainActivity.MainActivity
 import com.google.gson.internal.LinkedTreeMap
 import serverAPI.MOBServerAPI.MOBAPICallback
 

@@ -18,8 +18,8 @@ import com.example.mobv2.callback.abstraction.GetCommentOkCallback;
 import com.example.mobv2.databinding.ItemCommentBinding;
 import com.example.mobv2.model.CommentImpl;
 import com.example.mobv2.model.abstraction.HavingCommentsIds;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.view.item.CommentItem;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.item.CommentItem;
 import com.example.mobv2.util.MyObservableArrayList;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -28,7 +28,7 @@ import java.util.Collections;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
         implements AbleToAdd<CommentImpl>, AbleToReverse, AbleToSortByUserWills, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
 {
-    private final int maxUploadedCommentsCount = 6;
+    private static final int MAX_UPLOADED_COMMENTS_COUNT = 6;
 
     private final MainActivity mainActivity;
     private final NestedScrollView nestedScrollView;
@@ -68,7 +68,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         });
 
         var commentsIds = havingCommentsIds.getCommentIds();
-        for (int i = 0; i < Math.min(commentsIds.size(), maxUploadedCommentsCount); i++)
+        for (int i = 0; i < Math.min(commentsIds.size(), MAX_UPLOADED_COMMENTS_COUNT); i++)
         {
             getCommentByIndex(commentsIds.size() - 1 - i);
         }
@@ -88,13 +88,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
                                int oldScrollY)
     {
         var commentsIds = havingCommentsIds.getCommentIds();
-        if (commentsIds.size() - 1 >= getItemCount())
+        if (commentsIds.size() >= getItemCount())
         {
             View childView = view.getChildAt(view.getChildCount() - 1);
 
             if (scrollY > oldScrollY && scrollY >= childView.getMeasuredHeight() - view.getMeasuredHeight())
             {
-                getCommentByIndex(commentsIds.size() - 1 - getItemCount());
+                getCommentByIndex(commentsIds.size() - getItemCount());
             }
         }
     }

@@ -2,7 +2,7 @@ package com.example.mobv2.callback
 
 import android.util.Log
 import com.example.mobv2.callback.abstraction.CreatePostOkCallback
-import com.example.mobv2.ui.activity.MainActivity
+import com.example.mobv2.ui.activity.mainActivity.MainActivity
 import com.example.mobv2.util.abstraction.responseStateCallback.HasOkStateCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.internal.LinkedTreeMap

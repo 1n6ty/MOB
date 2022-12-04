@@ -5,15 +5,15 @@
     <string name="field_is_necessary"><u>Поле обязательно</u></string>
     <string name="navigation_drawer_open">Окрыть навигацию</string>
     <string name="navigation_drawer_close">Закрыть навигацию</string>
-    <string name="menu_edit_profile">Редактировать профиль</string>
+    <string name="menu_profile">Профиль</string>
     <string name="nav_header_item_settings">Настройки</string>
     <string name="menu_notification_and_sound">Уведомления и звук</string>
-    <string name="menu_map_features">Настройки карты</string>
+    <string name="menu_map_features">Возможности карты</string>
     <string name="menu_language">Выбрать язык</string>
-    <string name="preference_summary_phone_number">Нажмите для смены номера телефона</string>
+    <string name="preference_summary_phone_number">Ваш номера телефона</string>
     <string name="preference_summary_nickname">Ваш никнейм</string>
     <string name="preference_title_bio">О себе</string>
-    <string name="preference_summary_bio">Напишите мнежко слов о себе</string>
+    <string name="preference_summary_bio">Напишите немножко слов о себе</string>
     <string name="preference_title_home">Ваши адреса</string>
     <string name="preference_summary_home">Нажмите для изменения места текущего проживания</string>
     <string name="menu_set_new_photo">Установить новое фото</string>
@@ -29,9 +29,9 @@
     <string name="menu_goto_post">К посту</string>
     <string name="menu_edit">Редактировать</string>
     <string name="menu_delete">Удалить</string>
-    <string name="menu_sort_by_rates">Сортировка по рейтингу</string>
-    <string name="menu_sort_by_date">Сортировка по дате</string>
-    <string name="menu_sort_by_comments">Сортировка по комментариям</string>
+    <string name="menu_sort_by_rates">По рейтингу</string>
+    <string name="menu_sort_by_date">По дате</string>
+    <string name="menu_sort_by_comments">По комментариям</string>
     <string name="comments_count">Комментарии:</string>
     <string name="write_some_letters">Напишите что-нибудь...</string>
     <string name="bs_long_map_coordinates">Координаты:</string>
@@ -43,16 +43,22 @@
     <string name="marker_text_hint">Текст</string>
     <string name="show_comments_branch">Показать ветку комментариев</string>
     <string name="reply">Ответить</string>
-    <string name="january">Январь</string>
-    <string name="february">Февраль</string>
-    <string name="march">Март</string>
-    <string name="april">Апрель</string>
-    <string name="may">Май</string>
-    <string name="june">Июнь</string>
-    <string name="july">Июль</string>
-    <string name="august">Август</string>
-    <string name="september">Сентябрь</string>
-    <string name="october">Ноябрь</string>
-    <string name="november">Октябрь</string>
-    <string name="december">Декабрь</string>
+    <string-array name="months">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Ноябрь</item>
+        <item>Октябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+    <string name="preference_summary_email">Ваша почта</string>
+    <string name="edit_profile">Редактировать профиль</string>
+    <string name="today_at">Сегодня в</string>
+    <string name="yesterday_at">Вчера в</string>
 </resources>

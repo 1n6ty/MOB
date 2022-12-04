@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.ItemImageBinding;
 import com.example.mobv2.model.Image;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.view.item.ImageItem;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.item.ImageItem;
 
 import java.util.ArrayList;
 import java.util.List;

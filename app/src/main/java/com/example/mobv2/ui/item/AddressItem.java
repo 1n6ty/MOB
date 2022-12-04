@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.view.item;
+package com.example.mobv2.ui.item;
 
 import android.view.View;
 
@@ -12,24 +12,22 @@ import com.example.mobv2.databinding.ItemAddressBinding;
 import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.ui.abstraction.Item;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.main.MainFragmentViewModel;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
 public class AddressItem implements Item<ItemAddressBinding>
 {
+    public final AddressItemHelper addressItemHelper;
     private final MainActivity mainActivity;
     private final AddressesAdapter addressesAdapter;
-
-    public final AddressItemHelper addressItemHelper;
-
     private ItemAddressBinding binding;
 
     public AddressItem(MainActivity mainActivity,
-                             AddressesAdapter addressesAdapter,
-                             AddressImpl address)
+                       AddressesAdapter addressesAdapter,
+                       AddressImpl address)
     {
         this.mainActivity = mainActivity;
         this.addressesAdapter = addressesAdapter;
@@ -59,19 +57,21 @@ public class AddressItem implements Item<ItemAddressBinding>
     private void onAddressItemClick(View view)
     {
         if (addressesAdapter.checkIfAddressEqualsClickedAddress(this))
+        {
             return;
+        }
 
         addressesAdapter.deselectClickedAddress();
 
         addressItemHelper.setCurrent(true);
-        mainActivity.appDatabase.addressDao()
-                                .update(addressItemHelper.getAddress());
+        mainActivity.appDatabase.addressDao().update(addressItemHelper.getAddress());
 
-        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity), addressItemHelper.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.setLocation(new SetAddressCallback(mainActivity),
+                addressItemHelper.getId(), MainActivity.token);
 
-        var mainFragmentViewModel =
-                new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
-        mainFragmentViewModel.setAddressChanged(true);
+        var mainActivityViewModel = new ViewModelProvider(mainActivity).get(
+                MainActivityViewModel.class);
+        mainActivityViewModel.setAddressChanged(true);
         addressesAdapter.notifyItemChanged(this);
     }
 

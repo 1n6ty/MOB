@@ -15,12 +15,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.databinding.FragmentMapSkillsBottomSheetBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
-public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
-        implements HavingToolbar
+public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment implements HavingToolbar
 {
     private OnDestroyViewListener onDestroyViewListener;
 
@@ -61,12 +60,10 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
     {
         var toolbar = binding.toolbar;
 
-        String secondaryAddressTitle = viewModel.getAddress()
-                                                .getSecondary();
+        String secondaryAddressTitle = viewModel.getAddress().getSecondary();
         toolbar.setTitle(secondaryAddressTitle);
 
-        LatLng position = viewModel.getAddress()
-                                   .getLatLng();
+        LatLng position = viewModel.getAddress().getLatLng();
         String coordinatesSubtitle = position.latitude + " : " + position.longitude;
         toolbar.setSubtitle(coordinatesSubtitle);
         toolbar.setOnClickListener(this::onToolbarClick);
@@ -75,19 +72,14 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
     private void onToolbarClick(View view)
     {
         var clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        var clipText = clipboard.getPrimaryClip()
-                                .getItemAt(0)
-                                .getText();
-        var subtitle = binding.toolbar.getSubtitle()
-                                      .toString()
-                                      .replace(" : ", " ");
+        var clipText = clipboard.getPrimaryClip().getItemAt(0).getText();
+        var subtitle = binding.toolbar.getSubtitle().toString().replace(" : ", " ");
         if (!clipText.equals(subtitle))
         {
             var clip = ClipData.newPlainText("simple text", subtitle);
             clipboard.setPrimaryClip(clip);
 
-            Toast.makeText(getContext(), "Copied", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(getContext(), "Copied", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -105,7 +97,10 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment
     {
         super.onDestroyView();
 
-        if (onDestroyViewListener != null) onDestroyViewListener.onDestroyView(getView());
+        if (onDestroyViewListener != null)
+        {
+            onDestroyViewListener.onDestroyView(getView());
+        }
     }
 
     public void setOnDestroyViewListener(OnDestroyViewListener onDestroyViewListener)

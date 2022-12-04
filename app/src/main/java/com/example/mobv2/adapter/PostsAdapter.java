@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mobv2.R;
@@ -14,9 +13,8 @@ import com.example.mobv2.adapter.abstraction.AbleToReverse;
 import com.example.mobv2.adapter.abstraction.AbleToSortByUserWills;
 import com.example.mobv2.databinding.ItemPostBinding;
 import com.example.mobv2.model.PostImpl;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.main.MainFragmentViewModel;
-import com.example.mobv2.ui.view.item.PostItem;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.item.PostItem;
 import com.example.mobv2.util.MyObservableArrayList;
 
 import java.util.Collections;
@@ -76,22 +74,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
         View postItem = LayoutInflater.from(parent.getContext())
                                       .inflate(R.layout.item_post, parent, false);
         return new PostViewHolder(postItem);
-    }
-
-    @Override
-    public void onViewAttachedToWindow(@NonNull PostViewHolder holder)
-    {
-        var mainFragmentViewModel =
-                new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
-
-        var position = holder.getAdapterPosition();
-
-        if (position > -1)
-        {
-            var postItem = postItemList.get(position);
-
-            mainFragmentViewModel.setPostTitle(postItem.postItemHelper.getTitle());
-        }
     }
 
     @Override

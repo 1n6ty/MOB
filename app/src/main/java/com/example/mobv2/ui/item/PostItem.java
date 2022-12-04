@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.view.item;
+package com.example.mobv2.ui.item;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -11,8 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -28,9 +28,10 @@ import com.example.mobv2.model.Reaction;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.HavingCommentsIds;
 import com.example.mobv2.ui.abstraction.Item;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.comment.CommentsFragment;
-import com.example.mobv2.ui.fragment.comment.CommentsFragmentViewModel;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.fragment.CommentsFragment;
+import com.example.mobv2.util.DateString;
+import com.example.mobv2.util.MyObservableArrayList;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,12 +39,10 @@ import java.util.List;
 
 public class PostItem implements Item<ItemPostBinding>
 {
+    public final PostItemHelper postItemHelper;
     private final MainActivity mainActivity;
     private final PostsAdapter postsAdapter;
     private ReactionsAdapter reactionsAdapter;
-
-    public final PostItemHelper postItemHelper;
-
     private ItemPostBinding binding;
 
     private Menu menu;
@@ -89,8 +88,8 @@ public class PostItem implements Item<ItemPostBinding>
 
     private void onPostViewClick(View view)
     {
-        var contextThemeWrapper =
-                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+        var contextThemeWrapper = new ContextThemeWrapper(mainActivity,
+                R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
         popupMenu.inflate(R.menu.menu_item_post);
 
@@ -104,14 +103,14 @@ public class PostItem implements Item<ItemPostBinding>
         var user = postItemHelper.getUser();
         var postType = postItemHelper.getType();
 
-        var currentUser = mainActivity.appDatabase.userDao()
-                                                  .getCurrentOne();
+        var currentUser = mainActivity.appDatabase.userDao().getCurrentOne();
 
         boolean isCreator = user.compareById(currentUser);  // if the user is a post's creator
         switchMenuItemVisibility(R.id.menu_edit, isCreator);
         switchMenuItemVisibility(R.id.menu_delete, isCreator);
 
-        switchMenuItemVisibility(R.id.menu_copy_text, postType == PostImpl.POST_ONLY_TEXT || postType == PostImpl.POST_FULL);
+        switchMenuItemVisibility(R.id.menu_copy_text,
+                postType == PostItemHelper.POST_ONLY_TEXT || postType == PostItemHelper.POST_FULL);
 
         popupMenu.setOnMenuItemClickListener(this::onMenuItemClick);
     }
@@ -143,19 +142,20 @@ public class PostItem implements Item<ItemPostBinding>
         var imagesRecyclerView = binding.imagesRecyclerView;
         switch (postItemHelper.getType())
         {
-            case PostImpl.POST_ONLY_TEXT:
+            case PostItemHelper.POST_ONLY_TEXT:
                 imagesRecyclerView.setVisibility(View.GONE);
                 break;
-            case PostImpl.POST_ONLY_IMAGES:
+            case PostItemHelper.POST_ONLY_IMAGES:
                 textView.setVisibility(View.GONE);
-            case PostImpl.POST_FULL:
+            case PostItemHelper.POST_FULL:
                 List<Image> images = new ArrayList<>();
                 for (String url : postItemHelper.getImages())
                 {
                     images.add(new Image("", url, Image.IMAGE_ONLINE));
                 }
                 ImagesAdapter adapter = new ImagesAdapter(mainActivity, images);
-                imagesRecyclerView.setLayoutManager(new GridLayoutManager(mainActivity, Math.min(images.size(), 3)));
+                imagesRecyclerView.setLayoutManager(
+                        new GridLayoutManager(mainActivity, Math.min(images.size(), 3)));
                 imagesRecyclerView.setAdapter(adapter);
                 break;
         }
@@ -168,22 +168,16 @@ public class PostItem implements Item<ItemPostBinding>
         var user = postItemHelper.getUser();
         var userId = user.getId();
 
-        ratesGroup.getRateUpButton()
-                  .setSelected(false);
-        ratesGroup.getRateDownButton()
-                  .setSelected(false);
+        ratesGroup.getRateUpButton().setSelected(false);
+        ratesGroup.getRateDownButton().setSelected(false);
 
-        if (postItemHelper.getPositiveRates()
-                          .contains(userId))
+        if (postItemHelper.getPositiveRates().contains(userId))
         {
-            ratesGroup.getRateUpButton()
-                      .setSelected(true);
+            ratesGroup.getRateUpButton().setSelected(true);
         }
-        else if (postItemHelper.getNegativeRates()
-                               .contains(userId))
+        else if (postItemHelper.getNegativeRates().contains(userId))
         {
-            ratesGroup.getRateDownButton()
-                      .setSelected(true);
+            ratesGroup.getRateDownButton().setSelected(true);
         }
 
         ratesGroup.setOnRateUpClickListener(this::onRateUpButtonClick);
@@ -192,25 +186,31 @@ public class PostItem implements Item<ItemPostBinding>
 
     private void onRateUpButtonClick(View view)
     {
-        removeRateFromFirstRatesAndAddRateToSecondRates(postItemHelper.getNegativeRates(), postItemHelper.getPositiveRates());
+        removeRateFromFirstRatesAndAddRateToSecondRates(postItemHelper.getNegativeRates(),
+                postItemHelper.getPositiveRates());
 
-        mainActivity.mobServerAPI.postInc(new MOBAPICallbackImpl(), postItemHelper.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.postInc(new MOBAPICallbackImpl(), postItemHelper.getId(),
+                MainActivity.token);
     }
 
     private void onRateDownButtonClick(View view)
     {
-        removeRateFromFirstRatesAndAddRateToSecondRates(postItemHelper.getPositiveRates(), postItemHelper.getNegativeRates());
+        removeRateFromFirstRatesAndAddRateToSecondRates(postItemHelper.getPositiveRates(),
+                postItemHelper.getNegativeRates());
 
-        mainActivity.mobServerAPI.postDec(new MOBAPICallbackImpl(), postItemHelper.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.postDec(new MOBAPICallbackImpl(), postItemHelper.getId(),
+                MainActivity.token);
     }
 
     private void removeRateFromFirstRatesAndAddRateToSecondRates(List<String> firstRates,
                                                                  List<String> secondRates)
     {
-        var userId = mainActivity.appDatabase.userDao()
-                                             .getCurrentId();
+        var userId = mainActivity.appDatabase.userDao().getCurrentId();
         firstRates.remove(userId);
-        if (!secondRates.remove(userId)) secondRates.add(userId);
+        if (!secondRates.remove(userId))
+        {
+            secondRates.add(userId);
+        }
     }
 
     private void initShowReactionsButton()
@@ -225,20 +225,22 @@ public class PostItem implements Item<ItemPostBinding>
     {
         var reactionsRecyclerView = binding.reactionsRecyclerView;
 
-        if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
+        if (reactionsAdapter == null)
+        {
+            initAdapterForReactionsRecyclerView();
+        }
 
-        reactionsRecyclerView.setVisibility(reactionsRecyclerView.getVisibility() == View.GONE
-                ? View.VISIBLE
-                : View.GONE);
+        reactionsRecyclerView.setVisibility(
+                reactionsRecyclerView.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     private boolean onShowReactionsViewLongClick(View view)
     {
-        final int[] menuIds =
-                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
+        final int[] menuIds = {R.id.menu_reaction_like, R.id.menu_reaction_dislike,
+                R.id.menu_reaction_love};
 
-        var contextThemeWrapper =
-                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+        var contextThemeWrapper = new ContextThemeWrapper(mainActivity,
+                R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
         popupMenu.inflate(R.menu.menu_reactions);
 
@@ -248,16 +250,17 @@ public class PostItem implements Item<ItemPostBinding>
 
         for (int id : menuIds)
         {
-            menu.findItem(id)
-                .setOnMenuItemClickListener(item ->
+            menu.findItem(id).setOnMenuItemClickListener(item ->
+            {
+                binding.reactionsRecyclerView.setVisibility(View.VISIBLE);
+                String emojiItem = item.getTitle().toString();
+                if (reactionsAdapter == null)
                 {
-                    binding.reactionsRecyclerView.setVisibility(View.VISIBLE);
-                    String emojiItem = item.getTitle()
-                                           .toString();
-                    if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
-                    reactionsAdapter.addElement(new Reaction(emojiItem, new ArrayList<>()));
-                    return true;
-                });
+                    initAdapterForReactionsRecyclerView();
+                }
+                reactionsAdapter.addElement(new Reaction(emojiItem, new ArrayList<>()));
+                return true;
+            });
         }
 
         return true;
@@ -266,7 +269,8 @@ public class PostItem implements Item<ItemPostBinding>
     private void initReactionsRecyclerView()
     {
         var reactionsRecyclerView = binding.reactionsRecyclerView;
-        reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        reactionsRecyclerView.setLayoutManager(
+                new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         if (reactionsAdapter != null)
         {
             reactionsRecyclerView.setAdapter(reactionsAdapter);
@@ -280,8 +284,8 @@ public class PostItem implements Item<ItemPostBinding>
 
     private void initAdapterForReactionsRecyclerView()
     {
-        reactionsAdapter =
-                new ReactionsAdapter(mainActivity, postItemHelper.getReactions(), postItemHelper.post);
+        reactionsAdapter = new ReactionsAdapter(mainActivity, postItemHelper.getReactions(),
+                postItemHelper.post);
         binding.reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
@@ -293,174 +297,9 @@ public class PostItem implements Item<ItemPostBinding>
 
     private void onCommentViewClick(View view)
     {
-        var viewModel = new ViewModelProvider(mainActivity).get(CommentsFragmentViewModel.class);
-        viewModel.setPostItem(this);
-        mainActivity.goToFragment(new CommentsFragment());
-    }
-
-    public class PostItemHelper implements HavingCommentsIds
-    {
-        private final PostImpl post;
-
-        private MarkerInfoItem.MarkerInfoItemHelper markerInfoItemHelper;
-
-        public PostItemHelper(PostImpl post)
-        {
-            this.post = post;
-        }
-
-        public boolean copyText()
-        {
-            var clipboard =
-                    (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-            var clip = ClipData.newPlainText("simple text", post.getText());
-            clipboard.setPrimaryClip(clip);
-
-            Toast.makeText(mainActivity, "Copied", Toast.LENGTH_LONG)
-                 .show();
-            return true;
-        }
-
-        public boolean forward()
-        {
-            Toast.makeText(mainActivity, "Forwarded", Toast.LENGTH_LONG)
-                 .show();
-            return true;
-        }
-
-        public boolean goTo()
-        {
-            if (markerInfoItemHelper != null) markerInfoItemHelper.goTo();
-
-            return true;
-        }
-
-        public boolean edit()
-        {
-            Toast.makeText(mainActivity, "Edited", Toast.LENGTH_LONG)
-                 .show();
-            return true;
-        }
-
-        public boolean delete()
-        {
-            if (markerInfoItemHelper != null) markerInfoItemHelper.delete();
-            postsAdapter.deletePostItem(PostItem.this);
-
-            mainActivity.appDatabase.postDao()
-                                    .delete(post);
-            mainActivity.mobServerAPI.postDelete(new MOBAPICallbackImpl(), post.getId(), MainActivity.token);
-
-            Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
-                 .show();
-
-            return true;
-        }
-
-        public void setMarkerInfoItemHelper(MarkerInfoItem.MarkerInfoItemHelper markerInfoItemHelper)
-        {
-            this.markerInfoItemHelper = markerInfoItemHelper;
-        }
-
-        public String getId()
-        {
-            return post.getId();
-        }
-
-        public UserImpl getUser()
-        {
-            return post.getUser();
-        }
-
-        public Date getDate()
-        {
-            return post.getDate();
-        }
-
-        public String getDateString()
-        {
-            int[] months = {R.string.january,
-                    R.string.february,
-                    R.string.march,
-                    R.string.april,
-                    R.string.may,
-                    R.string.june,
-                    R.string.july,
-                    R.string.august,
-                    R.string.september,
-                    R.string.october,
-                    R.string.november,
-                    R.string.december,};
-            String dateString = "";
-
-            if (post.getDate().equals(new Date()))
-            {
-                dateString += "Сегодня в ";
-                dateString += post.getDate().getDay() + " ";
-                dateString += post.getDate().getDay() + " ";
-                dateString += post.getDate().getDay() + " ";
-            }
-
-            else
-            {
-                dateString += post.getDate().getDate() + " ";
-                dateString += mainActivity.getString(months[ post.getDate().getMonth()]).substring(0, 3) + " ";
-                dateString += post.getDate().getYear() + " ";
-            }
-
-
-            return dateString;
-        }
-
-        public String getTitle()
-        {
-            return post.getTitle();
-        }
-
-        public String getText()
-        {
-            return post.getText();
-        }
-
-        public List<String> getImages()
-        {
-            return post.getImages();
-        }
-
-        public List<Reaction> getReactions()
-        {
-            return post.getReactions();
-        }
-
-        public List<String> getCommentIds()
-        {
-            return post.getCommentIds();
-        }
-
-        public List<String> getPositiveRates()
-        {
-            return post.getPositiveRates();
-        }
-
-        public List<String> getNegativeRates()
-        {
-            return post.getNegativeRates();
-        }
-
-        public ObservableInt getCommentsCount()
-        {
-            return post.getCommentsCount();
-        }
-
-        public ObservableInt getRatesCount()
-        {
-            return post.getRatesCount();
-        }
-
-        public int getType()
-        {
-            return post.getType();
-        }
+        var commentsFragment = new CommentsFragment();
+        commentsFragment.setPostItem(this);
+        mainActivity.goToFragment(commentsFragment);
     }
 
     public View getShowReactionsButton()
@@ -516,7 +355,181 @@ public class PostItem implements Item<ItemPostBinding>
     private void switchMenuItemVisibility(int menuItemId,
                                           boolean visible)
     {
-        if (menu != null) menu.findItem(menuItemId)
-                              .setVisible(visible);
+        if (menu != null)
+        {
+            menu.findItem(menuItemId).setVisible(visible);
+        }
+    }
+
+    public class PostItemHelper extends DateString implements HavingCommentsIds
+    {
+        public static final int POST_ONLY_TEXT = 0, POST_ONLY_IMAGES = 1, POST_FULL = 2;
+
+        private final PostImpl post;
+
+        private final ObservableField<String> title;
+
+        private final MyObservableArrayList<String> commentIds;
+        private final MyObservableArrayList<String> positiveRates;
+        private final MyObservableArrayList<String> negativeRates;
+
+        private final ObservableInt commentsCount;
+        private final ObservableInt ratesCount;
+
+        private final int type;
+
+        private MarkerInfoItem.MarkerInfoItemHelper markerInfoItemHelper;
+
+        public PostItemHelper(PostImpl post)
+        {
+            super(mainActivity);
+            this.post = post;
+
+            this.title = new ObservableField<>(post.getTitle());
+
+            this.commentIds = new MyObservableArrayList<>(post.getCommentIds());
+            this.positiveRates = new MyObservableArrayList<>(post.getPositiveRates());
+            this.negativeRates = new MyObservableArrayList<>(post.getNegativeRates());
+
+            commentsCount = new ObservableInt(commentIds.size());
+            ratesCount = new ObservableInt(positiveRates.size() - negativeRates.size());
+
+            this.commentIds.setOnListChangedCallback(new PostImpl.Operation(commentsCount, 1, -1));
+            this.positiveRates.setOnListChangedCallback(new PostImpl.Operation(ratesCount, 1, -1));
+            this.negativeRates.setOnListChangedCallback(new PostImpl.Operation(ratesCount, -1, 1));
+
+            if (post.getImages() == null || post.getImages().isEmpty())
+            {
+                type = POST_ONLY_TEXT;
+            }
+            else if (post.getText() == null || post.getText().isEmpty())
+            {
+                type = POST_ONLY_IMAGES;
+            }
+            else
+            {
+                type = POST_FULL;
+            }
+        }
+
+        public boolean copyText()
+        {
+            var clipboard = (ClipboardManager) mainActivity.getSystemService(
+                    Context.CLIPBOARD_SERVICE);
+            var clip = ClipData.newPlainText("simple text", post.getText());
+            clipboard.setPrimaryClip(clip);
+
+            Toast.makeText(mainActivity, "Copied", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        public boolean forward()
+        {
+            Toast.makeText(mainActivity, "Forwarded", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        public boolean goTo()
+        {
+            if (markerInfoItemHelper != null)
+            {
+                markerInfoItemHelper.goTo();
+            }
+
+            return true;
+        }
+
+        public boolean edit()
+        {
+            Toast.makeText(mainActivity, "Edited", Toast.LENGTH_LONG).show();
+            return true;
+        }
+
+        public boolean delete()
+        {
+            if (markerInfoItemHelper != null)
+            {
+                markerInfoItemHelper.delete();
+            }
+            postsAdapter.deletePostItem(PostItem.this);
+
+            mainActivity.appDatabase.postDao().delete(post);
+            mainActivity.mobServerAPI.postDelete(new MOBAPICallbackImpl(), post.getId(),
+                    MainActivity.token);
+
+            Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG).show();
+
+            return true;
+        }
+
+        public void setMarkerInfoItemHelper(MarkerInfoItem.MarkerInfoItemHelper markerInfoItemHelper)
+        {
+            this.markerInfoItemHelper = markerInfoItemHelper;
+        }
+
+        public String getId()
+        {
+            return post.getId();
+        }
+
+        public UserImpl getUser()
+        {
+            return post.getUser();
+        }
+
+        public Date getDate()
+        {
+            return post.getDate();
+        }
+
+        public ObservableField<String> getTitle()
+        {
+            return title;
+        }
+
+        public String getText()
+        {
+            return post.getText();
+        }
+
+        public List<String> getImages()
+        {
+            return post.getImages();
+        }
+
+        public List<Reaction> getReactions()
+        {
+            return post.getReactions();
+        }
+
+        public List<String> getCommentIds()
+        {
+            return commentIds;
+        }
+
+        public List<String> getPositiveRates()
+        {
+            return positiveRates;
+        }
+
+        public List<String> getNegativeRates()
+        {
+            return negativeRates;
+        }
+
+        public ObservableInt getCommentsCount()
+        {
+            return commentsCount;
+        }
+
+        public ObservableInt getRatesCount()
+        {
+            return ratesCount;
+        }
+
+        public int getType()
+        {
+            return type;
+        }
     }
 }

@@ -31,7 +31,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name=".ui.activity.mainActivity.MainActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true">
             <intent-filter>

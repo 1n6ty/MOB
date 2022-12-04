@@ -7,14 +7,14 @@
 
         <variable
             name="bindingContext"
-            type="com.example.mobv2.ui.fragment.main.MainFragmentViewModel" />
+            type="com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragment.main.MainFragment"
+        tools:context=".ui.fragment.MainFragment"
         tools:openDrawer="end">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,15 +51,12 @@
                         android:elevation="2dp"
                         app:navigationIcon="@drawable/ic_menu_drawer"
                         app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
-
-
                 </androidx.coordinatorlayout.widget.CoordinatorLayout>
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible">
+                android:layout_height="match_parent">
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/frame_posts"
@@ -102,7 +99,7 @@
                                     app:menu="@menu/menu_recycler_toolbar"
                                     app:navigationIcon="@drawable/ic_close"
                                     app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
-                                    app:title="@{bindingContext.postTitle}" />
+                                    app:title="Post" />
                             </com.google.android.material.appbar.AppBarLayout>
                         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

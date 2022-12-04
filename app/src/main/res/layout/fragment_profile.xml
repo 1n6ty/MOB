@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:focusable="true">
+
+    <data>
+
+        <variable
+            name="bindingContext"
+            type="com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?backgroundPrimaryWindow">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/avatar_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/sample_avatar" />
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbar"
+                        style="@style/collapsingToolbarStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:layout_marginTop="@dimen/toolbar_rest_margin_top"
+                        app:menu="@menu/menu_profile"
+                        app:navigationIcon="@drawable/ic_arrow"
+                        app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
+                        app:title="@{bindingContext.fullName}"
+                        tools:title="@string/sample_fullname" />
+
+                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?backgroundSecondaryWindow"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/vertical_medium_margin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/settings_phone_number_view"
+                        style="@style/settingsItemStyle">
+
+                        <TextView
+                            android:id="@+id/login_view"
+                            style="@style/settingsItemHeaderTextStyle"
+                            android:text="@{bindingContext.phoneNumber}"
+                            tools:text="+78005553535" />
+
+                        <TextView
+                            style="@style/settingsItemSubheaderTextStyle"
+                            android:text="@string/preference_summary_phone_number" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/settings_nickname_view"
+                        style="@style/settingsItemStyle">
+
+                        <TextView
+                            android:id="@+id/nickname_view"
+                            style="@style/settingsItemHeaderTextStyle"
+                            android:text="@{bindingContext.nickName}"
+                            tools:text="\@abobus" />
+
+                        <TextView
+                            style="@style/settingsItemSubheaderTextStyle"
+                            android:text="@string/preference_summary_nickname" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/settings_bio_view"
+                        style="@style/settingsItemStyle">
+
+                        <TextView
+                            style="@style/settingsItemHeaderTextStyle"
+                            android:text="@string/preference_title_bio" />
+
+                        <TextView
+                            style="@style/settingsItemSubheaderTextStyle"
+                            android:text="@string/preference_summary_bio" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/settings_addresses_view"
+                        style="@style/settingsItemStyle">
+
+                        <TextView
+                            style="@style/settingsItemHeaderTextStyle"
+                            android:text="@string/preference_title_home" />
+
+                        <TextView
+                            style="@style/settingsItemSubheaderTextStyle"
+                            android:text="@string/preference_summary_home" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/edit_profile_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/vertical_margin"
+            android:scaleType="centerCrop"
+            app:backgroundTint="?backgroundPrimaryFab"
+            app:elevation="2dp"
+            app:layout_anchor="@id/appBarLayout"
+            app:layout_anchorGravity="bottom|end"
+            app:srcCompat="@drawable/ic_edit"
+            app:tint="?colorPrimaryFabIcon" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

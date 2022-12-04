@@ -1,4 +1,4 @@
-package com.example.mobv2.ui.view.item;
+package com.example.mobv2.ui.item;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.ObservableInt;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,25 +26,21 @@ import com.example.mobv2.model.Reaction;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.HavingCommentsIds;
 import com.example.mobv2.ui.abstraction.Item;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.inputMessage.InputMessageFragment;
-import com.example.mobv2.ui.fragment.inputMessage.InputMessageFragmentViewModel;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.fragment.InputMessageFragment;
+import com.example.mobv2.util.DateString;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 {
+    public final CommentItemHelper commentItemHelper;
     private final MainActivity mainActivity;
     private final CommentsAdapter commentsAdapter;
     private ReactionsAdapter reactionsAdapter;
     private CommentsAdapter innerCommentsAdapter;
-
-    public final CommentItemHelper commentItemHelper;
-
     private ItemCommentBinding binding;
 
     private Menu menu;
@@ -85,7 +80,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         var user = commentItemHelper.getUser();
 
         binding.setFullName(user.getFullName());
-        binding.setDate(new SimpleDateFormat("dd.MM.yyyy/HH:mm", Locale.getDefault()).format(commentItemHelper.getDate()));
+        binding.setDate(commentItemHelper.getDateString());
         binding.setCommentText(commentItemHelper.getText());
         binding.setRatesCount(commentItemHelper.getRatesCount());
 
@@ -94,8 +89,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void onItemViewClick(View view)
     {
-        var contextThemeWrapper =
-                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+        var contextThemeWrapper = new ContextThemeWrapper(mainActivity,
+                R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, binding.userInfoLayout);
         popupMenu.inflate(R.menu.menu_item_comment);
 
@@ -108,8 +103,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         menu = popupMenu.getMenu();
         var user = commentItemHelper.getUser();
 
-        var currentUser = mainActivity.appDatabase.userDao()
-                                                  .getCurrentOne();
+        var currentUser = mainActivity.appDatabase.userDao().getCurrentOne();
 
         boolean isCreator = user.compareById(currentUser);  // if the user is a post's creator
         switchMenuItemVisibility(R.id.menu_edit, isCreator);
@@ -155,22 +149,16 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         var user = commentItemHelper.getUser();
         var userId = user.getId();
 
-        ratesGroup.getRateUpButton()
-                  .setSelected(false);
-        ratesGroup.getRateDownButton()
-                  .setSelected(false);
+        ratesGroup.getRateUpButton().setSelected(false);
+        ratesGroup.getRateDownButton().setSelected(false);
 
-        if (commentItemHelper.getPositiveRates()
-                             .contains(userId))
+        if (commentItemHelper.getPositiveRates().contains(userId))
         {
-            ratesGroup.getRateUpButton()
-                      .setSelected(true);
+            ratesGroup.getRateUpButton().setSelected(true);
         }
-        else if (commentItemHelper.getNegativeRates()
-                                  .contains(userId))
+        else if (commentItemHelper.getNegativeRates().contains(userId))
         {
-            ratesGroup.getRateDownButton()
-                      .setSelected(true);
+            ratesGroup.getRateDownButton().setSelected(true);
         }
 
         ratesGroup.setOnRateUpClickListener(this::onRateUpButtonClick);
@@ -179,25 +167,31 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void onRateUpButtonClick(View view)
     {
-        removeRateFromFirstRatesAndAddRateToSecondRates(commentItemHelper.getNegativeRates(), commentItemHelper.getPositiveRates());
+        removeRateFromFirstRatesAndAddRateToSecondRates(commentItemHelper.getNegativeRates(),
+                commentItemHelper.getPositiveRates());
 
-        mainActivity.mobServerAPI.commentInc(new MOBAPICallbackImpl(), commentItemHelper.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.commentInc(new MOBAPICallbackImpl(), commentItemHelper.getId(),
+                MainActivity.token);
     }
 
     private void onRateDownButtonClick(View view)
     {
-        removeRateFromFirstRatesAndAddRateToSecondRates(commentItemHelper.getPositiveRates(), commentItemHelper.getNegativeRates());
+        removeRateFromFirstRatesAndAddRateToSecondRates(commentItemHelper.getPositiveRates(),
+                commentItemHelper.getNegativeRates());
 
-        mainActivity.mobServerAPI.commentDec(new MOBAPICallbackImpl(), commentItemHelper.getId(), MainActivity.token);
+        mainActivity.mobServerAPI.commentDec(new MOBAPICallbackImpl(), commentItemHelper.getId(),
+                MainActivity.token);
     }
 
     private void removeRateFromFirstRatesAndAddRateToSecondRates(List<String> firstRates,
                                                                  List<String> secondRates)
     {
-        var userId = mainActivity.appDatabase.userDao()
-                                             .getCurrentId();
+        var userId = mainActivity.appDatabase.userDao().getCurrentId();
         firstRates.remove(userId);
-        if (!secondRates.remove(userId)) secondRates.add(userId);
+        if (!secondRates.remove(userId))
+        {
+            secondRates.add(userId);
+        }
     }
 
     private void initReplyButton()
@@ -208,14 +202,13 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void onReplyButtonClick(View view)
     {
-        var viewModel =
-                new ViewModelProvider(mainActivity).get(InputMessageFragmentViewModel.class);
-
-        viewModel.setParentId(commentItemHelper.getId());
-        viewModel.setCommentOkCallback(this::createCommentByIdAndTextAndAddToCommentIds);
-        if (!viewModel.getActive())
+        if (!InputMessageFragment.active)
         {
-            mainActivity.goToFragment(new InputMessageFragment(), 0, 0);
+            var inputMessageFragment = new InputMessageFragment();
+            inputMessageFragment.setParentId(commentItemHelper.getId());
+            inputMessageFragment.setCommentOkCallback(
+                    this::createCommentByIdAndTextAndAddToCommentIds);
+            mainActivity.goToFragment(inputMessageFragment);
         }
     }
 
@@ -223,12 +216,11 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     public void createCommentByIdAndTextAndAddToCommentIds(String commentId,
                                                            String messageText)
     {
-        var comment = CommentImpl.createNewComment(commentId, mainActivity.appDatabase.userDao()
-                                                                                      .getCurrentOne(), messageText);
+        var comment = CommentImpl.createNewComment(commentId,
+                mainActivity.appDatabase.userDao().getCurrentOne(), messageText);
         binding.showCommentsButton.callOnClick();
         innerCommentsAdapter.addElement(comment);
-        commentItemHelper.getCommentIds()
-                         .add(commentId);
+        commentItemHelper.getCommentIds().add(commentId);
 
 //        binding.commentsRecyclerView.scrollTo(binding.commentsRecyclerView.get);
     }
@@ -245,20 +237,22 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     {
         RecyclerView reactionsRecyclerView = binding.reactionsRecyclerView;
 
-        if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
+        if (reactionsAdapter == null)
+        {
+            initAdapterForReactionsRecyclerView();
+        }
 
-        reactionsRecyclerView.setVisibility(reactionsRecyclerView.getVisibility() == View.GONE
-                ? View.VISIBLE
-                : View.GONE);
+        reactionsRecyclerView.setVisibility(
+                reactionsRecyclerView.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
 
     private boolean onShowReactionsViewLongClick(View view)
     {
-        final int[] menuIds =
-                {R.id.menu_reaction_like, R.id.menu_reaction_dislike, R.id.menu_reaction_love};
+        final int[] menuIds = {R.id.menu_reaction_like, R.id.menu_reaction_dislike,
+                R.id.menu_reaction_love};
 
-        var contextThemeWrapper =
-                new ContextThemeWrapper(mainActivity, R.style.Theme_MOBv2_PopupOverlay);
+        var contextThemeWrapper = new ContextThemeWrapper(mainActivity,
+                R.style.Theme_MOBv2_PopupOverlay);
         var popupMenu = new PopupMenu(contextThemeWrapper, view);
         popupMenu.inflate(R.menu.menu_reactions);
 
@@ -268,15 +262,16 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
         for (int id : menuIds)
         {
-            menu.findItem(id)
-                .setOnMenuItemClickListener(item ->
+            menu.findItem(id).setOnMenuItemClickListener(item ->
+            {
+                String emojiItem = item.getTitle().toString();
+                if (reactionsAdapter == null)
                 {
-                    String emojiItem = item.getTitle()
-                                           .toString();
-                    if (reactionsAdapter == null) initAdapterForReactionsRecyclerView();
-                    reactionsAdapter.addElement(new Reaction(emojiItem, new ArrayList<>()));
-                    return true;
-                });
+                    initAdapterForReactionsRecyclerView();
+                }
+                reactionsAdapter.addElement(new Reaction(emojiItem, new ArrayList<>()));
+                return true;
+            });
         }
 
         return true;
@@ -285,7 +280,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     private void initReactionsRecyclerView()
     {
         var reactionsRecyclerView = binding.reactionsRecyclerView;
-        reactionsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
+        reactionsRecyclerView.setLayoutManager(
+                new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false));
         if (reactionsAdapter != null)
         {
             reactionsRecyclerView.setAdapter(reactionsAdapter);
@@ -299,8 +295,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
     private void initAdapterForReactionsRecyclerView()
     {
-        reactionsAdapter =
-                new ReactionsAdapter(mainActivity, commentItemHelper.getReactions(), commentItemHelper.comment);
+        reactionsAdapter = new ReactionsAdapter(mainActivity, commentItemHelper.getReactions(),
+                commentItemHelper.comment);
         binding.reactionsRecyclerView.setAdapter(reactionsAdapter);
     }
 
@@ -314,10 +310,8 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         }
         else
         {
-            showCommentsButton.setVisibility(commentItemHelper.getCommentsCount()
-                                                              .get() > 0
-                    ? View.VISIBLE
-                    : View.GONE);
+            showCommentsButton.setVisibility(
+                    commentItemHelper.getCommentsCount().get() > 0 ? View.VISIBLE : View.GONE);
         }
 
         showCommentsButton.setOnClickListener(this::onShowCommentButtonClick);
@@ -330,13 +324,16 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
         binding.commentsRecyclerView.setVisibility(View.VISIBLE);
 
-        if (innerCommentsAdapter == null) initAdapterForInnerCommentsRecyclerView();
+        if (innerCommentsAdapter == null)
+        {
+            initAdapterForInnerCommentsRecyclerView();
+        }
     }
 
     private void initAdapterForInnerCommentsRecyclerView()
     {
-        innerCommentsAdapter =
-                new CommentsAdapter(mainActivity, binding.nestedScrollView, commentItemHelper);
+        innerCommentsAdapter = new CommentsAdapter(mainActivity, binding.nestedScrollView,
+                commentItemHelper);
         binding.commentsRecyclerView.setAdapter(innerCommentsAdapter);
     }
 
@@ -345,10 +342,21 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         var innerCommentsRecyclerView = binding.commentsRecyclerView;
         innerCommentsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
         if (innerCommentsAdapter != null)
+        {
             innerCommentsRecyclerView.setAdapter(innerCommentsAdapter);
+        }
     }
 
-    public class CommentItemHelper implements HavingCommentsIds
+    private void switchMenuItemVisibility(int menuItemId,
+                                          boolean visible)
+    {
+        if (menu != null)
+        {
+            menu.findItem(menuItemId).setVisible(visible);
+        }
+    }
+
+    public class CommentItemHelper extends DateString implements HavingCommentsIds
     {
         private final CommentImpl comment;
 
@@ -356,32 +364,30 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
 
         public CommentItemHelper(CommentImpl comment)
         {
+            super(mainActivity);
             this.comment = comment;
         }
 
         public boolean copyText()
         {
-            var clipboard =
-                    (ClipboardManager) mainActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+            var clipboard = (ClipboardManager) mainActivity.getSystemService(
+                    Context.CLIPBOARD_SERVICE);
             var clip = ClipData.newPlainText("simple text", comment.getText());
             clipboard.setPrimaryClip(clip);
 
-            Toast.makeText(mainActivity, "Copied", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(mainActivity, "Copied", Toast.LENGTH_LONG).show();
             return true;
         }
 
         public boolean forward()
         {
-            Toast.makeText(mainActivity, "Forwarded", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(mainActivity, "Forwarded", Toast.LENGTH_LONG).show();
             return true;
         }
 
         public boolean edit()
         {
-            Toast.makeText(mainActivity, "Edited", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(mainActivity, "Edited", Toast.LENGTH_LONG).show();
             return true;
         }
 
@@ -389,17 +395,15 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         {
             if (havingCommentsIds != null)
             {
-                havingCommentsIds.getCommentIds()
-                                 .remove(comment.getId());
+                havingCommentsIds.getCommentIds().remove(comment.getId());
             }
             commentsAdapter.deleteComment(CommentItem.this);
 
-            mainActivity.appDatabase.commentDao()
-                                    .delete(comment);
-            mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(), MainActivity.token);
+            mainActivity.appDatabase.commentDao().delete(comment);
+            mainActivity.mobServerAPI.commentDelete(new MOBAPICallbackImpl(), comment.getId(),
+                    MainActivity.token);
 
-            Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(mainActivity, "Deleted", Toast.LENGTH_LONG).show();
 
             return true;
         }
@@ -458,16 +462,6 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
         public ObservableInt getRatesCount()
         {
             return comment.getRatesCount();
-        }
-    }
-
-    private void switchMenuItemVisibility(int menuItemId,
-                                          boolean visible)
-    {
-        if (menu != null)
-        {
-            menu.findItem(menuItemId)
-                .setVisible(visible);
         }
     }
 }

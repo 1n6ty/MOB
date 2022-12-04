@@ -4,13 +4,13 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.transition.TransitionInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.mobv2.R;
-import com.example.mobv2.adapter.MarkersAdapter;
 import com.example.mobv2.callback.AuthCallback;
 import com.example.mobv2.callback.AutoAuthCallback;
 import com.example.mobv2.callback.abstraction.AuthOkCallback;
@@ -18,8 +18,7 @@ import com.example.mobv2.databinding.FragmentAuthBinding;
 import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.Address;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.main.MainFragment;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -37,6 +36,17 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        var transitionNo = TransitionInflater.from(mainActivity)
+                                             .inflateTransition(android.R.transition.no_transition);
+        setExitTransition(transitionNo);
+        setEnterTransition(transitionNo);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState)
     {
@@ -50,13 +60,13 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     {
         AsyncTask.execute(() ->
         {
-            var lastLoginUser = mainActivity.appDatabase.userDao()
-                                                        .getLastLoginOne();
+            var lastLoginUser = mainActivity.appDatabase.userDao().getLastLoginOne();
             if (lastLoginUser != null && lastLoginUser.getNickName() != null && lastLoginUser.getPassword() != null)
             {
                 var autoAuthCallback = new AutoAuthCallback(mainActivity);
                 autoAuthCallback.setOkCallback(this::parseUserInfoFromMapAndAddToLocalDatabase);
-                mainActivity.mobServerAPI.auth(autoAuthCallback, lastLoginUser.getNickName(), lastLoginUser.getPassword());
+                mainActivity.mobServerAPI.auth(autoAuthCallback, lastLoginUser.getNickName(),
+                        lastLoginUser.getPassword());
             }
         });
     }
@@ -69,11 +79,8 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     private void onNextButtonClick(View view)
     {
         final int DELAY = 3000; // in milliseconds
-        String loginText = binding.loginView.getText()
-                                            .toString()
-                                            .trim();
-        passwordText = binding.passwordView.getText()
-                                           .toString();
+        String loginText = binding.loginView.getText().toString().trim();
+        passwordText = binding.passwordView.getText().toString();
 
         View errorView;
         if (loginText.isEmpty())
@@ -113,14 +120,13 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
             MainActivity.token = (String) map.get("token");
             MainActivity.refresh = (String) map.get("refresh");
 
-            var edit = mainActivity.getPrivatePreferences()
-                                   .edit();
+            var edit = mainActivity.getPrivatePreferences().edit();
             edit.putString(MainActivity.TOKEN_KEY, MainActivity.token);
             edit.putString(MainActivity.REFRESH_KEY, MainActivity.refresh);
             edit.apply();
         }
 
-        var user = new UserImpl.UserBuilder().parseFromMap((Map<String, Object>) map.get("user"));
+        var user = new UserImpl.UserParser().parseFromMap((Map<String, Object>) map.get("user"));
 
         AsyncTask.execute(() ->
         {
@@ -131,7 +137,9 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
             if (!user.compareById(userDao.getLastLoginOne()))
             {
                 for (AddressImpl address : addresses)
+                {
                     addressDao.delete(address);
+                }
             }
             var lastLogin = userDao.getLastLoginOne();
             if (lastLogin != null)
@@ -151,7 +159,10 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
             userDao.insert(user);
 
             Object addressesObject = map.get("addresses");
-            if (addressesObject.equals("none")) return;
+            if (addressesObject.equals("none"))
+            {
+                return;
+            }
 
             var addressesMapList = (List<Map<String, Object>>) addressesObject;
 
@@ -179,9 +190,9 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     {
         try
         {
-            var geocoder = new Geocoder(mainActivity, MarkersAdapter.LOCALE);
-            android.location.Address mapAddress = geocoder.getFromLocationName(address.toString(), 1)
-                                                          .get(0);
+            var geocoder = new Geocoder(mainActivity, MainActivity.LOCALE);
+            android.location.Address mapAddress = geocoder.getFromLocationName(address.toString(),
+                    1).get(0);
 
             return new LatLng(mapAddress.getLatitude(), mapAddress.getLongitude());
         }
@@ -195,6 +206,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
     @Override
     protected void updateWindow()
     {
-        super.updateWindow(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR, mainActivity.getAttributeColor(R.attr.backgroundSecondaryWindow));
+        super.updateWindow(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR,
+                mainActivity.getAttributeColor(R.attr.backgroundSecondaryWindow));
     }
 }

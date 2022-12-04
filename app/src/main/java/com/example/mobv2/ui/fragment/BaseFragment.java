@@ -2,6 +2,7 @@ package com.example.mobv2.ui.fragment;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +22,13 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mobv2.R;
 import com.example.mobv2.ui.abstraction.Updatable;
-import com.example.mobv2.ui.activity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 
 public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment implements Updatable
 {
+    private final int layoutId;
     protected MainActivity mainActivity;
     protected T binding;
-
-    private final int layoutId;
 
     public BaseFragment(@LayoutRes int layoutId)
     {
@@ -41,6 +41,12 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
         super.onCreate(savedInstanceState);
 
         mainActivity = (MainActivity) getActivity();
+
+        var transitionSlideInRight = TransitionInflater.from(mainActivity)
+                                                       .inflateTransition(
+                                                               R.transition.slide_in_right);
+        setExitTransition(transitionSlideInRight);
+        setEnterTransition(transitionSlideInRight);
         updateWindow();
     }
 
@@ -62,7 +68,8 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
 
     protected void updateWindow()
     {
-        updateWindow(View.SYSTEM_UI_FLAG_VISIBLE, getResources().getColor(mainActivity.getAttribute(R.attr.backgroundPrimaryWindow)));
+        updateWindow(View.SYSTEM_UI_FLAG_VISIBLE,
+                getResources().getColor(mainActivity.getAttribute(R.attr.backgroundPrimaryWindow)));
     }
 
     protected void updateWindow(int visibility,
@@ -72,10 +79,14 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
-            window.getDecorView()
-                  .setSystemUiVisibility(visibility);
+            window.getDecorView().setSystemUiVisibility(visibility);
         }
         window.setNavigationBarColor(color);
+    }
+
+    protected void initToolbar(Toolbar toolbar)
+    {
+        toolbar.setNavigationOnClickListener(this::defaultOnClick);
     }
 
     protected void initToolbar(Toolbar toolbar,

@@ -12,15 +12,16 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.R;
+import com.example.mobv2.databinding.FragmentMainBinding;
 import com.example.mobv2.databinding.NavHeaderMainBinding;
 import com.example.mobv2.model.MenuItemMetadatum;
 import com.example.mobv2.model.UserImpl;
-import com.example.mobv2.ui.activity.MainActivity;
-import com.example.mobv2.ui.fragment.EditProfileFragment;
+import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
 import com.example.mobv2.ui.fragment.LanguageFragment;
 import com.example.mobv2.ui.fragment.MapFeaturesFragment;
 import com.example.mobv2.ui.fragment.NotificationAndSoundFragment;
-import com.example.mobv2.ui.fragment.main.MainFragmentViewModel;
+import com.example.mobv2.ui.fragment.ProfileFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class NavDrawer implements NavigationView.OnNavigationItemSelectedListener
@@ -32,15 +33,17 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
     private final MainActivity mainActivity;
 
     private final DrawerLayout drawerLayout;
-    private NavigationView navigationView;
     private View headerView;
 
-    public NavDrawer(MainActivity mainActivity)
+    private FragmentMainBinding binding;
+
+    public NavDrawer(MainActivity mainActivity,
+                     FragmentMainBinding binding)
     {
         this.mainActivity = mainActivity;
+        this.binding = binding;
 
-        UserImpl currentUser = mainActivity.appDatabase.userDao()
-                                                      .getCurrentOne();
+        var currentUser = mainActivity.appDatabase.userDao().getCurrentOne();
         user = currentUser != null ? currentUser : new UserImpl();
 
         drawerLayout = mainActivity.findViewById(R.id.drawer_layout);
@@ -52,22 +55,22 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
     private void initNavigationView()
     {
-        navigationView = mainActivity.findViewById(R.id.navigation_view);
+        var navigationView = binding.navigationView;
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 
         headerView = navigationView.getHeaderView(0);
 
         var binding = NavHeaderMainBinding.bind(headerView);
-        var mainFragmentViewModel =
-                new ViewModelProvider(mainActivity).get(MainFragmentViewModel.class);
-        binding.setBindingContext(mainFragmentViewModel);
+        var mainActivityViewModel = new ViewModelProvider(mainActivity).get(
+                MainActivityViewModel.class);
+        binding.setBindingContext(mainActivityViewModel);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
-        NavDrawerViewModel viewModel =
-                new ViewModelProvider(mainActivity).get(NavDrawerViewModel.class);
+        var viewModel = new ViewModelProvider(mainActivity.getFragmentAtFrame()).get(
+                NavDrawerViewModel.class);
         MenuItemMetadatum metadatum = viewModel.getMenuItemHash(item);
 
         switch (metadatum.itemType)
@@ -85,69 +88,46 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
     private void updateHeaderView()
     {
-        ImageView avatarView = headerView.findViewById(R.id.avatar_view);
+        var avatarView = (ImageView) headerView.findViewById(R.id.avatar_view);
 
-        MainActivity.loadImageInView(user.getAvatarUrl(), navigationView, avatarView);
+        MainActivity.loadImageInView(user.getAvatarUrl(), binding.navigationView, avatarView);
     }
 
     private void initNavigationMenu()
     {
-        Menu menu = navigationView.getMenu();
+        var menu = binding.navigationView.getMenu();
         menu.clear();
 
         int order = 0;
 
-        addNavigationMenuItem(menu,
-                PROFILE_GROUP,
-                order++,
-                R.string.menu_edit_profile,
-                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () ->
-                        {
-                            mainActivity.goToFragment(new EditProfileFragment());
-                        }),
-                R.drawable.ic_menu_profile
-        );
+        addNavigationMenuItem(menu, PROFILE_GROUP, order++, R.string.menu_profile,
+                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT, () ->
+                {
+                    mainActivity.goToFragment(new ProfileFragment());
+                }), R.drawable.ic_menu_profile);
 
         // the next submenu
-        Menu submenuSettings =
-                menu.addSubMenu(SETTINGS_GROUP, Menu.NONE, order, R.string.nav_header_item_settings);
+        Menu submenuSettings = menu.addSubMenu(SETTINGS_GROUP, Menu.NONE, order,
+                R.string.nav_header_item_settings);
 
-        addNavigationMenuItem(submenuSettings,
-                SETTINGS_GROUP,
-                order++,
+        addNavigationMenuItem(submenuSettings, SETTINGS_GROUP, order++,
                 R.string.menu_notification_and_sound,
-                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () ->
-                        {
-                            mainActivity.goToFragment(new NotificationAndSoundFragment());
-                        }),
-                R.drawable.ic_menu_notification
-        );
+                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT, () ->
+                {
+                    mainActivity.goToFragment(new NotificationAndSoundFragment());
+                }), R.drawable.ic_menu_notification);
 
-        addNavigationMenuItem(submenuSettings,
-                SETTINGS_GROUP,
-                order++,
-                R.string.menu_map_features,
-                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () ->
-                        {
-                            mainActivity.goToFragment(new MapFeaturesFragment());
-                        }),
-                R.drawable.ic_menu_map
-        );
+        addNavigationMenuItem(submenuSettings, SETTINGS_GROUP, order++, R.string.menu_map_features,
+                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT, () ->
+                {
+                    mainActivity.goToFragment(new MapFeaturesFragment());
+                }), R.drawable.ic_menu_map);
 
-        addNavigationMenuItem(submenuSettings,
-                SETTINGS_GROUP,
-                order,
-                R.string.menu_language,
-                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () ->
-                        {
-                            mainActivity.goToFragment(new LanguageFragment());
-                        }),
-                R.drawable.ic_menu_international
-        );
+        addNavigationMenuItem(submenuSettings, SETTINGS_GROUP, order, R.string.menu_language,
+                new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT, () ->
+                {
+                    mainActivity.goToFragment(new LanguageFragment());
+                }), R.drawable.ic_menu_international);
     }
 
 
@@ -158,7 +138,8 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                                        MenuItemMetadatum menuItemMetadatum,
                                        @DrawableRes int icon)
     {
-        addNavigationMenuItem(menu, groupId, order, mainActivity.getString(title), menuItemMetadatum, icon);
+        addNavigationMenuItem(menu, groupId, order, mainActivity.getString(title),
+                menuItemMetadatum, icon);
     }
 
     private void addNavigationMenuItem(Menu menu,
@@ -168,32 +149,31 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
                                        MenuItemMetadatum menuItemMetadatum,
                                        @DrawableRes int icon)
     {
-        MenuItem menuItem = menu.add(groupId, order, order, title)
-                                .setIcon(icon);
+        var menuItem = menu.add(groupId, order, order, title).setIcon(icon);
 
-        NavDrawerViewModel viewModel =
-                new ViewModelProvider(mainActivity).get(NavDrawerViewModel.class);
+        var viewModel = new ViewModelProvider(mainActivity.getFragmentAtFrame()).get(
+                NavDrawerViewModel.class);
 
         viewModel.putMenuItemHash(menuItem, menuItemMetadatum);
     }
 
     public boolean isOpen()
     {
-        return drawerLayout.isDrawerOpen(navigationView);
+        return drawerLayout.isDrawerOpen(binding.navigationView);
     }
 
     public void open()
     {
-        drawerLayout.openDrawer(navigationView);
+        drawerLayout.openDrawer(binding.navigationView);
     }
 
     public boolean isClosed()
     {
-        return !drawerLayout.isDrawerOpen(navigationView);
+        return !drawerLayout.isDrawerOpen(binding.navigationView);
     }
 
     public void close()
     {
-        drawerLayout.closeDrawer(navigationView);
+        drawerLayout.closeDrawer(binding.navigationView);
     }
 }
