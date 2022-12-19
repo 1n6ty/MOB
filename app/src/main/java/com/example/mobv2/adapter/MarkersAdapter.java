@@ -17,9 +17,10 @@ import com.example.mobv2.model.MarkerInfoImpl;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.markerCreator.MapSkillsBottomSheetFragment;
 import com.example.mobv2.ui.fragment.markerCreator.MarkerCreatorViewModel;
+import com.example.mobv2.ui.item.MarkerInfoItem;
 import com.example.mobv2.ui.view.Map;
 import com.example.mobv2.ui.view.MarkerView;
-import com.example.mobv2.ui.item.MarkerInfoItem;
+import com.example.mobv2.util.LocationAddress;
 import com.example.mobv2.util.MarkerAddition;
 import com.example.mobv2.util.MyObservableArrayList;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,7 +31,8 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.Objects;
 
-public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoImpl>, CreatePostOkCallback
+public class MarkersAdapter extends Map.Adapter
+        implements AbleToAdd<MarkerInfoImpl>, CreatePostOkCallback
 {
     public static final int ZOOM = 18;
     public static final int MIN_ZOOM = 16;
@@ -49,34 +51,35 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
         this.markersAdapterHelper = markersAdapterHelper;
 
         markerInfoItemList = new MyObservableArrayList<>();
-        markerInfoItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
-        {
-            @Override
-            public void onAdded(int index,
-                                MarkerInfoItem element)
-            {
-                notifyItemInserted(index);
-            }
+        markerInfoItemList.setOnListChangedCallback(
+                new MyObservableArrayList.OnListChangedCallback<>()
+                {
+                    @Override
+                    public void onAdded(int index,
+                                        MarkerInfoItem element)
+                    {
+                        notifyItemInserted(index);
+                    }
 
-            @Override
-            public void onRemoved(int index)
-            {
-                notifyItemRemoved(index);
-            }
+                    @Override
+                    public void onRemoved(int index)
+                    {
+                        notifyItemRemoved(index);
+                    }
 
-            @Override
-            public void onRemoved(int index,
-                                  Object o)
-            {
-                notifyItemRemoved(index);
-            }
+                    @Override
+                    public void onRemoved(int index,
+                                          Object o)
+                    {
+                        notifyItemRemoved(index);
+                    }
 
-            @Override
-            public void onClear(int count)
-            {
-                notifyItemRangeRemoved(0, count);
-            }
-        });
+                    @Override
+                    public void onClear(int count)
+                    {
+                        notifyItemRangeRemoved(0, count);
+                    }
+                });
     }
 
     @Override
@@ -111,52 +114,56 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
 
     private void onMapLongClick(@NonNull LatLng latLng)
     {
-        var currentAddress = mainActivity.appDatabase.addressDao()
-                                                     .getCurrentOne();
+        var currentAddress = mainActivity.appDatabase.addressDao().getCurrentOne();
 
         var currentAddressLatLng = currentAddress.getLatLng();
-        var distance =
-                mainActivity.getDistance(latLng.latitude, latLng.longitude, currentAddressLatLng.latitude, currentAddressLatLng.longitude);
+        var distance = LocationAddress.getDistance(latLng.latitude, latLng.longitude,
+                currentAddressLatLng.latitude, currentAddressLatLng.longitude);
 
-        if (distance[0] > MarkersAdapter.CIRCLE_RADIUS) return;
+        if (distance[0] > MarkersAdapter.CIRCLE_RADIUS)
+        {
+            return;
+        }
 
         deselectClickedMarkerInfoAndHideBottom();
 
         initMarkerCreatorViewModel(latLng);
 
-        var pointerMarker =
-                map.addMarker(new MarkerAddition(latLng.latitude, latLng.longitude).create());
+        var pointerMarker = map.addMarker(
+                new MarkerAddition(latLng.latitude, latLng.longitude).create());
 
         animateCameraTo(latLng, new GoogleMap.CancelableCallback()
         {
             @Override
             public void onCancel()
             {
-                Objects.requireNonNull(pointerMarker)
-                       .remove();
+                Objects.requireNonNull(pointerMarker).remove();
             }
 
             @Override
             public void onFinish()
             {
                 var bottomSheetFragment = new MapSkillsBottomSheetFragment();
-                bottomSheetFragment.setOnDestroyViewListener(view -> Objects.requireNonNull(pointerMarker)
-                                                                            .remove());
-                bottomSheetFragment.show(mainActivity.getSupportFragmentManager(), MapSkillsBottomSheetFragment.class.getSimpleName());
+                bottomSheetFragment.setOnDestroyViewListener(
+                        view -> Objects.requireNonNull(pointerMarker).remove());
+                bottomSheetFragment.show(mainActivity.getSupportFragmentManager(),
+                        MapSkillsBottomSheetFragment.class.getSimpleName());
             }
         });
     }
 
     private void initMarkerCreatorViewModel(@NonNull LatLng latLng)
     {
-        var markerCreatorViewModel =
-                new ViewModelProvider(mainActivity).get(MarkerCreatorViewModel.class);
+        var markerCreatorViewModel = new ViewModelProvider(mainActivity).get(
+                MarkerCreatorViewModel.class);
 
         var createPostCallback = new CreatePostCallback(mainActivity, latLng);
-        createPostCallback.setOkCallback(this::parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList);
+        createPostCallback.setOkCallback(
+                this::parseMarkerInfoFromMapWithLatLngAndAddToMarkerInfoList);
         markerCreatorViewModel.setCreatePostCallback(createPostCallback);
 
-        var address = mainActivity.getOtherAddressByLatLng(latLng);
+        var address = LocationAddress.getOtherAddressByLatLng(mainActivity.getApplicationContext(),
+                latLng);
 
         markerCreatorViewModel.setAddress(address);
     }
@@ -168,7 +175,8 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
         String postId = String.valueOf(((Double) map.get("id")).intValue());
         double x = latLng.latitude;
         double y = latLng.longitude;
-        var markerInfo = new MarkerInfoImpl(postId, new LatLng(x, y), MarkerInfoImpl.SUB_ADDRESS_MARKER);
+        var markerInfo = new MarkerInfoImpl(postId, new LatLng(x, y),
+                MarkerInfoImpl.SUB_ADDRESS_MARKER);
 
         addElement(markerInfo);
     }
@@ -185,8 +193,8 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
     @Override
     public void addElement(@NonNull MarkerInfoImpl markerInfo)
     {
-        var markerInfoItem =
-                new MarkerInfoItem(mainActivity, this, markersAdapterHelper.postsRecyclerView, markerInfo);
+        var markerInfoItem = new MarkerInfoItem(mainActivity, this,
+                markersAdapterHelper.postsRecyclerView, markerInfo);
         markerInfoItemList.add(markerInfoItem);
     }
 
@@ -194,7 +202,8 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
     {
         var postsAdapter = new PostsAdapter(mainActivity, this);
         markersAdapterHelper.postsRecyclerView.setAdapter(postsAdapter);
-        markersAdapterHelper.postsRecyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+        markersAdapterHelper.postsRecyclerView.setLayoutManager(
+                new LinearLayoutManager(mainActivity));
 
         var clickedMarkerInfoItem = getClickedMarkerInfoItem();
         switch (clickedMarkerInfoItem.markerInfoItemHelper.getMarkerType())
@@ -218,13 +227,10 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
     {
         markersAdapterHelper.sheetBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
 
-        final boolean isAddressMarker =
-                getClickedMarkerInfoItem().markerInfoItemHelper.getMarkerType() == MarkerInfoImpl.ADDRESS_MARKER;
+        final boolean isAddressMarker = getClickedMarkerInfoItem().markerInfoItemHelper.getMarkerType() == MarkerInfoImpl.ADDRESS_MARKER;
         Menu postsToolbarMenu = markersAdapterHelper.postsToolbar.getMenu();
-        postsToolbarMenu.findItem(R.id.menu_posts_reverse)
-                        .setVisible(isAddressMarker);
-        postsToolbarMenu.findItem(R.id.menu_show_more)
-                        .setVisible(isAddressMarker);
+        postsToolbarMenu.findItem(R.id.menu_posts_reverse).setVisible(isAddressMarker);
+        postsToolbarMenu.findItem(R.id.menu_show_more).setVisible(isAddressMarker);
     }
 
     public void deleteMarkerInfoItem(MarkerInfoItem markerInfoItem)
@@ -261,7 +267,8 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
 
     public boolean checkIfClickedMarkerInfoEqualsTo(MarkerInfoItem markerInfoItem)
     {
-        return markerInfoItem.markerInfoItemHelper.compareById(getClickedMarkerInfoItem().markerInfoItemHelper);
+        return markerInfoItem.markerInfoItemHelper.compareById(
+                getClickedMarkerInfoItem().markerInfoItemHelper);
     }
 
     private MarkerInfoItem getClickedMarkerInfoItem()
@@ -280,13 +287,15 @@ public class MarkersAdapter extends Map.Adapter implements AbleToAdd<MarkerInfoI
 
     public void animateCameraTo(@NonNull LatLng latLng)
     {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, map.getCameraPosition().zoom)));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,
+                Math.max(ZOOM, map.getCameraPosition().zoom)));
     }
 
     public void animateCameraTo(@NonNull LatLng latLng,
                                 GoogleMap.CancelableCallback callback)
     {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Math.max(ZOOM, map.getCameraPosition().zoom)), callback);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,
+                Math.max(ZOOM, map.getCameraPosition().zoom)), callback);
     }
 
     public void scrollToStartPosition()

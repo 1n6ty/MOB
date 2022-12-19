@@ -95,7 +95,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
     {
         Date date = post.getDate();
         PostItem postItem = new PostItem(mainActivity, this, post);
-        if (postItemList.isEmpty() || date.compareTo(postItemList.get(postItemList.size() - 1).postItemHelper.getDate()) <= 0)
+        if (postItemList.isEmpty() || date.compareTo(
+                postItemList.get(postItemList.size() - 1).postItemHelper.getDate()) <= 0)
         {
             postItemList.add(postItem);
             return postItem;
@@ -161,7 +162,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.PostViewHold
             var nextPostItemHelperCommentIds = nextPostItem.postItemHelper.getCommentIds();
             var postItemHelperCommentIds = postItem.postItemHelper.getCommentIds();
 
-            return Integer.compare(nextPostItemHelperCommentIds.size(), postItemHelperCommentIds.size());
+            return Integer.compare(nextPostItemHelperCommentIds.size(),
+                    postItemHelperCommentIds.size());
         });
         notifyItemRangeChanged(0, postItemList.size());
         return true;

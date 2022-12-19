@@ -1,6 +1,5 @@
 package com.example.mobv2.ui.fragment;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 
@@ -10,15 +9,14 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentProfileBinding;
-import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
+import com.example.mobv2.util.Navigator;
 
 // TODO rewrite to adapter
 public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implements HavingToolbar
 {
-    private UserImpl user;
     private MainActivityViewModel viewModel;
 
     public ProfileFragment()
@@ -32,8 +30,6 @@ public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implem
     {
         super.onViewCreated(view, savedInstanceState);
 
-        user = mainActivity.appDatabase.userDao().getCurrentOne();
-
         viewModel = new ViewModelProvider(mainActivity).get(MainActivityViewModel.class);
         binding.setBindingContext(viewModel);
 
@@ -45,9 +41,9 @@ public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implem
 
     public void initToolbar()
     {
-        MainActivity.loadImageInView(user.getAvatarUrl(), getView(), binding.avatarView);
-
         super.initToolbar(binding.toolbar);
+
+        MainActivity.loadImageInView(viewModel.getAvatarUrl(), getView(), binding.avatarView);
 
         binding.toolbar.setOnMenuItemClickListener(item ->
         {
@@ -65,6 +61,8 @@ public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implem
                     return false;
             }
         });
+
+        binding.avatarView.setOnClickListener(view -> new ImageViewerFragment());
     }
 
     private boolean logOut()
@@ -73,26 +71,19 @@ public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implem
         var lastLoginUser = userDao.getLastLoginOne();
         lastLoginUser.setLastLogin(false);
         userDao.update(lastLoginUser);
-        mainActivity.replaceFragment(new AuthFragment());
+        Navigator.replaceFragment(new AuthFragment());
         return true;
     }
 
     private void initSettingsAddressesView()
     {
         binding.settingsAddressesView.setOnClickListener(
-                view -> mainActivity.goToFragment(new ChangeAddressesFragment()));
+                view -> Navigator.goToFragment(new ChangeAddressesFragment()));
     }
 
     private void initEditProfileFab()
     {
         binding.editProfileFab.setOnClickListener(
-                view -> mainActivity.goToFragment(new EditProfileFragment()));
-    }
-
-    @Override
-    public void update()
-    {
-        super.update();
-        user = mainActivity.appDatabase.userDao().getCurrentOne();
+                view -> Navigator.goToFragment(new EditProfileFragment()));
     }
 }

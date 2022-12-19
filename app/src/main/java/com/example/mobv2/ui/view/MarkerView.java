@@ -43,14 +43,29 @@ public class MarkerView
         return marker.getAlpha();
     }
 
+    public void setAlpha(float alpha)
+    {
+        marker.setAlpha(alpha);
+    }
+
     public float getRotation()
     {
         return marker.getRotation();
     }
 
+    public void setRotation(float rotation)
+    {
+        marker.setRotation(rotation);
+    }
+
     public float getZIndex()
     {
         return marker.getZIndex();
+    }
+
+    public void setZIndex(float zIndex)
+    {
+        marker.setZIndex(zIndex);
     }
 
     @NonNull
@@ -59,10 +74,20 @@ public class MarkerView
         return marker.getPosition();
     }
 
+    public void setPosition(@NonNull LatLng latlng)
+    {
+        marker.setPosition(latlng);
+    }
+
     @Nullable
     public Object getTag()
     {
         return marker.getTag();
+    }
+
+    public void setTag(@Nullable Object tag)
+    {
+        marker.setTag(tag);
     }
 
     @NonNull
@@ -77,10 +102,20 @@ public class MarkerView
         return marker.getSnippet();
     }
 
+    public void setSnippet(@Nullable String snippet)
+    {
+        marker.setSnippet(snippet);
+    }
+
     @Nullable
     public String getTitle()
     {
         return marker.getTitle();
+    }
+
+    public void setTitle(@Nullable String title)
+    {
+        marker.setTitle(title);
     }
 
     public void hideInfoWindow()
@@ -93,25 +128,10 @@ public class MarkerView
         marker.remove();
     }
 
-    public void setAlpha(float alpha)
-    {
-        marker.setAlpha(alpha);
-    }
-
     public void setAnchor(float anchorU,
                           float anchorV)
     {
         marker.setAnchor(anchorU, anchorV);
-    }
-
-    public void setDraggable(boolean draggable)
-    {
-        marker.setDraggable(draggable);
-    }
-
-    public void setFlat(boolean flat)
-    {
-        marker.setFlat(flat);
     }
 
     public void setIcon(@Nullable BitmapDescriptor iconDescriptor)
@@ -125,41 +145,6 @@ public class MarkerView
         marker.setInfoWindowAnchor(anchorU, anchorV);
     }
 
-    public void setPosition(@NonNull LatLng latlng)
-    {
-        marker.setPosition(latlng);
-    }
-
-    public void setRotation(float rotation)
-    {
-        marker.setRotation(rotation);
-    }
-
-    public void setSnippet(@Nullable String snippet)
-    {
-        marker.setSnippet(snippet);
-    }
-
-    public void setTag(@Nullable Object tag)
-    {
-        marker.setTag(tag);
-    }
-
-    public void setTitle(@Nullable String title)
-    {
-        marker.setTitle(title);
-    }
-
-    public void setVisible(boolean visible)
-    {
-        marker.setVisible(visible);
-    }
-
-    public void setZIndex(float zIndex)
-    {
-        marker.setZIndex(zIndex);
-    }
-
     public void showInfoWindow()
     {
         marker.showInfoWindow();
@@ -170,9 +155,19 @@ public class MarkerView
         return marker.isDraggable();
     }
 
+    public void setDraggable(boolean draggable)
+    {
+        marker.setDraggable(draggable);
+    }
+
     public boolean isFlat()
     {
         return marker.isFlat();
+    }
+
+    public void setFlat(boolean flat)
+    {
+        marker.setFlat(flat);
     }
 
     public boolean isInfoWindowShown()
@@ -183,6 +178,11 @@ public class MarkerView
     public boolean isVisible()
     {
         return marker.isVisible();
+    }
+
+    public void setVisible(boolean visible)
+    {
+        marker.setVisible(visible);
     }
 
     public interface OnMarkerClickListener

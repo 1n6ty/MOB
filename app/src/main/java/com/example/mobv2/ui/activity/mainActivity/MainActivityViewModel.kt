@@ -8,6 +8,13 @@ class MainActivityViewModel : ObservableViewModel() {
     var isAddressChanged = false
 
     @Bindable
+    var avatarUrl = ""
+        set(value) {
+            field = value
+            notifyPropertyChanged(BR.avatarUrl)
+        }
+
+    @Bindable
     var fullName = ""
         set(value) {
             field = value

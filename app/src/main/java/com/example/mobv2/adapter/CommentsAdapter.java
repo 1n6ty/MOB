@@ -26,7 +26,8 @@ import com.google.gson.internal.LinkedTreeMap;
 import java.util.Collections;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>
-        implements AbleToAdd<CommentImpl>, AbleToReverse, AbleToSortByUserWills, NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
+        implements AbleToAdd<CommentImpl>, AbleToReverse, AbleToSortByUserWills,
+        NestedScrollView.OnScrollChangeListener, GetCommentOkCallback
 {
     private static final int MAX_UPLOADED_COMMENTS_COUNT = 6;
 
@@ -44,28 +45,29 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         this.nestedScrollView = nestedScrollView;
         this.havingCommentsIds = havingCommentsIds;
         this.commentItemList = new MyObservableArrayList<>();
-        commentItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<CommentItem>()
-        {
-            @Override
-            public void onAdded(int index,
-                                CommentItem element)
-            {
-                notifyItemInserted(index);
-            }
+        commentItemList.setOnListChangedCallback(
+                new MyObservableArrayList.OnListChangedCallback<CommentItem>()
+                {
+                    @Override
+                    public void onAdded(int index,
+                                        CommentItem element)
+                    {
+                        notifyItemInserted(index);
+                    }
 
-            @Override
-            public void onRemoved(int index)
-            {
-                notifyItemRemoved(index);
-            }
+                    @Override
+                    public void onRemoved(int index)
+                    {
+                        notifyItemRemoved(index);
+                    }
 
-            @Override
-            public void onRemoved(int index,
-                                  Object o)
-            {
-                notifyItemRemoved(index);
-            }
-        });
+                    @Override
+                    public void onRemoved(int index,
+                                          Object o)
+                    {
+                        notifyItemRemoved(index);
+                    }
+                });
 
         var commentsIds = havingCommentsIds.getCommentIds();
         for (int i = 0; i < Math.min(commentsIds.size(), MAX_UPLOADED_COMMENTS_COUNT); i++)
@@ -114,19 +116,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void parseCommentFromMapAndAddToComments(@NonNull LinkedTreeMap<String, Object> map)
     {
         var comment = new CommentImpl.CommentBuilder().parseFromMap(map);
-        mainActivity.appDatabase.commentDao()
-                                .insert(comment);
+        mainActivity.appDatabase.commentDao().insert(comment);
         addElement(comment);
     }
 
     private void getCommentByIdFromLocalDbAndAddToComments(String commentId)
     {
-        var comment = mainActivity.appDatabase.commentDao()
-                                              .getById(commentId);
+        var comment = mainActivity.appDatabase.commentDao().getById(commentId);
         if (comment == null)
         {
-            Toast.makeText(mainActivity, "Comment is not uploaded", Toast.LENGTH_LONG)
-                 .show();
+            Toast.makeText(mainActivity, "Comment is not uploaded", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -163,7 +162,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     {
         var date = comment.getDate();
         var commentItem = new CommentItem(mainActivity, this, comment);
-        if (commentItemList.isEmpty() || date.compareTo(commentItemList.get(commentItemList.size() - 1).commentItemHelper.getDate()) <= 0)
+        if (commentItemList.isEmpty() || date.compareTo(
+                commentItemList.get(commentItemList.size() - 1).commentItemHelper.getDate()) <= 0)
         {
             commentItemList.add(commentItem);
             return commentItem;
@@ -200,7 +200,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             var nextCommentPositiveRates = nextCommentItem.commentItemHelper.getPositiveRates();
             var nextCommentNegativeRates = nextCommentItem.commentItemHelper.getNegativeRates();
 
-            return Integer.compare(nextCommentPositiveRates.size() - nextCommentNegativeRates.size(),
+            return Integer.compare(
+                    nextCommentPositiveRates.size() - nextCommentNegativeRates.size(),
                     commentPositiveRates.size() - commentNegativeRates.size());
         });
         notifyItemRangeChanged(0, commentItemList.size());
@@ -229,13 +230,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
             var nextPostItemHelperCommentIds = nextCommentItem.commentItemHelper.getCommentIds();
             var postItemHelperCommentIds = commentItem.commentItemHelper.getCommentIds();
 
-            return Integer.compare(nextPostItemHelperCommentIds.size(), postItemHelperCommentIds.size());
+            return Integer.compare(nextPostItemHelperCommentIds.size(),
+                    postItemHelperCommentIds.size());
         });
         notifyItemRangeChanged(0, commentItemList.size());
         return true;
     }
 
-    public void scrollTo(int x, int y)
+    public void scrollTo(int x,
+                         int y)
     {
         nestedScrollView.scrollTo(x, y);
     }

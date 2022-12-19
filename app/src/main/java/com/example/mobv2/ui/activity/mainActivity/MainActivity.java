@@ -3,14 +3,11 @@ package com.example.mobv2.ui.activity.mainActivity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
@@ -19,13 +16,10 @@ import com.bumptech.glide.request.target.Target;
 import com.example.mobv2.callback.RefreshTokenCallback;
 import com.example.mobv2.callback.abstraction.RefreshTokenOkCallback;
 import com.example.mobv2.databinding.ActivityMainBinding;
-import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.ui.activity.ThemedActivity;
 import com.example.mobv2.ui.fragment.AuthFragment;
-import com.example.mobv2.ui.fragment.BaseFragment;
 import com.example.mobv2.ui.fragment.MainFragment;
 import com.example.mobv2.util.Navigator;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.net.MalformedURLException;
@@ -48,7 +42,6 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
     public static String refresh = "";
     public MOBServerAPI mobServerAPI;
     public ApplicationDatabase appDatabase;
-    public Navigator navigator;
 
     private ActivityMainBinding binding;
 
@@ -95,6 +88,9 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        initViewBinding();
+
         mobServerAPI = new MOBServerAPI(ip + "/");
         appDatabase = Room.databaseBuilder(getApplicationContext(), ApplicationDatabase.class,
                                   "information_about_session_database")
@@ -102,9 +98,8 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                           .fallbackToDestructiveMigration()  // it will destroy database and create the new
                           .build();
 
-//        navigator = new Navigator(this, binding.navContentFrame);
 
-        initViewBinding();
+        Navigator.create(this, binding.navContentFrame);
 
         initAuthFragment();
     }
@@ -121,44 +116,7 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
 
     private void initAuthFragment()
     {
-        replaceFragment(new AuthFragment());
-    }
-
-    public void goToFragment(@NonNull Fragment fragment)
-    {
-        String fragmentName = fragment.getClass().getSimpleName();
-
-        getSupportFragmentManager().beginTransaction()
-                                   .add(binding.navContentFrame.getId(), fragment, fragmentName)
-                                   .commitNow();
-    }
-
-    public void goToFragmentWithSharedElement(@NonNull Fragment fragment,
-                                              View sharedElement,
-                                              String destinationId)
-    {
-        String fragmentName = fragment.getClass().getSimpleName();
-
-        getSupportFragmentManager().beginTransaction()
-                                   .addSharedElement(sharedElement, destinationId)
-                                   .add(binding.navContentFrame.getId(), fragment, fragmentName)
-                                   .commitNow();
-    }
-
-    public void replaceFragment(@NonNull Fragment fragment)
-    {
-        String fragmentName = fragment.getClass().getSimpleName();
-
-        getSupportFragmentManager().beginTransaction()
-                                   .replace(binding.navContentFrame.getId(), fragment, fragmentName)
-                                   .commit();
-    }
-
-    public void toPreviousFragment()
-    {
-        getSupportFragmentManager().beginTransaction().remove(getFragmentAtFrame()).commitNow();
-
-        ((BaseFragment) getFragmentAtFrame()).update();
+        Navigator.replaceFragment(new AuthFragment());
     }
 
     @Override
@@ -170,7 +128,7 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
             return;
         }
 
-        toPreviousFragment();
+        Navigator.toPreviousFragment();
     }
 
     public Fragment getFragmentAtFrame()
@@ -181,39 +139,6 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
     public SharedPreferences getPrivatePreferences()
     {
         return getPreferences(Context.MODE_PRIVATE);
-    }
-
-    public AddressImpl getOtherAddressByLatLng(@NonNull LatLng latLng)
-    {
-        try
-        {
-            Geocoder geocoder = new Geocoder(getApplicationContext(), LOCALE);
-            android.location.Address mapAddress = geocoder.getFromLocation(latLng.latitude,
-                    latLng.longitude, 1).get(0);
-
-            AddressImpl rawAddress = AddressImpl.createRawAddress(mapAddress.getCountryName(),
-                    mapAddress.getLocality(), mapAddress.getThoroughfare(),
-                    mapAddress.getFeatureName());
-            rawAddress.setLatLng(latLng);
-            return rawAddress;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public float[] getDistance(double startLatitude,
-                               double startLongitude,
-                               double endLatitude,
-                               double endLongitude)
-    {
-        float[] distance = new float[2];
-        Location.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude,
-                distance);
-
-        return distance;
     }
 
     public void startRefreshingToken()

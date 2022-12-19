@@ -31,28 +31,29 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
     {
         this.mainActivity = mainActivity;
         this.reactionItemList = new MyObservableArrayList<>();
-        this.reactionItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
-        {
-            @Override
-            public void onAdded(int index,
-                                ReactionItem element)
-            {
-                notifyItemInserted(index);
-            }
+        this.reactionItemList.setOnListChangedCallback(
+                new MyObservableArrayList.OnListChangedCallback<>()
+                {
+                    @Override
+                    public void onAdded(int index,
+                                        ReactionItem element)
+                    {
+                        notifyItemInserted(index);
+                    }
 
-            @Override
-            public void onRemoved(int index)
-            {
-                notifyItemRemoved(index);
-            }
+                    @Override
+                    public void onRemoved(int index)
+                    {
+                        notifyItemRemoved(index);
+                    }
 
-            @Override
-            public void onRemoved(int index,
-                                  Object o)
-            {
-                notifyItemRemoved(index);
-            }
-        });
+                    @Override
+                    public void onRemoved(int index,
+                                          Object o)
+                    {
+                        notifyItemRemoved(index);
+                    }
+                });
 
         for (Reaction reaction : reactions)
         {
@@ -87,14 +88,16 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
     @Override
     public void addElement(@NonNull Reaction reaction)
     {
-        if (checkIfReactionWasAdded(reaction)) return;
+        if (checkIfReactionWasAdded(reaction))
+        {
+            return;
+        }
 
         var reactionItem = new ReactionItem(mainActivity, this, reaction);
         reactionItem.reactionItemHelper.setUserContent(userContent);
-        int count = reaction.getCount()
-                            .get();
-        if (reactionItemList.isEmpty() || count < reactionItemList.get(reactionItemList.size() - 1).reactionItemHelper.getCount()
-                                                                                                                      .get())
+        int count = reaction.getCount().get();
+        if (reactionItemList.isEmpty() || count < reactionItemList.get(
+                reactionItemList.size() - 1).reactionItemHelper.getCount().get())
         {
             upAndAddReactionItemToReactionItemList(reactionItem);
             return;
@@ -102,8 +105,7 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
 
         for (int i = 0; i < reactionItemList.size(); i++)
         {
-            int reactionItemCount = reactionItemList.get(i).reactionItemHelper.getCount()
-                                                                              .get();
+            int reactionItemCount = reactionItemList.get(i).reactionItemHelper.getCount().get();
             if (count >= reactionItemCount)
             {
                 upAndAddReactionItemToReactionItemList(reactionItem);
@@ -131,8 +133,7 @@ public class ReactionsAdapter extends RecyclerView.Adapter<ReactionsAdapter.Reac
 
     private void upAndAddReactionItemToReactionItemList(ReactionItem reactionItem)
     {
-        String userId = mainActivity.appDatabase.userDao()
-                                                .getCurrentId();
+        String userId = mainActivity.appDatabase.userDao().getCurrentId();
         reactionItem.reactionItemHelper.up(userId);
         reactionItemList.add(reactionItem);
     }

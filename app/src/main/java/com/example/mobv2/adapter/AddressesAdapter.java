@@ -15,7 +15,8 @@ import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.item.AddressItem;
 import com.example.mobv2.util.MyObservableArrayList;
 
-public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder> implements AbleToAdd<AddressImpl>
+public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.AddressViewHolder>
+        implements AbleToAdd<AddressImpl>
 {
     private final MainActivity mainActivity;
     private final MyObservableArrayList<AddressItem> addressItemList;
@@ -90,8 +91,7 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
     {
         var clickedAddress = getClickedAddressItem();
         clickedAddress.addressItemHelper.setCurrent(false);
-        mainActivity.appDatabase.addressDao()
-                                .update(clickedAddress.addressItemHelper.getAddress());
+        mainActivity.appDatabase.addressDao().update(clickedAddress.addressItemHelper.getAddress());
 
         for (int i = 0; i < addressItemList.size(); i++)
         {
@@ -109,7 +109,10 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Addr
         for (int i = 0; i < addressItemList.size(); i++)
         {
             var addressItem = addressItemList.get(i);
-            if (addressItem.addressItemHelper.isCurrent()) return addressItem;
+            if (addressItem.addressItemHelper.isCurrent())
+            {
+                return addressItem;
+            }
         }
 
         return new AddressItem(mainActivity, this, new AddressImpl());

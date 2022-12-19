@@ -22,7 +22,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
     private final List<ImageItem> imageItemList;
 
     public ImagesAdapter(MainActivity mainActivity,
-                         List<Image> images)
+                         @NonNull List<Image> images)
     {
         this.mainActivity = mainActivity;
         this.imageItemList = new ArrayList<>();

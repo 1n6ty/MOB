@@ -14,6 +14,7 @@ import com.example.mobv2.adapter.AddressesAdapter;
 import com.example.mobv2.databinding.FragmentChangeAddressesBinding;
 import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
+import com.example.mobv2.util.Navigator;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
             @Override
             public void onClick(View view)
             {
-                mainActivity.goToFragment(new MainFragment());
+                Navigator.goToFragment(new MainFragment());
             }
         });
     }

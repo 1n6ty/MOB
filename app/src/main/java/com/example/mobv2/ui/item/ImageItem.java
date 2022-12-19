@@ -12,6 +12,7 @@ import com.example.mobv2.model.Image;
 import com.example.mobv2.ui.abstraction.Item;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.ImageViewerFragment;
+import com.example.mobv2.util.Navigator;
 
 import java.util.List;
 
@@ -41,23 +42,23 @@ public class ImageItem implements Item<ItemImageBinding>
         parentView.setOnClickListener(this::onImageItemClick);
 
         var image = imageItemHelper.image;
-        if (image.getType() == Image.IMAGE_ONLINE)
-        {
-            MainActivity.loadImageInView((String) image.getPath(), parentView,
-                    binding.postImageView);
-        }
-        else if (image.getType() == Image.IMAGE_OFFLINE)
-        {
-            binding.postImageView.setImageURI((Uri) image.getPath());
-        }
+//        if (image.getType() == Image.IMAGE_ONLINE)
+//        {
+//            MainActivity.loadImageInView((String) image.getPath(), parentView,
+//                    binding.postImageView);
+//        }
+//        else if (image.getType() == Image.IMAGE_OFFLINE)
+//        {
+//            binding.postImageView.setImageURI((Uri) image.getPath());
+//        }
     }
 
     private void onImageItemClick(View view)
     {
         var imageViewerFragment = new ImageViewerFragment();
         imageViewerFragment.setImageItemList(imageItemHelper.imageItemList);
-        mainActivity.goToFragmentWithSharedElement(imageViewerFragment, binding.postImageView,
-                mainActivity.getString(R.string.viewer_image_transition));
+        Navigator.goToFragmentWithSharedElement(imageViewerFragment, binding.postImageView,
+                binding.postImageView.getTransitionName());
     }
 
     public class ImageItemHelper

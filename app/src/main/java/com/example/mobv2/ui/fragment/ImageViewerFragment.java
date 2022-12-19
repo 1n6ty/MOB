@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentImageViewerBinding;
@@ -56,7 +55,7 @@ public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding
 
     private void initImageView()
     {
-//        var startImage = imageItemList.get(0).imageItemHelper;
+        var startImage = imageItemList.get(0).imageItemHelper;
 //
 //        if (startImage.getType() == Image.IMAGE_ONLINE)
 //        {

@@ -10,11 +10,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.R;
 import com.example.mobv2.callback.EditUserCallback;
-import com.example.mobv2.callback.abstraction.EditUserOkCallback;
 import com.example.mobv2.databinding.FragmentEditProfileBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
+import com.example.mobv2.util.Navigator;
 
 public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
         implements HavingToolbar
@@ -42,22 +42,21 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
     @Override
     public void initToolbar()
     {
-        binding.toolbar.findViewById(R.id.menu_edit_confirm).setOnClickListener(view ->
+        var toolbar = binding.toolbar;
+        super.initToolbar(toolbar, getString(R.string.edit_profile));
+
+        toolbar.findViewById(R.id.menu_edit_confirm).setOnClickListener(view ->
         {
             var user = mainActivity.appDatabase.userDao().getCurrentOne();
             var callback = new EditUserCallback(mainActivity);
-            callback.setOkCallback(new EditUserOkCallback()
+            callback.setOkCallback(() ->
             {
-                @Override
-                public void editUserInLocalDatabase()
-                {
-                    user.edit()
-                        .setNickname(viewModel.getNickName())
-                        .setPhoneNumber(viewModel.getPhoneNumber())
-                        .setEmail(viewModel.getEmail());
-                    mainActivity.appDatabase.userDao().update(user);
-                    mainActivity.toPreviousFragment();
-                }
+                user.edit()
+                    .setNickname(viewModel.getNickName())
+                    .setPhoneNumber(viewModel.getPhoneNumber())
+                    .setEmail(viewModel.getEmail());
+                mainActivity.appDatabase.userDao().update(user);
+                Navigator.toPreviousFragment();
             });
 
             mainActivity.mobServerAPI.editUser(callback, null, viewModel.getNickName(), null,
@@ -66,7 +65,6 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
                                                                                    : viewModel.getPhoneNumber(),
                     null, MainActivity.token);
         });
-        super.initToolbar(binding.toolbar, getString(R.string.edit_profile));
     }
 
     public void initBody()

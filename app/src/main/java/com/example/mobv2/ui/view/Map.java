@@ -20,15 +20,14 @@ import java.util.List;
 
 public class Map
 {
-    private static final MarkerOptions MARKER_OPTIONS_DEFAULT =
-            new MarkerOptions().position(new LatLng(0, 0));
+    private static final MarkerOptions MARKER_OPTIONS_DEFAULT = new MarkerOptions().position(
+            new LatLng(0, 0));
 
     private final GoogleMap googleMap;
-    private Adapter adapter;
     private final AdapterHelper adapterHelper;
     private final List<MarkerView> markerViews = new ArrayList<>();
-
     private final MapDataObserver observer = new MapDataObserver();
+    private Adapter adapter;
 
     public Map(GoogleMap googleMap)
     {
@@ -64,8 +63,8 @@ public class Map
             {
                 if (itemCount == 1)
                 {
-                    MarkerView markerView =
-                            new MarkerView(googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
+                    MarkerView markerView = new MarkerView(
+                            googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
                     markerViews.add(markerView);
                     adapter.bindMarker(findMarkerView(positionStart), positionStart);
                     return;
@@ -73,8 +72,8 @@ public class Map
 
                 for (int i = positionStart; i < itemCount; i++)
                 {
-                    MarkerView markerView =
-                            new MarkerView(googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
+                    MarkerView markerView = new MarkerView(
+                            googleMap.addMarker(MARKER_OPTIONS_DEFAULT));
                     markerViews.add(markerView);
                     adapter.bindMarker(findMarkerView(i), i);
                 }
@@ -86,8 +85,7 @@ public class Map
             {
                 if (itemCount == 1)
                 {
-                    markerViews.get(positionStart)
-                               .remove();
+                    markerViews.get(positionStart).remove();
                     markerViews.remove(positionStart);
                     return;
                 }
@@ -111,7 +109,9 @@ public class Map
     public void setAdapter(Adapter adapter)
     {
         if (this.adapter != null)
+        {
             this.adapter.unregisterAdapterDataObserver(observer);
+        }
 
         this.adapter = adapter;
         if (adapter != null)
@@ -219,8 +219,7 @@ public class Map
         {
             for (MarkerView markerView : markerViews)
             {
-                if (markerView.getId()
-                              .equals(marker.getId()))
+                if (markerView.getId().equals(marker.getId()))
                 {
                     listener.onMarkerClick(markerView);
                     return true;
@@ -244,8 +243,7 @@ public class Map
             {
                 for (MarkerView markerView : markerViews)
                 {
-                    if (markerView.getId()
-                                  .equals(marker.getId()))
+                    if (markerView.getId().equals(marker.getId()))
                     {
                         listener.onMarkerDragEnd(markerView);
                         return;
@@ -362,8 +360,7 @@ public class Map
         {
             for (int i = mObservers.size() - 1; i >= 0; i--)
             {
-                mObservers.get(i)
-                          .onChanged();
+                mObservers.get(i).onChanged();
             }
         }
 
@@ -372,8 +369,7 @@ public class Map
         {
             for (int i = mObservers.size() - 1; i >= 0; i--)
             {
-                mObservers.get(i)
-                          .onItemRangeChanged(positionStart, itemCount);
+                mObservers.get(i).onItemRangeChanged(positionStart, itemCount);
             }
         }
 
@@ -382,8 +378,7 @@ public class Map
         {
             for (int i = mObservers.size() - 1; i >= 0; i--)
             {
-                mObservers.get(i)
-                          .onItemRangeInserted(positionStart, itemCount);
+                mObservers.get(i).onItemRangeInserted(positionStart, itemCount);
             }
         }
 
@@ -392,8 +387,7 @@ public class Map
         {
             for (int i = mObservers.size() - 1; i >= 0; i--)
             {
-                mObservers.get(i)
-                          .onItemRangeRemoved(positionStart, itemCount);
+                mObservers.get(i).onItemRangeRemoved(positionStart, itemCount);
             }
         }
     }

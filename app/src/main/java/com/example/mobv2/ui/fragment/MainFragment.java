@@ -95,13 +95,14 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
         var toolbar = binding.toolbar;
         super.initToolbar(toolbar, "", view -> navDrawer.open());
 
-        navDrawer = new NavDrawer(mainActivity, binding);
+        navDrawer = new NavDrawer(this, binding.navigationView);
 
         AsyncTask.execute(() ->
         {
             var user = mainActivity.appDatabase.userDao().getCurrentOne();
             var address = mainActivity.appDatabase.addressDao().getCurrentOne();
 
+            viewModel.setAvatarUrl(user.getAvatarUrl());
             viewModel.setFullName(user.getFullName());
             viewModel.setNickName(user.getNickName());
             viewModel.setPhoneNumber(user.getPhoneNumber());
