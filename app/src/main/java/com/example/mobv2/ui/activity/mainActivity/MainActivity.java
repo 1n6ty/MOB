@@ -19,7 +19,6 @@ import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.ui.activity.ThemedActivity;
 import com.example.mobv2.ui.fragment.AuthFragment;
 import com.example.mobv2.ui.fragment.MainFragment;
-import com.example.mobv2.util.Navigator;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.net.MalformedURLException;
@@ -98,10 +97,6 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                           .fallbackToDestructiveMigration()  // it will destroy database and create the new
                           .build();
 
-
-        Navigator.create(this, binding.navContentFrame);
-
-        initAuthFragment();
     }
 
     private void initViewBinding()
@@ -112,28 +107,6 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         setContentView(binding.getRoot());
-    }
-
-    private void initAuthFragment()
-    {
-        Navigator.replaceFragment(new AuthFragment());
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        if (getFragmentAtFrame() instanceof MainFragment)
-        {
-            finish();
-            return;
-        }
-
-        Navigator.toPreviousFragment();
-    }
-
-    public Fragment getFragmentAtFrame()
-    {
-        return getSupportFragmentManager().findFragmentById(binding.navContentFrame.getId());
     }
 
     public SharedPreferences getPrivatePreferences()

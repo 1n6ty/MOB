@@ -22,7 +22,6 @@ import com.example.mobv2.ui.fragment.MainFragment;
 import com.example.mobv2.ui.fragment.MapFeaturesFragment;
 import com.example.mobv2.ui.fragment.NotificationAndSoundFragment;
 import com.example.mobv2.ui.fragment.ProfileFragment;
-import com.example.mobv2.util.Navigator;
 import com.google.android.material.navigation.NavigationView;
 
 public class NavDrawer implements NavigationView.OnNavigationItemSelectedListener

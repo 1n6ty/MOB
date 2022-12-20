@@ -1,18 +1,15 @@
 package com.example.mobv2.ui.item;
 
-import android.net.Uri;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.example.mobv2.R;
 import com.example.mobv2.adapter.ImagesAdapter;
 import com.example.mobv2.databinding.ItemImageBinding;
 import com.example.mobv2.model.Image;
 import com.example.mobv2.ui.abstraction.Item;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.ImageViewerFragment;
-import com.example.mobv2.util.Navigator;
 
 import java.util.List;
 
@@ -57,8 +54,6 @@ public class ImageItem implements Item<ItemImageBinding>
     {
         var imageViewerFragment = new ImageViewerFragment();
         imageViewerFragment.setImageItemList(imageItemHelper.imageItemList);
-        Navigator.goToFragmentWithSharedElement(imageViewerFragment, binding.postImageView,
-                binding.postImageView.getTransitionName());
     }
 
     public class ImageItemHelper

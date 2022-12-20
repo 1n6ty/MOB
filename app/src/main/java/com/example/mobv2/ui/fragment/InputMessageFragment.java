@@ -18,7 +18,6 @@ import com.example.mobv2.databinding.FragmentInputMessageBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.util.MessageViewTextWatcher;
-import com.example.mobv2.util.Navigator;
 
 public class InputMessageFragment extends BaseFragment<FragmentInputMessageBinding>
         implements HavingToolbar

@@ -14,7 +14,6 @@ import com.example.mobv2.databinding.FragmentEditProfileBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
-import com.example.mobv2.util.Navigator;
 
 public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding>
         implements HavingToolbar

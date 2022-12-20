@@ -9,7 +9,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.navigation.Navigation;
 
 import com.example.mobv2.R;
 import com.example.mobv2.callback.AuthCallback;
@@ -20,7 +19,6 @@ import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.Address;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
-import com.example.mobv2.util.Navigator;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 

@@ -32,7 +32,6 @@ import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.CommentsFragment;
 import com.example.mobv2.util.DateString;
 import com.example.mobv2.util.MyObservableArrayList;
-import com.example.mobv2.util.Navigator;
 
 import java.util.ArrayList;
 import java.util.Date;

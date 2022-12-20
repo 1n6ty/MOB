@@ -19,7 +19,6 @@ import com.example.mobv2.model.Image;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.BaseFragment;
-import com.example.mobv2.util.Navigator;
 import com.example.mobv2.util.UriUtils;
 
 import java.io.File;

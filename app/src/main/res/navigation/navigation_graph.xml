@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/fragment_main">
+
+    <fragment
+        android:id="@+id/fragment_auth"
+        tools:layout="@layout/fragment_auth" />
+    <fragment
+        android:id="@+id/fragment_main"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_fragment_main_to_fragment_profile"
+            app:destination="@id/fragment_profile" />
+        <action
+            android:id="@+id/action_fragment_main_to_fragment_language"
+            app:destination="@id/fragment_language" />
+        <action
+            android:id="@+id/action_fragment_main_to_fragment_comments"
+            app:destination="@id/fragment_comments" />
+        <action
+            android:id="@+id/action_fragment_main_to_fragment_map_features"
+            app:destination="@id/fragment_map_features" />
+        <action
+            android:id="@+id/action_fragment_main_to_fragment_notification_and_sound"
+            app:destination="@id/fragment_notification_and_sound" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_fragment_profile_to_fragment_auth"
+            app:destination="@id/fragment_auth" />
+        <action
+            android:id="@+id/action_fragment_profile_to_fragment_edit_profile"
+            app:destination="@id/fragment_edit_profile" />
+        <action
+            android:id="@+id/action_fragment_profile_to_fragment_change_addresses"
+            app:destination="@id/fragment_change_addresses" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
+    <fragment
+        android:id="@+id/fragment_notification_and_sound"
+        tools:layout="@layout/fragment_notification_and_sound" />
+    <fragment
+        android:id="@+id/fragment_map_features"
+        tools:layout="@layout/fragment_map_features" />
+    <fragment
+        android:id="@+id/fragment_language"
+        tools:layout="@layout/fragment_language" />
+    <fragment
+        android:id="@+id/fragment_comments"
+        tools:layout="@layout/fragment_comments">
+        <action
+            android:id="@+id/action_fragment_comments_to_fragment_input_message"
+            app:destination="@id/fragment_input_message" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_change_addresses"
+        tools:layout="@layout/fragment_change_addresses" />
+    <fragment
+        android:id="@+id/fragment_input_message"
+        tools:layout="@layout/fragment_input_message" />
+</navigation>
