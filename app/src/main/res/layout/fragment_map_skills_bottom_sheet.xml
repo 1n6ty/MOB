@@ -2,6 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="bindingContext"
+            type="com.example.mobv2.ui.fragment.markerCreator.MarkerCreatorViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +30,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_marginTop="@dimen/vertical_margin"
-                app:popupTheme="@style/Theme.MOBv2.PopupOverlay" />
+                app:popupTheme="@style/Theme.MOBv2.PopupOverlay"
+                app:subtitle="@{String.valueOf(bindingContext.latLng.latitude) + ' ' + ':' + ' ' + String.valueOf(bindingContext.latLng.longitude)}"
+                app:title="@{bindingContext.secondaryAddressString}" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <LinearLayout

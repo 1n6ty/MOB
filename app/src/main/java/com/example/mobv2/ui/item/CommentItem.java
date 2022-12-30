@@ -208,7 +208,7 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
             inputMessageFragment.setParentId(commentItemHelper.getId());
             inputMessageFragment.setCommentOkCallback(
                     this::createCommentByIdAndTextAndAddToCommentIds);
-            Navigator.goToFragment(inputMessageFragment);
+//            Navigator.goToFragment(inputMessageFragment);
         }
     }
 

@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.mobv2.R;
 import com.example.mobv2.callback.EditUserCallback;
@@ -55,7 +56,8 @@ public class EditProfileFragment extends BaseFragment<FragmentEditProfileBinding
                     .setPhoneNumber(viewModel.getPhoneNumber())
                     .setEmail(viewModel.getEmail());
                 mainActivity.appDatabase.userDao().update(user);
-                Navigator.toPreviousFragment();
+                Navigation.findNavController(requireActivity(), R.id.nav_content_frame)
+                          .popBackStack();
             });
 
             mainActivity.mobServerAPI.editUser(callback, null, viewModel.getNickName(), null,

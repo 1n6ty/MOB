@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.mobv2.R;
@@ -111,6 +112,6 @@ public class MarkerCreatorFragment extends BaseFragment<FragmentMarkerCreatorBin
         mainActivity.mobServerAPI.post(viewModel.createPostCallback, text, title, latLng.latitude,
                 latLng.longitude, files.toArray(new File[0]), MainActivity.token);
 
-        Navigator.toPreviousFragment();
+        Navigation.findNavController(requireActivity(), R.id.nav_content_frame).popBackStack();
     }
 }

@@ -70,19 +70,19 @@ public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implem
         var lastLoginUser = userDao.getLastLoginOne();
         lastLoginUser.setLastLogin(false);
         userDao.update(lastLoginUser);
-        Navigator.replaceFragment(new AuthFragment());
+//        Navigator.replaceFragment(new AuthFragment());
         return true;
     }
 
     private void initSettingsAddressesView()
     {
-        binding.settingsAddressesView.setOnClickListener(
-                view -> Navigator.goToFragment(new ChangeAddressesFragment()));
+//        binding.settingsAddressesView.setOnClickListener(
+//                view -> Navigator.goToFragment(new ChangeAddressesFragment()));
     }
 
     private void initEditProfileFab()
     {
-        binding.editProfileFab.setOnClickListener(
-                view -> Navigator.goToFragment(new EditProfileFragment()));
+//        binding.editProfileFab.setOnClickListener(
+//                view -> Navigator.goToFragment(new EditProfileFragment()));
     }
 }

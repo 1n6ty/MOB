@@ -12,10 +12,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
+import com.example.mobv2.R;
 import com.example.mobv2.databinding.FragmentMapSkillsBottomSheetBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment implements HavingToolbar
@@ -59,12 +60,12 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment impl
     {
         var toolbar = binding.toolbar;
 
-        String secondaryAddressTitle = viewModel.getAddress().getSecondary();
+       /*String secondaryAddressTitle = viewModel.getAddress().getSecondary();
         toolbar.setTitle(secondaryAddressTitle);
 
         LatLng position = viewModel.getAddress().getLatLng();
         String coordinatesSubtitle = position.latitude + " : " + position.longitude;
-        toolbar.setSubtitle(coordinatesSubtitle);
+        toolbar.setSubtitle(coordinatesSubtitle);*/
         toolbar.setOnClickListener(this::onToolbarClick);
     }
 
@@ -86,7 +87,7 @@ public class MapSkillsBottomSheetFragment extends BottomSheetDialogFragment impl
     {
         binding.createSubAddressMarkerButton.setOnClickListener(view ->
         {
-            Navigator.goToFragment(new MarkerCreatorFragment());
+            Navigation.findNavController(requireActivity(), R.id.nav_content_frame).navigate(R.id.action_fragment_map_skills_bottom_sheet_to_fragment_marker_creator);
             dismiss();
         });
     }

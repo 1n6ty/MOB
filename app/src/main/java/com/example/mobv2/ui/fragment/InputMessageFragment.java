@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.Navigation;
 
 import com.example.mobv2.R;
 import com.example.mobv2.callback.CommentCallback;
@@ -92,7 +93,7 @@ public class InputMessageFragment extends BaseFragment<FragmentInputMessageBindi
         commentCallback.setOkCallback((commentId, messageText) ->
         {
             commentOkCallback.createCommentByIdAndTextAndAddToCommentIds(commentId, messageText);
-            Navigator.toPreviousFragment();
+            Navigation.findNavController(requireActivity(), R.id.nav_content_frame).popBackStack();
         });
 
         mainActivity.mobServerAPI.commentComment(commentCallback, messageView.getText().toString(),

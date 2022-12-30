@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.mobv2.R;
 import com.example.mobv2.databinding.NavHeaderMainBinding;
@@ -17,11 +18,7 @@ import com.example.mobv2.model.MenuItemMetadatum;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
-import com.example.mobv2.ui.fragment.LanguageFragment;
 import com.example.mobv2.ui.fragment.MainFragment;
-import com.example.mobv2.ui.fragment.MapFeaturesFragment;
-import com.example.mobv2.ui.fragment.NotificationAndSoundFragment;
-import com.example.mobv2.ui.fragment.ProfileFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class NavDrawer implements NavigationView.OnNavigationItemSelectedListener
@@ -101,7 +98,9 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
 
         addNavigationMenuItem(menu, PROFILE_GROUP, order++, R.string.menu_profile,
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () -> Navigator.goToFragment(new ProfileFragment())),
+                        () -> Navigation.findNavController(fragment.requireActivity(),
+                                                R.id.nav_content_frame)
+                                        .navigate(R.id.action_fragment_main_to_fragment_profile)),
                 R.drawable.ic_menu_profile);
 
         // the next submenu
@@ -111,17 +110,25 @@ public class NavDrawer implements NavigationView.OnNavigationItemSelectedListene
         addNavigationMenuItem(submenuSettings, SETTINGS_GROUP, order++,
                 R.string.menu_notification_and_sound,
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () -> Navigator.goToFragment(new NotificationAndSoundFragment())),
+                        () -> Navigation.findNavController(fragment.requireActivity(),
+                                                R.id.nav_content_frame)
+                                        .navigate(
+                                                R.id.action_fragment_main_to_fragment_notification_and_sound)),
                 R.drawable.ic_menu_notification);
 
         addNavigationMenuItem(submenuSettings, SETTINGS_GROUP, order++, R.string.menu_map_features,
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () -> Navigator.goToFragment(new MapFeaturesFragment())),
+                        () -> Navigation.findNavController(fragment.requireActivity(),
+                                                R.id.nav_content_frame)
+                                        .navigate(
+                                                R.id.action_fragment_main_to_fragment_map_features)),
                 R.drawable.ic_menu_map);
 
         addNavigationMenuItem(submenuSettings, SETTINGS_GROUP, order, R.string.menu_language,
                 new MenuItemMetadatum(MenuItemMetadatum.ITEM_FRAGMENT,
-                        () -> Navigator.goToFragment(new LanguageFragment())),
+                        () -> Navigation.findNavController(fragment.requireActivity(),
+                                                R.id.nav_content_frame)
+                                        .navigate(R.id.action_fragment_main_to_fragment_language)),
                 R.drawable.ic_menu_international);
     }
 

@@ -72,6 +72,11 @@ public abstract class BaseFragment<T extends ViewDataBinding> extends Fragment i
                 getResources().getColor(mainActivity.getAttribute(R.attr.backgroundPrimaryWindow)));
     }
 
+    public static BaseFragment newInstance()
+    {
+        return new ChangeAddressesFragment();
+    }
+
     protected void updateWindow(int visibility,
                                 @ColorInt int color)
     {

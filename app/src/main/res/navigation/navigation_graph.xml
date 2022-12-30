@@ -3,32 +3,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/fragment_main">
+    app:startDestination="@id/fragment_auth">
+
+    <action
+        android:id="@+id/action_fragment_map_skills_bottom_sheet_to_fragment_marker_creator"
+        app:destination="@id/fragment_marker_creator" />
+
+    <fragment
+        android:id="@+id/fragment_marker_creator"
+        android:name="com.example.mobv2.ui.fragment.markerCreator.MarkerCreatorFragment"
+        tools:layout="@layout/fragment_marker_creator" />
 
     <fragment
         android:id="@+id/fragment_auth"
-        tools:layout="@layout/fragment_auth" />
+        android:name="com.example.mobv2.ui.fragment.AuthFragment"
+        tools:layout="@layout/fragment_auth">
+        <action
+            android:id="@+id/action_fragment_auth_to_fragment_main"
+            app:destination="@id/fragment_main" />
+    </fragment>
     <fragment
         android:id="@+id/fragment_main"
+        android:name="com.example.mobv2.ui.fragment.MainFragment"
         tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_fragment_main_to_fragment_profile"
-            app:destination="@id/fragment_profile" />
+            app:destination="@id/fragment_profile"
+            app:launchSingleTop="true" />
         <action
             android:id="@+id/action_fragment_main_to_fragment_language"
-            app:destination="@id/fragment_language" />
+            app:destination="@id/fragment_language"
+            app:launchSingleTop="true" />
         <action
             android:id="@+id/action_fragment_main_to_fragment_comments"
-            app:destination="@id/fragment_comments" />
+            app:destination="@id/fragment_comments"
+            app:launchSingleTop="true" />
         <action
             android:id="@+id/action_fragment_main_to_fragment_map_features"
-            app:destination="@id/fragment_map_features" />
+            app:destination="@id/fragment_map_features"
+            app:launchSingleTop="true" />
         <action
             android:id="@+id/action_fragment_main_to_fragment_notification_and_sound"
-            app:destination="@id/fragment_notification_and_sound" />
+            app:destination="@id/fragment_notification_and_sound"
+            app:launchSingleTop="true" />
     </fragment>
     <fragment
         android:id="@+id/fragment_profile"
+        android:name="com.example.mobv2.ui.fragment.ProfileFragment"
         tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_fragment_profile_to_fragment_auth"
@@ -42,18 +63,23 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_edit_profile"
+        android:name="com.example.mobv2.ui.fragment.EditProfileFragment"
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
         android:id="@+id/fragment_notification_and_sound"
+        android:name="com.example.mobv2.ui.fragment.NotificationAndSoundFragment"
         tools:layout="@layout/fragment_notification_and_sound" />
     <fragment
         android:id="@+id/fragment_map_features"
+        android:name="com.example.mobv2.ui.fragment.MapFeaturesFragment"
         tools:layout="@layout/fragment_map_features" />
     <fragment
         android:id="@+id/fragment_language"
+        android:name="com.example.mobv2.ui.fragment.LanguageFragment"
         tools:layout="@layout/fragment_language" />
     <fragment
         android:id="@+id/fragment_comments"
+        android:name="com.example.mobv2.ui.fragment.CommentsFragment"
         tools:layout="@layout/fragment_comments">
         <action
             android:id="@+id/action_fragment_comments_to_fragment_input_message"
@@ -61,8 +87,10 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_change_addresses"
+        android:name="com.example.mobv2.ui.fragment.ChangeAddressesFragment"
         tools:layout="@layout/fragment_change_addresses" />
     <fragment
         android:id="@+id/fragment_input_message"
+        android:name="com.example.mobv2.ui.fragment.InputMessageFragment"
         tools:layout="@layout/fragment_input_message" />
 </navigation>

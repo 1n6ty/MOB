@@ -22,21 +22,21 @@ class MainActivityViewModel : ObservableViewModel() {
         }
 
     @Bindable
-    var nickName: String = ""
+    var nickName = ""
         set(value) {
             field = value
             notifyPropertyChanged(BR.nickName)
         }
 
     @Bindable
-    var phoneNumber: String = ""
+    var phoneNumber = ""
         set(value) {
             field = value
             notifyPropertyChanged(BR.phoneNumber)
         }
 
     @Bindable
-    var email: String = ""
+    var email = ""
         set(value) {
             field = value
             notifyPropertyChanged(BR.email)

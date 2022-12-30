@@ -9,6 +9,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.Navigation;
 
 import com.example.mobv2.R;
 import com.example.mobv2.callback.AuthCallback;
@@ -182,7 +183,8 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
         });
 
         mainActivity.startRefreshingToken();
-        Navigator.replaceFragment(new MainFragment());
+        Navigation.findNavController(requireActivity(), R.id.nav_content_frame)
+                  .navigate(R.id.action_fragment_auth_to_fragment_main);
     }
 
     @Nullable

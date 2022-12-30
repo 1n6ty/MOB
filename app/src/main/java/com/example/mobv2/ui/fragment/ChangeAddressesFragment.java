@@ -57,7 +57,7 @@ public class ChangeAddressesFragment extends BaseFragment<FragmentChangeAddresse
             @Override
             public void onClick(View view)
             {
-                Navigator.goToFragment(new MainFragment());
+//                Navigator.goToFragment(new MainFragment());
             }
         });
     }

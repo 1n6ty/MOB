@@ -299,7 +299,7 @@ public class PostItem implements Item<ItemPostBinding>
     {
         var commentsFragment = new CommentsFragment();
         commentsFragment.setPostItem(this);
-        Navigator.goToFragment(commentsFragment);
+//        Navigator.goToFragment(commentsFragment);
     }
 
     public View getShowReactionsButton()

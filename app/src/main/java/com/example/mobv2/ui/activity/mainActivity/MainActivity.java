@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.room.Room;
 
 import com.bumptech.glide.Glide;
@@ -97,6 +98,7 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                           .fallbackToDestructiveMigration()  // it will destroy database and create the new
                           .build();
 
+//        Navigation.
     }
 
     private void initViewBinding()

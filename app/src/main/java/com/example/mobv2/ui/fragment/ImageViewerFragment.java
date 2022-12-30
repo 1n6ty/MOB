@@ -24,11 +24,6 @@ public class ImageViewerFragment extends BaseFragment<FragmentImageViewerBinding
         super(R.layout.fragment_image_viewer);
     }
 
-    public static ImageViewerFragment newInstance()
-    {
-        return new ImageViewerFragment();
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
