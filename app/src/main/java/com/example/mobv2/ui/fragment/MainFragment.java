@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,6 +58,16 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     public MainFragment()
     {
         super(R.layout.fragment_main);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        setExitTransition(TransitionInflater.from(mainActivity)
+                                            .inflateTransition(
+                                                    R.transition.shared_image));
     }
 
     @Nullable
@@ -178,7 +189,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
 
             // add other markers
             var callback = new GetMarkersCallback(mainActivity);
-            callback.setOkCallback(this::parseMarkerInfosFromMapAndAddToMarkerInfoList);
+            callback.setOkCallback(this::addMappedMarkerInfoListToMarkerInfoList);
             callback.setFailCallback(
                     this::getMarkerInfosByCurrentAddressIdFromLocalDbAndAddToMarkerInfoList);
 
@@ -188,7 +199,7 @@ public class MainFragment extends BaseFragment<FragmentMainBinding>
     }
 
     @Override
-    public void parseMarkerInfosFromMapAndAddToMarkerInfoList(@NonNull LinkedTreeMap<String, Object> map)
+    public void addMappedMarkerInfoListToMarkerInfoList(@NonNull LinkedTreeMap<String, Object> map)
     {
         for (var postId : map.keySet())
         {

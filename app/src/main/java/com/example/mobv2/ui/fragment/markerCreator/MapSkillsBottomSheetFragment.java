@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mobv2.databinding.FragmentMapSkillsBottomSheetBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
+import com.example.mobv2.util.Navigator;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 

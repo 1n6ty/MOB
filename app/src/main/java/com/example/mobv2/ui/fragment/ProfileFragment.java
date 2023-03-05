@@ -12,6 +12,7 @@ import com.example.mobv2.databinding.FragmentProfileBinding;
 import com.example.mobv2.ui.abstraction.HavingToolbar;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.activity.mainActivity.MainActivityViewModel;
+import com.example.mobv2.util.Navigator;
 
 // TODO rewrite to adapter
 public class ProfileFragment extends BaseFragment<FragmentProfileBinding> implements HavingToolbar

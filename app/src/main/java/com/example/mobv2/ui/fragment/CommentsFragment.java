@@ -133,7 +133,7 @@ public class CommentsFragment extends BaseFragment<FragmentCommentsBinding>
     private void onSendButtonClick(View view)
     {
         var messageText = binding.messageView.getText();
-        CommentCallback callback = new CommentCallback(mainActivity, messageText.toString());
+        var callback = new CommentCallback(mainActivity, messageText.toString());
         callback.setOkCallback(this::createCommentByIdAndTextAndAddToCommentIds);
         mainActivity.mobServerAPI.commentPost(callback, messageText.toString(),
                 postItem.postItemHelper.getId(), MainActivity.token);

@@ -19,6 +19,7 @@ import com.example.mobv2.model.AddressImpl;
 import com.example.mobv2.model.UserImpl;
 import com.example.mobv2.model.abstraction.Address;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
+import com.example.mobv2.util.Navigator;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -126,22 +127,27 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
             edit.apply();
         }
 
-        var user = new UserImpl.UserParser().parseFromMap((Map<String, Object>) map.get("user"));
 
         AsyncTask.execute(() ->
         {
+            var user = new UserImpl.UserParser().parseFromMap(
+                    (Map<String, Object>) map.get("user"));
+
             var userDao = mainActivity.appDatabase.userDao();
             var addressDao = mainActivity.appDatabase.addressDao();
-            var addresses = addressDao.getAll();
 
-            if (!user.compareById(userDao.getLastLoginOne()))
+
+            var lastLogin = userDao.getLastLoginOne();
+            if (!user.compareById(lastLogin))
             {
+                var addresses = addressDao.getAll();
+
                 for (AddressImpl address : addresses)
                 {
                     addressDao.delete(address);
                 }
             }
-            var lastLogin = userDao.getLastLoginOne();
+
             if (lastLogin != null)
             {
                 lastLogin.setLastLogin(false);
@@ -174,7 +180,7 @@ public class AuthFragment extends BaseFragment<FragmentAuthBinding> implements A
                 var currentAddress = addressDao.getCurrentOne();
                 if (address.compareById(currentAddress))
                 {
-                    address.setCurrent(currentAddress.isCurrent());
+                    address.setCurrent(true);
                 }
 
                 addressDao.insert(address);

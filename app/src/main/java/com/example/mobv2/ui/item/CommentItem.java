@@ -29,6 +29,7 @@ import com.example.mobv2.ui.abstraction.Item;
 import com.example.mobv2.ui.activity.mainActivity.MainActivity;
 import com.example.mobv2.ui.fragment.InputMessageFragment;
 import com.example.mobv2.util.DateString;
+import com.example.mobv2.util.Navigator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -218,10 +219,12 @@ public class CommentItem implements Item<ItemCommentBinding>, CommentOkCallback
     {
         var comment = CommentImpl.createNewComment(commentId,
                 mainActivity.appDatabase.userDao().getCurrentOne(), messageText);
-        binding.showCommentsButton.callOnClick();
+
+        mainActivity.appDatabase.commentDao().insert(comment);
         innerCommentsAdapter.addElement(comment);
         commentItemHelper.getCommentIds().add(commentId);
 
+        binding.showCommentsButton.callOnClick();
 //        binding.commentsRecyclerView.scrollTo(binding.commentsRecyclerView.get);
     }
 

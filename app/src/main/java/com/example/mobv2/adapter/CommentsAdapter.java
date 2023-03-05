@@ -45,29 +45,28 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
         this.nestedScrollView = nestedScrollView;
         this.havingCommentsIds = havingCommentsIds;
         this.commentItemList = new MyObservableArrayList<>();
-        commentItemList.setOnListChangedCallback(
-                new MyObservableArrayList.OnListChangedCallback<CommentItem>()
-                {
-                    @Override
-                    public void onAdded(int index,
-                                        CommentItem element)
-                    {
-                        notifyItemInserted(index);
-                    }
+        commentItemList.setOnListChangedCallback(new MyObservableArrayList.OnListChangedCallback<>()
+        {
+            @Override
+            public void onAdded(int index,
+                                CommentItem element)
+            {
+                notifyItemInserted(index);
+            }
 
-                    @Override
-                    public void onRemoved(int index)
-                    {
-                        notifyItemRemoved(index);
-                    }
+            @Override
+            public void onRemoved(int index)
+            {
+                notifyItemRemoved(index);
+            }
 
-                    @Override
-                    public void onRemoved(int index,
-                                          Object o)
-                    {
-                        notifyItemRemoved(index);
-                    }
-                });
+            @Override
+            public void onRemoved(int index,
+                                  Object o)
+            {
+                notifyItemRemoved(index);
+            }
+        });
 
         var commentsIds = havingCommentsIds.getCommentIds();
         for (int i = 0; i < Math.min(commentsIds.size(), MAX_UPLOADED_COMMENTS_COUNT); i++)

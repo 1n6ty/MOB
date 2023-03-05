@@ -18,7 +18,7 @@ import com.example.mobv2.callback.abstraction.RefreshTokenOkCallback;
 import com.example.mobv2.databinding.ActivityMainBinding;
 import com.example.mobv2.ui.activity.ThemedActivity;
 import com.example.mobv2.ui.fragment.AuthFragment;
-import com.example.mobv2.ui.fragment.MainFragment;
+import com.example.mobv2.util.Navigator;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.net.MalformedURLException;
@@ -96,7 +96,8 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                           .allowMainThreadQueries() // it can lock the UI because of threads
                           .fallbackToDestructiveMigration()  // it will destroy database and create the new
                           .build();
-
+        Navigator.create(this, binding.navContentFrame);
+        Navigator.replaceFragment(new AuthFragment());
     }
 
     private void initViewBinding()
@@ -107,6 +108,11 @@ public class MainActivity extends ThemedActivity implements RefreshTokenOkCallba
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         setContentView(binding.getRoot());
+    }
+
+    public Fragment getFragmentAtFrame()
+    {
+        return getSupportFragmentManager().findFragmentById(binding.navContentFrame.getId());
     }
 
     public SharedPreferences getPrivatePreferences()

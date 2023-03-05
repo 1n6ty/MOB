@@ -42,7 +42,6 @@ public class MarkersAdapter extends Map.Adapter
     private final MyObservableArrayList<MarkerInfoItem> markerInfoItemList;
     private final MarkersAdapterHelper markersAdapterHelper;
     private Map map;
-//    private MarkerInfoItem bufferMarkerInfoItem;
 
     public MarkersAdapter(MainActivity mainActivity,
                           MarkersAdapterHelper markersAdapterHelper)
